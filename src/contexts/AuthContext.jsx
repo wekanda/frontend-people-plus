@@ -15,6 +15,18 @@ export function AuthProvider({ children }) {
       return;
     }
 
+    // Try to initialize user from localStorage as a fallback (helps when backend CORS blocks /auth/me)
+    const localUser = localStorage.getItem('user');
+    if (localUser) {
+      try {
+        setUser(JSON.parse(localUser));
+        setToken(tokenFromStorage);
+        setLoadingAuth(false); // mark as loaded since we have localStorage data
+      } catch (e) {
+        // ignore parse errors
+      }
+    }
+
     const restoreUser = async () => {
       try {
         const userRes = await api.get('/auth/me', {
@@ -24,11 +36,13 @@ export function AuthProvider({ children }) {
         setUser(userRes.data);
       } catch (err) {
         console.error('Auth restore failed:', err);
-        localStorage.removeItem('token');
-        setToken(null);
-        setUser(null);
-      } finally {
-        setLoadingAuth(false);
+        // if API call fails and we already set user from localStorage, keep it; otherwise clear
+        if (!localUser) {
+          localStorage.removeItem('token');
+          setToken(null);
+          setUser(null);
+          setLoadingAuth(false);
+        }
       }
     };
 

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import {
   Container, TextField, Button, Card, CardContent, Typography, Box,
-  Grid, Table, TableBody, TableCell, TableHead, TableRow, CircularProgress,
+  Grid, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, CircularProgress,
   Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
+import PageHeader from '../components/PageHeader';
 
 export default function Timesheet() {
+  const navigate = useNavigate();
   const { token, user } = useAuth();
   const [timesheets, setTimesheets] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -38,6 +41,8 @@ export default function Timesheet() {
       setTimesheets(res.data);
     } catch (err) {
       console.error('Error fetching timesheets:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,50 +113,40 @@ export default function Timesheet() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1877f2' }}>
-          ⏱️ Timesheet
-        </Typography>
-        {user?.employee_id && (
+      <PageHeader
+        title="⏱️ Timesheet"
+        subtitle="Each timesheet view has its own menu and actions for a cleaner workflow."
+        primaryAction={user?.employee_id ? (
           <Button variant="contained" onClick={() => setOpenDialog(true)} sx={{ background: '#1877f2' }}>
             Add Entry
           </Button>
-        )}
-      </Box>
+        ) : null}
+        menuItems={[
+          { label: 'Refresh Entries', onClick: user?.employee_id ? fetchTimesheets : fetchAllTimesheets },
+          { label: 'Open Leave', onClick: () => navigate('/leave') },
+          { label: 'Open Staff', onClick: () => navigate('/staff') }
+        ]}
+      />
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {user?.employee_id && (
           <>
-            <Grid item xs={12} sm={4}>
-              <Card sx={{ background: '#1877f2', color: 'white' }}>
-                <CardContent>
-                  <Typography>Total Hours</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                    {summary?.total_hours ?? 0}
+            {[
+              { label: 'Total Hours', value: summary?.total_hours ?? 0 },
+              { label: 'Overtime Hours', value: summary?.total_overtime ?? 0 },
+              { label: 'Days Recorded', value: summary?.days_recorded ?? 0 },
+            ].map((item) => (
+              <Grid item xs={12} sm={4} key={item.label}>
+                <Paper sx={{ minHeight: 150, borderRadius: 3, p: 3, border: '1px solid', borderColor: 'divider', bgcolor: '#f8fbff', boxShadow: 3 }}>
+                  <Typography sx={{ textTransform: 'uppercase', letterSpacing: 0.5, color: 'text.secondary', mb: 1 }}>
+                    {item.label}
                   </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card sx={{ background: '#34a853', color: 'white' }}>
-                <CardContent>
-                  <Typography>Overtime Hours</Typography>
                   <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                    {summary?.total_overtime ?? 0}
+                    {item.value}
                   </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card sx={{ background: '#fbbc04', color: 'white' }}>
-                <CardContent>
-                  <Typography>Days Recorded</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                    {summary?.days_recorded ?? 0}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+                </Paper>
+              </Grid>
+            ))}
           </>
         )}
         {!user?.employee_id && (user?.role === 'hr_admin' || user?.role === 'project_manager') && (
@@ -161,32 +156,40 @@ export default function Timesheet() {
         )}
       </Grid>
 
-      <Card>
-        <CardContent>
-          <Table>
-            <TableHead sx={{ backgroundColor: '#f0f2f5' }}>
+      <Paper sx={{ borderRadius: 3, boxShadow: 3, overflow: 'hidden' }}>
+        <Box sx={{ p: 3, borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            ⏱️ Timesheet Entries
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Review hours recorded with a clean table and clear approval actions.
+          </Typography>
+        </Box>
+        <TableContainer sx={{ maxHeight: 520 }}>
+          <Table sx={{ minWidth: 760 }}>
+            <TableHead sx={{ backgroundColor: '#e8f0fe' }}>
               <TableRow>
-                {!user?.employee_id && <TableCell><strong>Employee ID</strong></TableCell>}
-                <TableCell><strong>Date</strong></TableCell>
-                <TableCell><strong>Hours Worked</strong></TableCell>
-                <TableCell><strong>Overtime</strong></TableCell>
-                <TableCell><strong>Status</strong></TableCell>
-                <TableCell><strong>Action</strong></TableCell>
+                {!user?.employee_id && <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Employee ID</TableCell>}
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Date</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Hours Worked</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Overtime</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {timesheets.map(ts => (
-                <TableRow key={ts.id}>
-                  {!user?.employee_id && <TableCell>{ts.employee_id}</TableCell>}
-                  <TableCell>{ts.date}</TableCell>
-                  <TableCell>{ts.hours_worked}</TableCell>
-                  <TableCell>{ts.overtime_hours}</TableCell>
-                  <TableCell>
-                    <span style={{ color: ts.approved ? '#34a853' : '#fbbc04', fontWeight: 'bold' }}>
+                <TableRow key={ts.id} sx={{ '&:hover': { backgroundColor: '#f5f7ff' } }}>
+                  {!user?.employee_id && <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>{ts.employee_id}</TableCell>}
+                  <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>{ts.date}</TableCell>
+                  <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>{ts.hours_worked}</TableCell>
+                  <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>{ts.overtime_hours}</TableCell>
+                  <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>
+                    <Typography component="span" sx={{ color: ts.approved ? '#34a853' : '#fbbc04', fontWeight: 'bold' }}>
                       {ts.approved ? '✓ Approved' : '⏳ Pending'}
-                    </span>
+                    </Typography>
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>
                     {(!ts.approved && (user.role === 'hr_admin' || user.role === 'project_manager')) ? (
                       <Button variant="contained" color="success" size="small" onClick={() => handleApprove(ts.id)}>
                         Approve
@@ -197,8 +200,22 @@ export default function Timesheet() {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </TableContainer>
+        <Box sx={{ px: 3, py: 2, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 2, borderTop: '1px solid #e5e7eb', bgcolor: '#f8fafc' }}>
+          <Typography variant="caption" sx={{ color: '#475569', lineHeight: 1.4 }}>
+            Showing {timesheets.length} timesheet entries
+          </Typography>
+          {user?.employee_id ? (
+            <Button size="small" variant="contained" sx={{ background: '#111827', color: '#ffffff', textTransform: 'none', px: 2, py: 1, minHeight: 32, fontSize: '0.78rem' }} onClick={() => setOpenDialog(true)}>
+              Add entry
+            </Button>
+          ) : (
+            <Button size="small" variant="contained" sx={{ background: '#111827', color: '#ffffff', textTransform: 'none', px: 2, py: 1, minHeight: 32, fontSize: '0.78rem' }} onClick={fetchAllTimesheets}>
+              Refresh
+            </Button>
+          )}
+        </Box>
+      </Paper>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Add Timesheet Entry</DialogTitle>

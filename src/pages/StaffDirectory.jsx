@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import {
   Container, TextField, Button, Card, CardContent, Typography, Box,
   Grid, Chip, CircularProgress, ButtonGroup, Dialog, DialogTitle,
-  DialogContent, DialogActions, Stack, Alert
+  DialogContent, DialogActions, Stack, Alert, Avatar, Paper
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
+import PageHeader from '../components/PageHeader';
 
 const statusOptions = ['All', 'Active', 'Exited', 'On Recess'];
 
 export default function StaffDirectory() {
+  const navigate = useNavigate();
   const { token, user } = useAuth();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,6 +27,7 @@ export default function StaffDirectory() {
     location: '',
     contact_number: '',
     employment_type: '',
+    photo_url: '',
     contract_end: ''
   });
   const [message, setMessage] = useState('');
@@ -93,72 +97,114 @@ export default function StaffDirectory() {
     }
   };
 
+  const getAvatarUrl = (emp) => {
+    if (emp.photo_url) return emp.photo_url;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.full_name)}&background=1877f2&color=fff&rounded=true`;
+  };
+
   if (loading) return <CircularProgress />;
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold', color: '#1877f2' }}>
-        📁 Staff Directory
-      </Typography>
-
-      <Stack spacing={3} sx={{ mb: 3 }}>
-        {message && <Alert severity="success" onClose={() => setMessage('')}>{message}</Alert>}
-        {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
-      </Stack>
-
-      <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <TextField
-          placeholder="Search by name or file code..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          variant="outlined"
-          size="small"
-          sx={{ flex: 1, minWidth: 250 }}
-        />
-        <ButtonGroup variant="outlined" size="small">
-          {statusOptions.map(s => (
-            <Button
-              key={s}
-              onClick={() => setStatus(s)}
-              variant={status === s ? 'contained' : 'outlined'}
-              sx={{ background: status === s ? '#1877f2' : 'white' }}
-            >
-              {s}
-            </Button>
-          ))}
-        </ButtonGroup>
-        {(user.role === 'hr_admin' || user.role === 'project_manager') && (
+      <PageHeader
+        title="📁 Staff Directory"
+        subtitle="Each employee profile can include a photo and quick actions."
+        primaryAction={(
           <Button variant="contained" sx={{ background: '#1877f2', color: 'white' }} onClick={() => setOpenDialog(true)}>
             Add Employee
           </Button>
         )}
-      </Box>
+        menuItems={[
+          { label: 'Refresh List', onClick: fetchEmployees },
+          { label: 'Import from Excel', onClick: () => navigate('/upload') },
+          { label: 'Clear Filters', onClick: () => { setSearch(''); setStatus('All'); } }
+        ]}
+      />
 
-      <Grid container spacing={2}>
+      <Stack spacing={3} sx={{ mb: 3 }}>
+        {message && <Alert severity="success" onClose={() => setMessage('')} sx={{ borderRadius: 3 }}>{message}</Alert>}
+        {error && <Alert severity="error" onClose={() => setError('')} sx={{ borderRadius: 3 }}>{error}</Alert>}
+      </Stack>
+
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        {[
+          { label: 'Total Staff', value: employees.length },
+          { label: 'Matching Results', value: filteredEmployees.length },
+          { label: 'Active', value: employees.filter((emp) => emp.status === 'Active').length },
+          { label: 'On Recess', value: employees.filter((emp) => emp.status === 'On Recess').length },
+        ].map((card) => (
+          <Grid item xs={12} sm={6} md={3} key={card.label}>
+            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: '#f8fbff' }}>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 0.8, mb: 1 }}>
+                {card.label}
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{card.value}</Typography>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Paper sx={{ p: 3, mb: 3, borderRadius: 3, boxShadow: 3, bgcolor: '#ffffff', border: '1px solid', borderColor: 'divider' }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+          <TextField
+            placeholder="Search by name or file code..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            variant="outlined"
+            size="small"
+            sx={{ flex: 1, minWidth: 250, bgcolor: '#f6f8ff', borderRadius: 2 }}
+          />
+          <ButtonGroup variant="outlined" size="small" sx={{ boxShadow: 'none' }}>
+            {statusOptions.map(s => (
+              <Button
+                key={s}
+                onClick={() => setStatus(s)}
+                variant={status === s ? 'contained' : 'outlined'}
+                sx={{ background: status === s ? '#1877f2' : 'white', color: status === s ? 'white' : 'inherit', textTransform: 'none' }}
+              >
+                {s}
+              </Button>
+            ))}
+          </ButtonGroup>
+          {(user.role === 'hr_admin' || user.role === 'project_manager') && (
+            <Button variant="contained" sx={{ background: '#1877f2', color: 'white', textTransform: 'none' }} onClick={() => setOpenDialog(true)}>
+              Add Employee
+            </Button>
+          )}
+        </Box>
+      </Paper>
+
+      <Grid container spacing={3}>
         {filteredEmployees.map(emp => (
           <Grid item xs={12} sm={6} md={4} key={emp.id}>
-            <Card sx={{ height: '100%', boxShadow: 2, '&:hover': { boxShadow: 4 } }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  {emp.full_name}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                  {emp.file_code}
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Project:</strong> {emp.project || 'N/A'}
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Position:</strong> {emp.position || 'N/A'}
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Contact:</strong> {emp.contact_number || 'N/A'}
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 2 }}>
-                  <strong>Location:</strong> {emp.location || 'N/A'}
-                </Typography>
+            <Card sx={{ height: '100%', borderRadius: 3, boxShadow: 3, border: '1px solid rgba(0,0,0,0.08)', '&:hover': { boxShadow: 6, transform: 'translateY(-2px)' }, transition: 'transform 0.2s ease' }}>
+              <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                      {emp.full_name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {emp.position || 'N/A'} • {emp.file_code}
+                    </Typography>
+                  </Box>
+                  <Avatar src={getAvatarUrl(emp)} alt={emp.full_name} sx={{ width: 64, height: 64, bgcolor: '#1877f2' }} />
+                </Box>
 
-                <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                <Paper sx={{ p: 2, bgcolor: '#eef5ff', borderRadius: 3, mb: 1 }}>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">Project</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>{emp.project || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">Location</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>{emp.location || 'N/A'}</Typography>
+                    </Grid>
+                  </Grid>
+                </Paper>
+
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   <Chip
                     label={emp.status || 'Unknown'}
                     size="small"
@@ -174,16 +220,22 @@ export default function StaffDirectory() {
                   )}
                 </Box>
 
-                {(user.role === 'hr_admin' || user.role === 'project_manager') && (
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    onClick={() => handleDelete(emp.id)}
-                  >
-                    Remove
-                  </Button>
-                )}
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Contact: {emp.contact_number || 'N/A'}
+                  </Typography>
+                  {(user.role === 'hr_admin' || user.role === 'project_manager') && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={() => handleDelete(emp.id)}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </Box>
               </CardContent>
             </Card>
           </Grid>
@@ -239,6 +291,12 @@ export default function StaffDirectory() {
             label="Employment Type"
             value={formData.employment_type}
             onChange={(e) => setFormData({ ...formData, employment_type: e.target.value })}
+            fullWidth
+          />
+          <TextField
+            label="Profile Photo URL"
+            value={formData.photo_url}
+            onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
             fullWidth
           />
           <TextField

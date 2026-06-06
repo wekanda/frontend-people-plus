@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import {
   Container, Card, CardContent, Typography, Box, Grid, Button, CircularProgress,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem,
-  Snackbar, Alert
+  Snackbar, Alert, Paper
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
+import PageHeader from '../components/PageHeader';
 
 export default function PerformanceAppraisal() {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [appraisals, setAppraisals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
+  const selectedEmployee = employees.find((emp) => emp.id === Number(selectedEmployeeId));
   const [formData, setFormData] = useState({
     employee_id: '',
     position: '',
@@ -28,6 +32,11 @@ export default function PerformanceAppraisal() {
     fetchEmployees();
   }, [token]);
 
+  useEffect(() => {
+    if (!token) return;
+    fetchAppraisals(selectedEmployeeId);
+  }, [token, selectedEmployeeId]);
+
   const fetchEmployees = async () => {
     try {
       const res = await api.get('/api/employees/', {
@@ -38,6 +47,25 @@ export default function PerformanceAppraisal() {
     } catch (err) {
       console.error('Error fetching employees:', err);
       setLoading(false);
+    }
+  };
+
+  const fetchAppraisals = async (employeeId) => {
+    try {
+      if (employeeId) {
+        const res = await api.get(`/api/appraisal/employee/${employeeId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setAppraisals(res.data);
+      } else {
+        const res = await api.get('/api/appraisal/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setAppraisals(res.data);
+      }
+    } catch (err) {
+      console.error('Error fetching appraisals:', err);
+      setAppraisals([]);
     }
   };
 
@@ -56,32 +84,43 @@ export default function PerformanceAppraisal() {
     }
   };
 
-  const fetchAppraisals = async (employeeId) => {
-    try {
-      if (!employeeId) return;
-      const res = await api.get(`/api/appraisal/employee/${employeeId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setAppraisals(res.data);
-    } catch (err) {
-      console.error('Error fetching appraisals:', err);
-    }
-  };
-
   if (loading) return <CircularProgress />;
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1877f2' }}>
-          📝 Performance Appraisals
-        </Typography>
-        <Button variant="contained" onClick={() => setOpenDialog(true)} sx={{ background: '#1877f2' }}>
-          Create Appraisal
-        </Button>
-      </Box>
+      <PageHeader
+        title="📝 Performance Appraisals"
+        subtitle="Review and manage appraisal records with an independent action menu."
+        primaryAction={(
+          <Button variant="contained" onClick={() => setOpenDialog(true)} sx={{ background: '#1877f2', color: 'white', textTransform: 'none' }}>
+            Create Appraisal
+          </Button>
+        )}
+        menuItems={[
+          { label: 'Refresh Appraisals', onClick: () => fetchAppraisals(selectedEmployeeId) },
+          { label: 'Select New Employee', onClick: () => setSelectedEmployeeId('') },
+          { label: 'View Employees', onClick: () => navigate('/staff') }
+        ]}
+      />
 
-      <Box sx={{ mb: 3 }}>
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        {[
+          { label: 'Total Appraisals', value: appraisals.length },
+          { label: 'Employee Filter', value: selectedEmployee ? selectedEmployee.full_name : 'All employees' },
+          { label: 'Team Size', value: employees.length },
+        ].map((card) => (
+          <Grid item xs={12} sm={6} md={4} key={card.label}>
+            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: '#f8fbff', boxShadow: 3 }}>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 0.8, mb: 1 }}>
+                {card.label}
+              </Typography>
+              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{card.value}</Typography>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Paper sx={{ p: 3, mb: 3, borderRadius: 3, boxShadow: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
         <TextField
           select
           label="Select Employee"
@@ -91,25 +130,30 @@ export default function PerformanceAppraisal() {
             fetchAppraisals(e.target.value);
           }}
           fullWidth
+          sx={{ bgcolor: '#f8fbff', borderRadius: 2 }}
         >
           <MenuItem value="">All employees</MenuItem>
           {employees.map(emp => (
             <MenuItem key={emp.id} value={emp.id}>{emp.full_name}</MenuItem>
           ))}
         </TextField>
-      </Box>
+      </Paper>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         {appraisals.map(appraisal => (
           <Grid item xs={12} md={6} key={appraisal.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  {appraisal.position}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                  {appraisal.appraisal_date}
-                </Typography>
+            <Card sx={{ borderRadius: 3, boxShadow: 3, border: '1px solid', borderColor: 'divider', '&:hover': { boxShadow: 6, transform: 'translateY(-2px)' }, transition: 'transform 0.2s ease' }}>
+              <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                      {appraisal.position}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {appraisal.appraisal_date}
+                    </Typography>
+                  </Box>
+                </Box>
 
                 <Typography variant="body2" sx={{ mb: 1 }}>
                   <strong>Duration:</strong> {appraisal.duration_in_position || 'N/A'}
@@ -120,7 +164,7 @@ export default function PerformanceAppraisal() {
                 <Typography variant="body2" sx={{ mb: 1 }}>
                   <strong>Challenges:</strong> {appraisal.challenges}
                 </Typography>
-                <Typography variant="body2" sx={{ color: '#555' }}>
+                <Typography variant="body2" color="text.secondary">
                   <strong>Point Outs:</strong> {appraisal.point_outs || 'N/A'}
                 </Typography>
               </CardContent>
@@ -130,7 +174,7 @@ export default function PerformanceAppraisal() {
       </Grid>
 
       {appraisals.length === 0 && (
-        <Typography sx={{ mt: 4, textAlign: 'center', color: '#999' }}>
+        <Typography sx={{ mt: 4, textAlign: 'center', color: 'text.secondary' }}>
           No appraisals found for this employee.
         </Typography>
       )}

@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useAuth } from '../contexts/AuthContext';
 import {
   Container, Card, CardContent, Typography, Box, Button, TextField,
   Grid, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions,
-  Table, TableBody, TableCell, TableHead, TableRow, Chip, Snackbar,
+  Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, Chip, Snackbar,
   Alert
 } from '@mui/material';
+import PageHeader from '../components/PageHeader';
 
 export default function LeaveManagement() {
+  const navigate = useNavigate();
   const { token, user } = useAuth();
   const [balance, setBalance] = useState({ remaining: 0, used: 0, total_allowed: 0 });
   const [leaves, setLeaves] = useState([]);
@@ -94,92 +97,92 @@ export default function LeaveManagement() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold', color: '#1877f2' }}>
-        🏖️ Leave Management
-      </Typography>
+      <PageHeader
+        title="🏖️ Leave Management"
+        subtitle="Manage leave requests with a dedicated menu for actions and approvals."
+        primaryAction={(
+          <Button variant="contained" onClick={() => setOpenDialog(true)} sx={{ background: '#1877f2' }}>
+            Request Leave
+          </Button>
+        )}
+        menuItems={[
+          { label: 'Refresh Data', onClick: fetchLeaves },
+          { label: 'Go to Staff Directory', onClick: () => navigate('/staff') },
+          { label: 'Open Timesheet', onClick: () => navigate('/timesheet') }
+        ]}
+      />
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ background: 'linear-gradient(135deg, #fbbc04 0%, #f57c00 100%)', color: 'white' }}>
-            <CardContent>
-              <Typography color="inherit" gutterBottom>Total Allowed</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                {balance.total_allowed}
+        {[
+          { label: 'Total Allowed', value: balance.total_allowed },
+          { label: 'Used Days', value: balance.used },
+          { label: 'Remaining Days', value: balance.remaining },
+        ].map((item) => (
+          <Grid item xs={12} sm={6} md={3} key={item.label}>
+            <Paper sx={{ p: 3, minHeight: 150, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 0.6, mb: 1 }}>
+                {item.label}
               </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                {item.value}
+              </Typography>
+            </Paper>
+          </Grid>
+        ))}
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ background: 'linear-gradient(135deg, #ea4335 0%, #c5221f 100%)', color: 'white' }}>
-            <CardContent>
-              <Typography color="inherit" gutterBottom>Used Days</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                {balance.used}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ background: 'linear-gradient(135deg, #34a853 0%, #1e8449 100%)', color: 'white' }}>
-            <CardContent>
-              <Typography color="inherit" gutterBottom>Remaining Days</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                {balance.remaining}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Box sx={{ pt: 1 }}>
+          <Paper sx={{ p: 3, minHeight: 150, borderRadius: 3, display: 'flex', alignItems: 'center', border: '1px solid', borderColor: 'divider' }}>
             <Button
               variant="contained"
               fullWidth
               onClick={() => setOpenDialog(true)}
-              sx={{ background: '#1877f2', height: '100%', fontSize: '16px', fontWeight: 'bold' }}
+              sx={{ background: '#1877f2', height: '100%', fontSize: '16px', fontWeight: 'bold', textTransform: 'none' }}
             >
               Request Leave
             </Button>
-          </Box>
+          </Paper>
         </Grid>
       </Grid>
 
-      <Card>
-        <CardContent>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+      <Paper sx={{ borderRadius: 3, boxShadow: 3, overflow: 'hidden' }}>
+        <Box sx={{ p: 3, borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
             📅 Leave Requests
           </Typography>
-          <Table>
-            <TableHead sx={{ backgroundColor: '#f0f2f5' }}>
+          <Typography variant="body2" color="text.secondary">
+            Review leave activity with clean row spacing and actions.
+          </Typography>
+        </Box>
+        <TableContainer sx={{ maxHeight: 520 }}>
+          <Table sx={{ minWidth: 760 }}>
+            <TableHead sx={{ backgroundColor: '#e8f0fe' }}>
               <TableRow>
-                <TableCell><strong>Employee</strong></TableCell>
-                <TableCell><strong>Start</strong></TableCell>
-                <TableCell><strong>End</strong></TableCell>
-                <TableCell><strong>Days</strong></TableCell>
-                <TableCell><strong>Type</strong></TableCell>
-                <TableCell><strong>Status</strong></TableCell>
-                <TableCell><strong>Action</strong></TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Employee</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Start</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>End</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Days</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Type</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2.5 }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {leaves.length > 0 ? (
                 leaves.map((leave) => (
-                  <TableRow key={leave.id}>
-                    <TableCell>{leave.employee_id}</TableCell>
-                    <TableCell>{leave.start_date}</TableCell>
-                    <TableCell>{leave.end_date}</TableCell>
-                    <TableCell>{leave.days}</TableCell>
-                    <TableCell>{leave.type}</TableCell>
-                    <TableCell>
+                  <TableRow key={leave.id} sx={{ '&:hover': { backgroundColor: '#f5f7ff' } }}>
+                    <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>{leave.employee_id}</TableCell>
+                    <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>{leave.start_date}</TableCell>
+                    <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>{leave.end_date}</TableCell>
+                    <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>{leave.days}</TableCell>
+                    <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>{leave.type}</TableCell>
+                    <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>
                       <Chip
                         label={leave.status}
                         color={leave.status === 'Approved' ? 'success' : leave.status === 'Rejected' ? 'error' : 'warning'}
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell sx={{ py: 2.5, borderBottomColor: 'divider' }}>
                       {leave.status === 'Pending' && (user.role === 'hr_admin' || user.role === 'project_manager') ? (
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                           <Button size="small" variant="contained" color="success" onClick={() => handleAction(leave.id, 'approve')}>
@@ -197,13 +200,23 @@ export default function LeaveManagement() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} align="center">No leave requests yet</TableCell>
+                  <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                    No leave requests yet
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </TableContainer>
+        <Box sx={{ px: 3, py: 2, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 2, borderTop: '1px solid #e5e7eb', bgcolor: '#f8fafc' }}>
+          <Typography variant="caption" sx={{ color: '#475569', lineHeight: 1.4 }}>
+            Showing {leaves.length} leave requests
+          </Typography>
+          <Button size="small" variant="contained" sx={{ background: '#111827', color: '#ffffff', textTransform: 'none', px: 2, py: 1, minHeight: 32, fontSize: '0.78rem' }} onClick={() => setOpenDialog(true)}>
+            New request
+          </Button>
+        </Box>
+      </Paper>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Request Leave</DialogTitle>

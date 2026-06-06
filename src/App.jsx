@@ -1,16 +1,20 @@
 import React, { useState, createContext, useContext } from 'react';
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { AppBar, Toolbar, Button, Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import Dashboard from './pages/Dashboard';
 import StaffDirectory from './pages/StaffDirectory';
 import LeaveManagement from './pages/LeaveManagement';
 import Timesheet from './pages/Timesheet';
 import PerformanceAppraisal from './pages/PerformanceAppraisal';
 import Upload from './pages/Upload';
+import Notifications from './pages/Notifications';
+import IndependentSheet from './pages/IndependentSheet';
 import Login from './pages/Login';
+import DashboardLayout from './components/DashboardLayout';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
@@ -20,10 +24,46 @@ function AppContent() {
     toggleColorMode: () => setMode(prev => prev === 'light' ? 'dark' : 'light'),
   };
   const theme = createTheme({
+    shape: { borderRadius: 14 },
     palette: {
       mode,
       primary: { main: '#1877f2' },
-      background: { default: mode === 'light' ? '#f0f2f5' : '#121212' },
+      background: { default: mode === 'light' ? '#f4f6f8' : '#121212', paper: mode === 'light' ? '#ffffff' : '#1d1d1d' },
+      text: { primary: mode === 'light' ? '#111827' : '#f9fafb', secondary: mode === 'light' ? '#6b7280' : '#cbd5e1' },
+      divider: mode === 'light' ? '#e5e7eb' : '#374151',
+    },
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          body: {
+            backgroundColor: mode === 'light' ? '#f4f6f8' : '#121212',
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundColor: mode === 'light' ? '#ffffff' : '#1e293b',
+            boxShadow: mode === 'light' ? '0px 8px 24px rgba(15, 23, 42, 0.06)' : '0px 8px 24px rgba(0, 0, 0, 0.35)',
+            border: `1px solid ${mode === 'light' ? '#e5e7eb' : '#334155'}`,
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            textTransform: 'none',
+            borderRadius: 10,
+          },
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            borderBottom: `1px solid ${mode === 'light' ? '#e5e7eb' : '#334155'}`,
+          },
+        },
+      },
     },
   });
 
@@ -34,36 +74,19 @@ function AppContent() {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <AppBar position="static" color="primary" enableColorOnDark>
-          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              <Button component={NavLink} to="/" sx={{ color: 'white' }}>Dashboard</Button>
-              <Button component={NavLink} to="/staff" sx={{ color: 'white' }}>Staff</Button>
-              <Button component={NavLink} to="/leave" sx={{ color: 'white' }}>Leave</Button>
-              <Button component={NavLink} to="/timesheet" sx={{ color: 'white' }}>Timesheet</Button>
-              <Button component={NavLink} to="/appraisals" sx={{ color: 'white' }}>Appraisals</Button>
-              <Button component={NavLink} to="/upload" sx={{ color: 'white' }}>Upload</Button>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
-              <Typography sx={{ color: 'white', mr: 2 }}>{user.full_name} ({user.role})</Typography>
-              <Button variant="outlined" size="small" onClick={colorMode.toggleColorMode} sx={{ color: 'white', borderColor: 'white' }}>
-                {mode === 'light' ? 'Dark Mode' : 'Light Mode'}
-              </Button>
-              <Button variant="contained" size="small" onClick={logout} sx={{ background: '#ffffff', color: '#1877f2' }}>
-                Logout
-              </Button>
-            </Box>
-          </Toolbar>
-        </AppBar>
 
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ minHeight: '100vh' }}>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/staff" element={<StaffDirectory />} />
-            <Route path="/leave" element={<LeaveManagement />} />
-            <Route path="/timesheet" element={<Timesheet />} />
-            <Route path="/appraisals" element={<PerformanceAppraisal />} />
-            <Route path="/upload" element={<Upload />} />
+            <Route path="/" element={<DashboardLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="staff" element={<StaffDirectory />} />
+              <Route path="leave" element={<LeaveManagement />} />
+              <Route path="timesheet" element={<Timesheet />} />
+              <Route path="appraisals" element={<PerformanceAppraisal />} />
+              <Route path="sheet" element={<IndependentSheet />} />
+              <Route path="notifications" element={<Notifications />} />
+              <Route path="upload" element={<Upload />} />
+            </Route>
           </Routes>
         </Box>
       </ThemeProvider>
@@ -75,7 +98,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppContent />
+        <NotificationProvider>
+          <AppContent />
+        </NotificationProvider>
       </AuthProvider>
     </BrowserRouter>
   );
