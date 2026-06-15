@@ -13,6 +13,26 @@ import Notifications from './pages/Notifications';
 import IndependentSheet from './pages/IndependentSheet';
 import Login from './pages/Login';
 import DashboardLayout from './components/DashboardLayout';
+import Recruitment from './pages/Recruitment';
+import Internship from './pages/Internship';
+import Payslip from './pages/Payslip';
+import Finance from './pages/Finance';
+import JobAdmin from './pages/JobAdmin';
+import Applicants from './pages/Applicants';
+import ApplicantDetail from './pages/ApplicantDetail';
+import Pipeline from './pages/Pipeline';
+import HRTools from './pages/HRTools';
+import TalentPool from './pages/TalentPool';
+import Referrals from './pages/Referrals';
+import Assessments from './pages/Assessments';
+import OfferManagement from './pages/OfferManagement';
+import BackgroundChecks from './pages/BackgroundChecks';
+import Compliance from './pages/Compliance';
+import Reporting from './pages/Reporting';
+import Onboarding from './pages/Onboarding';
+import ContractGeneration from './pages/ContractGeneration';
+import InterviewScheduling from './pages/InterviewScheduling';
+import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 
@@ -79,13 +99,33 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
-              <Route path="staff" element={<StaffDirectory />} />
-              <Route path="leave" element={<LeaveManagement />} />
-              <Route path="timesheet" element={<Timesheet />} />
-              <Route path="appraisals" element={<PerformanceAppraisal />} />
-              <Route path="sheet" element={<IndependentSheet />} />
-              <Route path="notifications" element={<Notifications />} />
-              <Route path="upload" element={<Upload />} />
+              {/* Removed duplicate 'My Dashboard' route; single Dashboard at '/' */}
+              <Route path="staff" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><StaffDirectory /></ProtectedRoute>} />
+              <Route path="recruitment" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Recruitment /></ProtectedRoute>} />
+              <Route path="recruitment-admin" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><JobAdmin /></ProtectedRoute>} />
+              <Route path="applicants" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Applicants /></ProtectedRoute>} />
+              <Route path="applicant/:id" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><ApplicantDetail /></ProtectedRoute>} />
+              <Route path="pipeline" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Pipeline /></ProtectedRoute>} />
+              <Route path="hr-tools" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><HRTools /></ProtectedRoute>} />
+              <Route path="talent-pool" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><TalentPool /></ProtectedRoute>} />
+              <Route path="referrals" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Referrals /></ProtectedRoute>} />
+              <Route path="assessments" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Assessments /></ProtectedRoute>} />
+              <Route path="offers" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><OfferManagement /></ProtectedRoute>} />
+              <Route path="background-checks" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><BackgroundChecks /></ProtectedRoute>} />
+              <Route path="compliance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Compliance /></ProtectedRoute>} />
+              <Route path="reporting" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Reporting /></ProtectedRoute>} />
+              <Route path="onboarding" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Onboarding /></ProtectedRoute>} />
+              <Route path="contracts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><ContractGeneration /></ProtectedRoute>} />
+              <Route path="interviews" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><InterviewScheduling /></ProtectedRoute>} />
+              <Route path="internships" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Internship /></ProtectedRoute>} />
+              <Route path="finance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance']}><Finance /></ProtectedRoute>} />
+              <Route path="payslips" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Payslip /></ProtectedRoute>} />
+              <Route path="leave" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><LeaveManagement /></ProtectedRoute>} />
+              <Route path="timesheet" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><Timesheet /></ProtectedRoute>} />
+              <Route path="appraisals" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><PerformanceAppraisal /></ProtectedRoute>} />
+              <Route path="sheet" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><IndependentSheet /></ProtectedRoute>} />
+              <Route path="notifications" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Notifications /></ProtectedRoute>} />
+              <Route path="upload" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Upload /></ProtectedRoute>} />
             </Route>
           </Routes>
         </Box>

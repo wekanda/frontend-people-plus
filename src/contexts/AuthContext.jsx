@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
       try {
         setUser(JSON.parse(localUser));
         setToken(tokenFromStorage);
-        setLoadingAuth(false); // mark as loaded since we have localStorage data
+        setLoadingAuth(false); // render quickly using cached auth until restore completes
       } catch (e) {
         // ignore parse errors
       }
@@ -34,15 +34,17 @@ export function AuthProvider({ children }) {
         });
         setToken(tokenFromStorage);
         setUser(userRes.data);
+        localStorage.setItem('user', JSON.stringify(userRes.data));
       } catch (err) {
         console.error('Auth restore failed:', err);
-        // if API call fails and we already set user from localStorage, keep it; otherwise clear
         if (!localUser) {
           localStorage.removeItem('token');
+          localStorage.removeItem('user');
           setToken(null);
           setUser(null);
-          setLoadingAuth(false);
         }
+      } finally {
+        setLoadingAuth(false);
       }
     };
 
@@ -51,18 +53,23 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const formData = new URLSearchParams();
-      formData.append('username', email);
-      formData.append('password', password);
-      const res = await api.post('/auth/token', formData, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      const params = new URLSearchParams();
+      params.append('username', email);
+      params.append('password', password);
+      
+      const res = await api.post('/auth/token', params.toString(), {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        transformRequest: [(data, headers) => data]
       });
+      
       localStorage.setItem('token', res.data.access_token);
       setToken(res.data.access_token);
+      
       const userRes = await api.get('/auth/me', {
         headers: { Authorization: `Bearer ${res.data.access_token}` }
       });
       setUser(userRes.data);
+      localStorage.setItem('user', JSON.stringify(userRes.data));
     } catch (err) {
       console.error(err);
       alert('Login failed: ' + (err.response?.data?.detail || err.message));
@@ -71,6 +78,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setToken(null);
     setUser(null);
   };

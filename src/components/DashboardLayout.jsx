@@ -5,14 +5,30 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 
 const navItems = [
-  { label: '📊 Dashboard', path: '/' },
-  { label: '👥 Staff Directory', path: '/staff' },
-  { label: '🏖️ Leave Management', path: '/leave' },
-  { label: '⏱️ Timesheet', path: '/timesheet' },
-  { label: '⭐ Appraisals', path: '/appraisals' },
-  { label: '📋 Independent Sheet', path: '/sheet' },
-  { label: '🔔 Notifications', path: '/notifications' },
-  { label: '📥 Excel Import', path: '/upload' },
+  { label: '📊 Dashboard', path: '/', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+  { label: '🧾 Payslips', path: '/payslips', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+  { label: '💼 Recruitment', path: '/recruitment', roles: ['hr_admin', 'project_manager'] },
+  { label: '🧾 Job Admin', path: '/recruitment-admin', roles: ['hr_admin', 'project_manager'] },
+  { label: '👤 Applicants', path: '/applicants', roles: ['hr_admin', 'project_manager'] },
+  { label: '📈 Pipeline', path: '/pipeline', roles: ['hr_admin', 'project_manager'] },
+  { label: '🧰 HR Tools', path: '/hr-tools', roles: ['hr_admin', 'project_manager'] },
+  { label: '🎯 Assessments', path: '/assessments', roles: ['hr_admin', 'project_manager'] },
+  { label: '📄 Offer Management', path: '/offers', roles: ['hr_admin', 'project_manager'] },
+  { label: '🔍 Background Checks', path: '/background-checks', roles: ['hr_admin', 'project_manager'] },
+  { label: '🔐 Compliance', path: '/compliance', roles: ['hr_admin', 'project_manager'] },
+  { label: '📊 Analytics', path: '/reporting', roles: ['hr_admin', 'project_manager'] },
+  { label: '🚀 Onboarding', path: '/onboarding', roles: ['hr_admin', 'project_manager'] },
+  { label: '📝 Contracts', path: '/contracts', roles: ['hr_admin', 'project_manager'] },
+  { label: '� Interviews', path: '/interviews', roles: ['hr_admin', 'project_manager'] },
+  { label: '�🎓 Internships', path: '/internships', roles: ['hr_admin', 'project_manager'] },
+  { label: '👥 Staff Directory', path: '/staff', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+  { label: '💰 Finance', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance'] },
+  { label: '🏖️ Leave Management', path: '/leave', roles: ['hr_admin', 'project_manager', 'staff'] },
+  { label: '⏱️ Timesheet', path: '/timesheet', roles: ['hr_admin', 'project_manager', 'staff'] },
+  { label: '⭐ Appraisals', path: '/appraisals', roles: ['hr_admin', 'project_manager', 'staff'] },
+  { label: '📋 Independent Sheet', path: '/sheet', roles: ['hr_admin', 'project_manager', 'staff'] },
+  { label: '🔔 Notifications', path: '/notifications', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+  { label: '📥 Excel Import', path: '/upload', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
 ];
 
 export default function DashboardLayout() {
@@ -68,50 +84,52 @@ export default function DashboardLayout() {
 
         <Box sx={{ p: 2, borderRadius: 3, bgcolor: '#1e40af', border: '1px solid rgba(255,255,255,0.12)' }}>
           <List disablePadding>
-            {navItems.map((item) => (
-              <ListItemButton
-                key={item.path}
-                component={NavLink}
-                to={item.path}
-                end={item.path === '/'}
-                sx={{
-                  color: '#f8fafc',
-                  borderRadius: 2,
-                  mb: 0.5,
-                  py: 1.5,
-                  px: 2,
-                  '&.active': {
-                    bgcolor: '#2563eb',
-                    color: '#ffffff',
-                    fontWeight: 700,
-                  },
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.08)',
-                  },
-                }}
-              >
-                <ListItemText
-                  primary={
-                    item.path === '/notifications' ? (
-                      <Badge
-                        badgeContent={unreadCount}
-                        color="secondary"
-                        showZero={false}
-                        max={99}
-                        sx={{ '& .MuiBadge-badge': { right: -18, top: 8 } }}
-                      >
-                        <Typography sx={{ fontSize: 14, fontWeight: 500, color: 'inherit' }}>
-                          {item.label}
-                        </Typography>
-                      </Badge>
-                    ) : (
-                      item.label
-                    )
-                  }
-                  primaryTypographyProps={{ fontSize: 14, fontWeight: 500, color: 'inherit' }}
-                />
-              </ListItemButton>
-            ))}
+            {navItems
+              .filter((item) => !item.roles || item.roles.includes(user?.role))
+              .map((item) => (
+                <ListItemButton
+                  key={item.path}
+                  component={NavLink}
+                  to={item.path}
+                  end={item.path === '/'}
+                  sx={{
+                    color: '#f8fafc',
+                    borderRadius: 2,
+                    mb: 0.5,
+                    py: 1.5,
+                    px: 2,
+                    '&.active': {
+                      bgcolor: '#2563eb',
+                      color: '#ffffff',
+                      fontWeight: 700,
+                    },
+                    '&:hover': {
+                      bgcolor: 'rgba(255,255,255,0.08)',
+                    },
+                  }}
+                >
+                  <ListItemText
+                    primary={
+                      item.path === '/notifications' ? (
+                        <Badge
+                          badgeContent={unreadCount}
+                          color="secondary"
+                          showZero={false}
+                          max={99}
+                          sx={{ '& .MuiBadge-badge': { right: -18, top: 8 } }}
+                        >
+                          <Typography sx={{ fontSize: 14, fontWeight: 500, color: 'inherit' }}>
+                            {item.label}
+                          </Typography>
+                        </Badge>
+                      ) : (
+                        item.label
+                      )
+                    }
+                    primaryTypographyProps={{ fontSize: 14, fontWeight: 500, color: 'inherit' }}
+                  />
+                </ListItemButton>
+              ))}
           </List>
         </Box>
 
