@@ -53,26 +53,26 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const params = new URLSearchParams();
-      params.append('username', email);
-      params.append('password', password);
-      
-      const res = await api.post('/auth/token', params.toString(), {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        transformRequest: [(data, headers) => data]
+      const params = new URLSearchParams({
+        username: email,
+        password,
       });
-      
+
+      const res = await api.post('/auth/token', params, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
+
       localStorage.setItem('token', res.data.access_token);
       setToken(res.data.access_token);
-      
+
       const userRes = await api.get('/auth/me', {
-        headers: { Authorization: `Bearer ${res.data.access_token}` }
+        headers: { Authorization: `Bearer ${res.data.access_token}` },
       });
       setUser(userRes.data);
       localStorage.setItem('user', JSON.stringify(userRes.data));
     } catch (err) {
-      console.error(err);
-      alert('Login failed: ' + (err.response?.data?.detail || err.message));
+      console.error('Login failed:', err);
+      throw err;
     }
   };
 
