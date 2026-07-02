@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { Box, CircularProgress } from '@mui/material';
 import api from '../api';
 
 const AuthContext = createContext();
@@ -82,7 +83,11 @@ export function AuthProvider({ children }) {
   };
 
   if (loadingAuth) {
-    return null;
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return <AuthContext.Provider value={{ user, token, loading: loadingAuth, login, logout }}>{children}</AuthContext.Provider>;
