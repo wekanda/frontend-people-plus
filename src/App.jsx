@@ -59,7 +59,14 @@ function AppContent() {
         <Box sx={{ minHeight: '100vh' }}>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<DashboardLayout />}>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay']}>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route index element={<Dashboard />} />
               {/* Removed duplicate 'My Dashboard' route; single Dashboard at '/' */}
               <Route path="staff" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><StaffDirectory /></ProtectedRoute>} />

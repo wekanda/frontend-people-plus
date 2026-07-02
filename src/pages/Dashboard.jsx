@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -20,8 +21,11 @@ export default function Dashboard() {
           headers: { Authorization: `Bearer ${token}` },
         });
         setDashboardData(res.data);
+        setError('');
       } catch (err) {
         console.error('Dashboard error:', err);
+        const message = err?.response?.data?.detail || err?.message || 'Unable to load dashboard data.';
+        setError(`Dashboard failed: ${message}`);
       }
     };
 
@@ -54,7 +58,21 @@ export default function Dashboard() {
   }, [dashboardData, search]);
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}><CircularProgress /></Box>;
-  if (!dashboardData) return <Typography>Failed to load dashboard</Typography>;
+  if (!dashboardData) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper sx={{ p: 4, borderRadius: 3, boxShadow: 3 }}>
+          <Typography variant="h5" sx={{ mb: 2, fontWeight: 700 }}>Failed to load dashboard</Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+            {error || 'Please refresh the page or check your network connection.'}
+          </Typography>
+          <Button variant="contained" onClick={() => window.location.reload()} sx={{ textTransform: 'none' }}>
+            Retry
+          </Button>
+        </Paper>
+      </Container>
+    );
+  }
 
   const topCards = [
     { label: 'Total Staff', value: dashboardData.total_staff, borderColor: '#d1d5db' },
