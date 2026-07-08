@@ -1,17 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, TextField, Paper, Typography, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, user, token } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (user && token) {
+      navigate('/', { replace: true });
+    }
+  }, [user, token, navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     try {
       await login(email, password);
+      navigate('/', { replace: true });
     } catch (err) {
       setError('Login failed. Please check your credentials and try again.');
     }
