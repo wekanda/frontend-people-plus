@@ -30,6 +30,7 @@ export default function EmployeeProfile() {
   
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profileError, setProfileError] = useState('');
   const [editing, setEditing] = useState(false);
   const [tabValue, setTabValue] = useState(0);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
@@ -82,6 +83,7 @@ export default function EmployeeProfile() {
         });
       } catch (error) {
         console.error('Error fetching profile:', error);
+        setProfileError(error.response?.data?.detail || error.message || 'Unknown error');
         // If not found, try fallback by searching employee by personal_email
         try {
           if (error.response?.status === 404 && user?.email) {
@@ -193,7 +195,7 @@ export default function EmployeeProfile() {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="warning">
-          Unable to load your employee profile. Please contact HR.
+          Unable to load your employee profile. {profileError ? `Details: ${profileError}` : 'Please contact HR.'}
         </Alert>
       </Container>
     );

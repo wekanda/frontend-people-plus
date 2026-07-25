@@ -191,7 +191,7 @@ export default function Timesheet() {
 
         <Box sx={{ overflowX: 'auto' }}>
           <TableContainer>
-            <Table size={{ xs: 'small', md: 'medium' }}>
+            <Table size="small">
               <TableHead sx={{ backgroundColor: 'primary.main', '& th': { color: 'white', fontWeight: 700 } }}>
                 <TableRow>
                   {!user?.employee_id && <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Employee</TableCell>}
