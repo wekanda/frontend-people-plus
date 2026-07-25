@@ -37,6 +37,17 @@ export default function EmployeeProfile() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoPreview, setPhotoPreview] = useState(null);
 
+  const getErrorMessage = (error) => {
+    if (typeof error === 'string') return error;
+    if (error?.response?.data?.detail) {
+      const detail = error.response.data.detail;
+      if (typeof detail === 'string') return detail;
+      if (typeof detail === 'object') return JSON.stringify(detail);
+    }
+    if (error?.message) return error.message;
+    return 'Unknown error';
+  };
+
   const [formData, setFormData] = useState({
     full_name: '',
     position: '',
@@ -83,7 +94,8 @@ export default function EmployeeProfile() {
         });
       } catch (error) {
         console.error('Error fetching profile:', error);
-        setProfileError(error.response?.data?.detail || error.message || 'Unknown error');
+        const message = getErrorMessage(error);
+        setProfileError(message);
         // If not found, try fallback by searching employee by personal_email
         try {
           if (error.response?.status === 404 && user?.email) {
@@ -116,7 +128,7 @@ export default function EmployeeProfile() {
         } catch (e) {
           console.error('Fallback fetch by personal_email failed:', e);
         }
-        notify('Failed to load profile', 'error');
+        notify(`Failed to load profile: ${message}`, 'error');
       } finally {
         setLoading(false);
       }
