@@ -36,7 +36,7 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import { DownloadIcon, CheckCircle, Clock, X as XIcon } from 'lucide-react';
+import { Download, CheckCircle, Clock, X as XIcon } from 'lucide-react';
 import api from '../api';
 import PageHeader from '../components/PageHeader';
 
@@ -58,6 +58,18 @@ export default function DocumentManagement() {
     fetchEmployees();
   }, []);
 
+  useEffect(() => {
+    if (selectedEmployee) {
+      fetchEmployeeDocuments(selectedEmployee);
+    }
+  }, [selectedEmployee]);
+
+  useEffect(() => {
+    if (selectedEmployee) {
+      fetchEmployeeDocuments(selectedEmployee);
+    }
+  }, [selectedEmployee]);
+
   const fetchDocumentTypes = async () => {
     try {
       const response = await api.get('/api/documents/types');
@@ -70,13 +82,14 @@ export default function DocumentManagement() {
 
   const fetchEmployees = async () => {
     try {
-      const response = await api.get('/api/employees');
+      const response = await api.get('/api/employees/');
       setEmployees(response.data);
       if (response.data.length > 0) {
         setSelectedEmployee(response.data[0].id);
       }
     } catch (err) {
       console.error('Error fetching employees:', err);
+      setError('Failed to load employees');
     }
   };
 
@@ -114,10 +127,15 @@ export default function DocumentManagement() {
   const fetchEmployeeDocuments = async (employeeId) => {
     try {
       setLoading(true);
+      setError('');
       const response = await api.get(`/api/documents/employee/${employeeId}`);
-      setDocuments(response.data);
+      // Ensure we have an array
+      const docs = Array.isArray(response.data) ? response.data : [];
+      setDocuments(docs);
     } catch (err) {
-      setError('Failed to load documents');
+      console.error('Error fetching documents:', err);
+      setDocuments([]);
+      setError(err.response?.data?.detail || 'Failed to load documents');
     } finally {
       setLoading(false);
     }
@@ -153,7 +171,7 @@ export default function DocumentManagement() {
   };
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" sx={{ mb: 4 }}>
       <PageHeader
         title="📄 Document Management"
         subtitle="Upload, approve, and track employee documents for electronic personnel files (e-PFile)"
@@ -171,17 +189,18 @@ export default function DocumentManagement() {
         </Alert>
       )}
 
-      <Card sx={{ mb: 3 }}>
-        <CardHeader title="Document Upload" />
+      <Card sx={{ mb: 3, borderRadius: 2 }}>
+        <CardHeader title="📤 Upload Document" titleTypographyProps={{ variant: 'h6' }} />
         <CardContent>
-          <Grid container spacing={2} alignItems="flex-end">
-            <Grid item xs={12} sm={4}>
+          <Grid container spacing={2} alignItems={{ xs: 'stretch', sm: 'flex-end' }}>
+            <Grid item xs={12} sm={6} md={4}>
               <FormControl fullWidth>
                 <InputLabel>Select Employee</InputLabel>
                 <Select
                   value={selectedEmployee}
                   onChange={handleEmployeeChange}
                   label="Select Employee"
+                  size="small"
                 >
                   {employees.map((emp) => (
                     <MenuItem key={emp.id} value={emp.id}>
@@ -191,12 +210,14 @@ export default function DocumentManagement() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={8}>
+            <Grid item xs={12} sm={6} md={8}>
               <Button
                 variant="contained"
                 onClick={() => setUploadDialogOpen(true)}
+                fullWidth={{ xs: true, sm: false }}
+                sx={{ height: '56px' }}
               >
-                Upload New Document
+                📤 Upload New Document
               </Button>
             </Grid>
           </Grid>
@@ -208,56 +229,69 @@ export default function DocumentManagement() {
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead sx={{ backgroundColor: '#1E5A96', '& th': { color: 'white' } }}>
-              <TableRow>
-                <TableCell>Document Name</TableCell>
-                <TableCell>Category</TableCell>
-                <TableCell>Uploaded</TableCell>
-                <TableCell>Approval Status</TableCell>
-                <TableCell>Uploaded By</TableCell>
-                <TableCell>Expiry Date</TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {documents.length === 0 ? (
+        <Box sx={{ overflowX: 'auto' }}>
+          <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+            <Table size="small">
+              <TableHead sx={{ backgroundColor: 'primary.main', '& th': { color: 'white', fontWeight: 700 } }}>
                 <TableRow>
-                  <TableCell colSpan={7} align="center">
-                    No documents found
-                  </TableCell>
+                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Document Name</TableCell>
+                  <TableCell>Category</TableCell>
+                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Uploaded</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>Uploaded By</TableCell>
+                  <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>Expiry</TableCell>
+                  <TableCell align="right">Actions</TableCell>
                 </TableRow>
-              ) : (
-                documents.map((doc) => (
-                  <TableRow key={doc.id} hover>
-                    <TableCell>{doc.file_name}</TableCell>
-                    <TableCell>
-                      <Chip label={doc.document_type?.category || 'General'} size="small" />
-                    </TableCell>
-                    <TableCell>
-                      {new Date(doc.uploaded_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>{getStatusChip(doc.approval_status)}</TableCell>
-                    <TableCell>{doc.uploaded_by}</TableCell>
-                    <TableCell>
-                      {doc.expiry_date
-                        ? new Date(doc.expiry_date).toLocaleDateString()
-                        : 'No expiry'}
-                    </TableCell>
-                    <TableCell align="right">
-                      <Tooltip title="Download">
-                        <IconButton size="small">
-                          <DownloadIcon size={18} />
-                        </IconButton>
-                      </Tooltip>
+              </TableHead>
+              <TableBody>
+                {documents.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
+                      <Typography variant="body2" color="textSecondary">
+                        No documents found for this employee
+                      </Typography>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                ) : (
+                  documents.map((doc) => (
+                    <TableRow key={doc.id} hover sx={{ transition: 'background-color 0.2s' }}>
+                      <TableCell sx={{ display: { xs: 'none', md: 'table-cell' }, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {doc.file_name}
+                      </TableCell>
+                      <TableCell>
+                        <Chip 
+                          label={doc.document_type?.category || 'General'} 
+                          size="small" 
+                          variant="outlined"
+                          sx={{ fontSize: '0.75rem' }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ display: { xs: 'none', md: 'table-cell' }, fontSize: '0.875rem' }}>
+                        {new Date(doc.uploaded_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>{getStatusChip(doc.approval_status)}</TableCell>
+                      <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' }, fontSize: '0.875rem' }}>
+                        {doc.uploaded_by}
+                      </TableCell>
+                      <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' }, fontSize: '0.875rem' }}>
+                        {doc.expiry_date
+                          ? new Date(doc.expiry_date).toLocaleDateString()
+                          : 'No expiry'}
+                      </TableCell>
+                      <TableCell align="right">
+                        <Tooltip title="Download">
+                          <IconButton size="small" color="primary">
+                            <Download size={18} />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       )}
 
       {/* Upload Dialog */}
