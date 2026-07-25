@@ -1,18 +1,24 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import CakeIcon from '@mui/icons-material/Cake';
 import { Container, Grid, Paper, Typography, Box, CircularProgress, Button, Stack, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Divider, Chip, TextField } from '@mui/material';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [dashboardData, setDashboardData] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const role = user?.role;
+  const isHRorManager = role === 'hr_admin' || role === 'project_manager';
+  const isFinance = role === 'finance' || role === 'pay';
+  const isStaff = role === 'staff';
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -74,14 +80,27 @@ export default function Dashboard() {
     );
   }
 
-  const topCards = [
-    { label: 'Total Staff', value: dashboardData.total_staff, borderColor: '#d1d5db' },
-    { label: 'Active Staff', value: dashboardData.active_staff, borderColor: '#d1d5db' },
-    { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, borderColor: '#fde68a' },
-    { label: 'Missing Documents', value: dashboardData.staff_with_missing_docs, borderColor: '#e9d5ff' },
-  ];
-
   const featuredEmployee = dashboardData.featured_employee;
+  const birthdaysToday = dashboardData.birthdays_today || [];
+  const upcomingBirthdays = dashboardData.upcoming_birthdays || [];
+  const birthdayMessage = dashboardData.birthday_message;
+
+  const renderBirthdayEntry = (entry, isToday = false) => (
+    <Box key={entry.id} sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 1.5, borderRadius: 2, bgcolor: isToday ? '#ffffff' : '#f8fafc', border: '1px solid', borderColor: isToday ? '#bfdbfe' : '#e2e8f0' }}>
+      <Box
+        component="img"
+        src={entry.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(entry.full_name)}&background=2563eb&color=fff&rounded=true`}
+        alt={entry.full_name}
+        sx={{ width: 48, height: 48, borderRadius: '14px', objectFit: 'cover' }}
+      />
+      <Box sx={{ minWidth: 0, flex: 1 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>{entry.full_name}</Typography>
+        <Typography variant="body2" color="text.secondary">{entry.position || 'Team member'}</Typography>
+      </Box>
+      <Chip label={isToday ? 'Today' : `In ${entry.days_until}d`} size="small" color={isToday ? 'primary' : 'default'} sx={{ minWidth: 80 }} />
+    </Box>
+  );
+
   const documentChecklist = featuredEmployee ? [
     { label: 'App Resume', missing: featuredEmployee.missing_app_resume },
     { label: 'Appointment Letter', missing: featuredEmployee.missing_appointment_letter },
@@ -89,14 +108,42 @@ export default function Dashboard() {
     { label: 'National ID', missing: featuredEmployee.missing_national_id },
   ] : [];
 
+  const topCards = isHRorManager
+    ? [
+        { label: 'Total Staff', value: dashboardData.total_staff, borderColor: '#d1d5db' },
+        { label: 'Active Staff', value: dashboardData.active_staff, borderColor: '#d1d5db' },
+        { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, borderColor: '#fde68a' },
+        { label: 'Missing Documents', value: dashboardData.staff_with_missing_docs, borderColor: '#e9d5ff' },
+      ]
+    : isFinance
+      ? [
+          { label: 'Total Staff', value: dashboardData.total_staff, borderColor: '#d1d5db' },
+          { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, borderColor: '#fde68a' },
+          { label: 'Pending Timesheets', value: dashboardData.pending_timesheet_approvals, borderColor: '#dbeafe' },
+        ]
+      : isStaff
+        ? [
+            { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, borderColor: '#fde68a' },
+            { label: 'Missing Documents', value: dashboardData.staff_with_missing_docs, borderColor: '#e9d5ff' },
+            { label: 'Notifications', value: notifications.length, borderColor: '#bfdbfe' },
+          ]
+        : [
+            { label: 'Total Staff', value: dashboardData.total_staff, borderColor: '#d1d5db' },
+            { label: 'Active Staff', value: dashboardData.active_staff, borderColor: '#d1d5db' },
+            { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, borderColor: '#fde68a' },
+          ];
+
+  const primaryActionLabel = isStaff ? 'View your documents' : 'Upload Excel Data';
+  const primaryActionHandler = () => navigate(isStaff ? '/documents' : '/upload');
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <PageHeader
         title="Internal HR Dashboard"
         subtitle="Your workspace for contract tracking, staff status, payroll metrics and action alerts."
         primaryAction={(
-          <Button variant="contained" sx={{ background: '#111827', color: '#ffffff', textTransform: 'none' }} onClick={() => navigate('/upload')}>
-            Upload Excel Data
+          <Button variant="contained" sx={{ background: '#111827', color: '#ffffff', textTransform: 'none' }} onClick={primaryActionHandler}>
+            {primaryActionLabel}
           </Button>
         )}
         menuItems={[
@@ -106,11 +153,29 @@ export default function Dashboard() {
         ]}
       />
 
+      {birthdayMessage && (
+        <Paper sx={{ p: 3, mb: 3, borderRadius: 3, bgcolor: '#dbeafe', border: '1px solid #bfdbfe' }} elevation={0}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <Box sx={{ width: 44, height: 44, borderRadius: '14px', bgcolor: '#2563eb', display: 'grid', placeItems: 'center', color: '#fff' }}>
+              <CakeIcon fontSize="small" />
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: '#1d4ed8' }}>
+                {birthdayMessage}
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#1e3a8a', mt: 1 }}>
+                Celebrate with your teammates today. Check the birthday section for details and plans.
+              </Typography>
+            </Box>
+          </Box>
+        </Paper>
+      )}
+
       <Grid container spacing={3} sx={{ mb: 3 }}>
         {topCards.map((item) => (
           <Grid item xs={12} sm={6} md={3} key={item.label}>
             <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: item.borderColor, bgcolor: '#ffffff' }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, textTransform: 'uppercase', letterSpacing: 0.8, color: '#6b7280' }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, textTransform: 'uppercase', letterSpacing: 0.8, color: '#475569' }}>
                 {item.label}
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 700, color: '#111827' }}>
@@ -188,8 +253,43 @@ export default function Dashboard() {
 
         <Grid item xs={12} lg={4}>
           <Stack spacing={3}>
+            {birthdayMessage && (
+              <Paper sx={{ p: 3, borderRadius: 3, bgcolor: '#eef2ff', border: '1px solid #c7d2fe' }} elevation={0}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                  <Box sx={{ width: 48, height: 48, borderRadius: '16px', bgcolor: '#6366f1', display: 'grid', placeItems: 'center', color: '#fff' }}>
+                    <CakeIcon fontSize="medium" />
+                  </Box>
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1e3a8a' }}>Birthday Dashboard</Typography>
+                    <Typography variant="body2" color="text.secondary">Keep the team celebration on schedule.</Typography>
+                  </Box>
+                </Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#1e3a8a' }}>{birthdayMessage}</Typography>
+                <Typography variant="body2" sx={{ color: '#334155', mt: 1 }}>Today’s birthdays and upcoming staff celebrations are listed below.</Typography>
+              </Paper>
+            )}
+
             <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: '#d1d5db', bgcolor: '#f8fafc' }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#111827' }}>Staff Profile</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#111827' }}>Birthdays</Typography>
+              <Typography variant="body2" sx={{ color: '#475569', mb: 3 }}>Celebrate the next two weeks of staff birthdays and stay ahead of recognition plans.</Typography>
+              {birthdaysToday.length > 0 ? (
+                <Box sx={{ display: 'grid', gap: 1, mb: 2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>Today</Typography>
+                  {birthdaysToday.map((entry) => renderBirthdayEntry(entry, true))}
+                </Box>
+              ) : (
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>No birthdays today. Keep an eye on upcoming team milestones.</Typography>
+              )}
+              {upcomingBirthdays.length > 0 && (
+                <Box sx={{ display: 'grid', gap: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>Upcoming</Typography>
+                  {upcomingBirthdays.map((entry) => renderBirthdayEntry(entry))}
+                </Box>
+              )}
+            </Paper>
+
+            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: '#d1d5db', bgcolor: '#f8fafc' }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#111827' }}>Staff Profile</Typography>
               {featuredEmployee ? (
                 <>
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
@@ -224,7 +324,7 @@ export default function Dashboard() {
                     ))}
                   </Box>
 
-                  <Button variant="contained" fullWidth sx={{ background: '#1877f2', textTransform: 'none' }} onClick={() => navigate('/staff')}>
+                  <Button variant="contained" fullWidth sx={{ background: '#0f172a', textTransform: 'none' }} onClick={() => navigate('/staff')}>
                     View Profile
                   </Button>
                 </>

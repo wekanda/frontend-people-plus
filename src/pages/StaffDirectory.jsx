@@ -4,10 +4,12 @@ import api from '../api';
 import {
   Container, TextField, Button, Card, CardContent, Typography, Box,
   Grid, Chip, CircularProgress, ButtonGroup, Dialog, DialogTitle,
-  DialogContent, DialogActions, Stack, Alert, Avatar, Paper
+  DialogContent, DialogActions, Stack, Alert, Avatar, Paper, Table,
+  TableHead, TableBody, TableRow, TableCell, IconButton, Divider
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import PageHeader from '../components/PageHeader';
+import { X as XIcon } from 'lucide-react';
 
 const statusOptions = ['All', 'Active', 'Exited', 'On Recess'];
 
@@ -32,6 +34,7 @@ export default function StaffDirectory() {
   });
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const canManageEmployees = user?.role === 'hr_admin';
 
   useEffect(() => {
     fetchEmployees();
@@ -90,228 +93,305 @@ export default function StaffDirectory() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Active': return 'success.main';
-      case 'Exited': return 'error.main';
-      case 'On Recess': return 'warning.main';
-      default: return '#999';
+      case 'Active': return 'success';
+      case 'Exited': return 'error';
+      case 'On Recess': return 'warning';
+      default: return 'default';
     }
   };
 
   const getAvatarUrl = (emp) => {
-    if (emp.photo_url) return emp.photo_url;
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.full_name)}&background=1877f2&color=fff&rounded=true`;
+    return emp.photo_url || '';
   };
 
-  if (loading) return <CircularProgress />;
+  if (loading) return (
+    <Container maxWidth="lg" sx={{ py: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+      <CircularProgress />
+    </Container>
+  );
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, mb: 4 }}>
       <PageHeader
-        title="📁 Staff Directory"
-        subtitle="Each employee profile can include a photo and quick actions."
-        primaryAction={(
-          <Button variant="contained" sx={{ background: 'primary.main', color: 'primary.contrastText' }} onClick={() => setOpenDialog(true)}>
-            Add Employee
+        title="👥 Staff Directory"
+        subtitle="Manage and view all employees in your organization."
+        primaryAction={canManageEmployees ? (
+          <Button
+            variant="contained"
+            onClick={() => setOpenDialog(true)}
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          >
+            ➕ Add Employee
           </Button>
-        )}
-        menuItems={[
-          { label: 'Refresh List', onClick: fetchEmployees },
-          { label: 'Import from Excel', onClick: () => navigate('/upload') },
-          { label: 'Clear Filters', onClick: () => { setSearch(''); setStatus('All'); } }
-        ]}
+        ) : undefined}
       />
 
-      <Stack spacing={3} sx={{ mb: 3 }}>
-        {message && <Alert severity="success" onClose={() => setMessage('')} sx={{ borderRadius: 3 }}>{message}</Alert>}
-        {error && <Alert severity="error" onClose={() => setError('')} sx={{ borderRadius: 3 }}>{error}</Alert>}
-      </Stack>
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
 
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        {[
-          { label: 'Total Staff', value: employees.length },
-          { label: 'Matching Results', value: filteredEmployees.length },
-          { label: 'Active', value: employees.filter((emp) => emp.status === 'Active').length },
-          { label: 'On Recess', value: employees.filter((emp) => emp.status === 'On Recess').length },
-        ].map((card) => (
-          <Grid item xs={12} sm={6} md={3} key={card.label}>
-            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: '#f8fbff' }}>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 0.8, mb: 1 }}>
-                {card.label}
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{card.value}</Typography>
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
+      {message && (
+        <Alert severity="success" sx={{ mb: 3 }} onClose={() => setMessage('')}>
+          {message}
+        </Alert>
+      )}
 
-      <Paper sx={{ p: 3, mb: 3, borderRadius: 3, boxShadow: 3, bgcolor: '#ffffff', border: '1px solid', borderColor: 'divider' }}>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+      {/* Search and Filter */}
+      <Paper sx={{ p: 2, mb: 3, borderRadius: 2, boxShadow: 1 }}>
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
           <TextField
-            placeholder="Search by name or file code..."
+            placeholder="Search by name or employee code..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             variant="outlined"
             size="small"
-                sx={{ flex: 1, minWidth: 250, bgcolor: 'background.paper', borderRadius: 2 }}
+            sx={{ flex: { xs: '1 1 100%', md: '1 1 300px' } }}
+            InputProps={{
+              startAdornment: '🔍',
+            }}
           />
-          <ButtonGroup variant="outlined" size="small" sx={{ boxShadow: 'none' }}>
+          <ButtonGroup variant="outlined" size="small">
             {statusOptions.map(s => (
               <Button
                 key={s}
                 onClick={() => setStatus(s)}
                 variant={status === s ? 'contained' : 'outlined'}
-                sx={{ background: status === s ? 'primary.main' : 'background.paper', color: status === s ? 'primary.contrastText' : 'inherit', textTransform: 'none' }}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: status === s ? 600 : 500,
+                  fontSize: '0.85rem',
+                  px: { xs: 1, sm: 1.5 },
+                }}
               >
                 {s}
               </Button>
             ))}
           </ButtonGroup>
-          {(user.role === 'hr_admin' || user.role === 'project_manager') && (
-            <Button variant="contained" sx={{ background: '#1877f2', color: 'white', textTransform: 'none' }} onClick={() => setOpenDialog(true)}>
-              Add Employee
-            </Button>
-          )}
         </Box>
       </Paper>
 
-      <Grid container spacing={3}>
-        {filteredEmployees.map(emp => (
-          <Grid item xs={12} sm={6} md={4} key={emp.id}>
-            <Card sx={{ height: '100%', borderRadius: 3, boxShadow: 3, border: '1px solid rgba(0,0,0,0.08)', '&:hover': { boxShadow: 6, transform: 'translateY(-2px)' }, transition: 'transform 0.2s ease' }}>
-              <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                      {emp.full_name}
+      {/* Staff Grid/Table Display */}
+      {filteredEmployees.length === 0 ? (
+        <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
+          <Typography color="textSecondary">
+            No employees found matching your search criteria.
+          </Typography>
+        </Paper>
+      ) : (
+        <>
+          {/* Mobile: Card View */}
+          <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 3 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+              {filteredEmployees.map((emp) => (
+                <Card key={emp.id} sx={{ borderRadius: 2, boxShadow: 2, '&:hover': { boxShadow: 4 } }}>
+                  <CardContent sx={{ pb: 1 }}>
+                    <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mb: 2 }}>
+                      <Avatar
+                        src={getAvatarUrl(emp)}
+                        sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}
+                      >
+                        {emp.full_name?.charAt(0)}
+                      </Avatar>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.25 }}>
+                          {emp.full_name}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
+                          {emp.file_code}
+                        </Typography>
+                        <Chip
+                          label={emp.status || 'Active'}
+                          color={getStatusColor(emp.status || 'Active')}
+                          size="small"
+                          sx={{ fontWeight: 600 }}
+                        />
+                      </Box>
+                    </Stack>
+                    <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 0.5 }}>
+                      <strong>Position:</strong> {emp.position || 'N/A'}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {emp.position || 'N/A'} • {emp.file_code}
+                    <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 0.5 }}>
+                      <strong>Department:</strong> {emp.project || 'N/A'}
                     </Typography>
-                  </Box>
-                  <Avatar src={getAvatarUrl(emp)} alt={emp.full_name} sx={{ width: 64, height: 64, bgcolor: 'primary.main' }} />
-                </Box>
+                    <Typography variant="caption" color="textSecondary" display="block">
+                      <strong>Location:</strong> {emp.location || 'N/A'}
+                    </Typography>
+                    <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                      {canManageEmployees && (
+                        <Button size="small" variant="outlined" sx={{ flex: 1, textTransform: 'none', fontSize: '0.8rem' }} onClick={() => handleDelete(emp.id)}>
+                          Delete
+                        </Button>
+                      )}
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          </Box>
 
-                <Paper sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 3, mb: 1 }}>
-                  <Grid container spacing={1}>
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" color="text.secondary">Project</Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 600 }}>{emp.project || 'N/A'}</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" color="text.secondary">Location</Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 600 }}>{emp.location || 'N/A'}</Typography>
-                    </Grid>
-                  </Grid>
-                </Paper>
+          {/* Desktop: Table View */}
+          <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+            <Paper sx={{ borderRadius: 2, overflow: 'hidden', boxShadow: 2 }}>
+              <Box sx={{ overflowX: 'auto' }}>
+                <Table>
+                  <TableHead sx={{ backgroundColor: 'primary.main', '& th': { color: 'white', fontWeight: 700 } }}>
+                    <TableRow>
+                      <TableCell>Employee</TableCell>
+                      <TableCell>Code</TableCell>
+                      <TableCell>Position</TableCell>
+                      <TableCell>Department</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Location</TableCell>
+                      <TableCell align="right">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredEmployees.map((emp) => (
+                      <TableRow key={emp.id} hover sx={{ transition: 'background-color 0.2s' }}>
+                        <TableCell>
+                          <Stack direction="row" spacing={1.5} alignItems="center">
+                            <Avatar
+                              src={getAvatarUrl(emp)}
+                              sx={{ width: 40, height: 40, bgcolor: 'primary.main', fontSize: '0.9rem' }}
+                            >
+                              {emp.full_name?.charAt(0)}
+                            </Avatar>
+                            <Box>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                                {emp.full_name}
+                              </Typography>
+                            </Box>
+                          </Stack>
+                        </TableCell>
+                        <TableCell sx={{ fontFamily: 'monospace', fontWeight: 500 }}>{emp.file_code}</TableCell>
+                        <TableCell>{emp.position || 'N/A'}</TableCell>
+                        <TableCell>{emp.project || 'N/A'}</TableCell>
+                        <TableCell>
+                          <Chip
+                            label={emp.status || 'Active'}
+                            color={getStatusColor(emp.status || 'Active')}
+                            size="small"
+                            sx={{ fontWeight: 600 }}
+                          />
+                        </TableCell>
+                        <TableCell>{emp.location || 'N/A'}</TableCell>
+                        <TableCell align="right">
+                          {canManageEmployees ? (
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleDelete(emp.id)}
+                              title="Delete employee"
+                            >
+                              <XIcon size={18} />
+                            </IconButton>
+                          ) : (
+                            <Typography variant="caption" color="textSecondary">—</Typography>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
 
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  <Chip
-                    label={emp.status || 'Unknown'}
+              <Box sx={{ px: 3, py: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, borderTop: '1px solid #E0E0E0', bgcolor: '#F5F7FA' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                  Total: {filteredEmployees.length} employees
+                </Typography>
+                {canManageEmployees && (
+                  <Button
                     size="small"
-                    sx={{ backgroundColor: getStatusColor(emp.status), color: 'white' }}
-                  />
-                  {emp.contract_end && (
-                    <Chip
-                      label={`Expires: ${emp.contract_end}`}
-                      size="small"
-                      variant="outlined"
-                      color={new Date(emp.contract_end) < new Date() ? 'error' : 'default'}
-                    />
-                  )}
-                </Box>
-
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Contact: {emp.contact_number || 'N/A'}
-                  </Typography>
-                  {(user.role === 'hr_admin' || user.role === 'project_manager') && (
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      onClick={() => handleDelete(emp.id)}
-                      sx={{ textTransform: 'none' }}
-                    >
-                      Remove
-                    </Button>
-                  )}
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-      {filteredEmployees.length === 0 && (
-        <Typography sx={{ mt: 4, textAlign: 'center', color: '#999' }}>
-          No employees found matching your search
-        </Typography>
+                    variant="contained"
+                    onClick={() => setOpenDialog(true)}
+                    sx={{ textTransform: 'none', fontWeight: 600 }}
+                  >
+                    ➕ Add Employee
+                  </Button>
+                )}
+              </Box>
+            </Paper>
+          </Box>
+        </>
       )}
 
+      {/* Add Employee Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Add Employee</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700, fontSize: '1.1rem' }}>
+          ➕ Add New Employee
+        </DialogTitle>
         <DialogContent sx={{ display: 'grid', gap: 2, pt: 2 }}>
           <TextField
             label="File Code"
             value={formData.file_code}
             onChange={(e) => setFormData({ ...formData, file_code: e.target.value })}
             fullWidth
+            size="small"
           />
           <TextField
             label="Full Name"
             value={formData.full_name}
             onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
             fullWidth
-          />
-          <TextField
-            label="Project"
-            value={formData.project}
-            onChange={(e) => setFormData({ ...formData, project: e.target.value })}
-            fullWidth
+            size="small"
           />
           <TextField
             label="Position"
             value={formData.position}
             onChange={(e) => setFormData({ ...formData, position: e.target.value })}
             fullWidth
+            size="small"
+          />
+          <TextField
+            label="Department/Project"
+            value={formData.project}
+            onChange={(e) => setFormData({ ...formData, project: e.target.value })}
+            fullWidth
+            size="small"
           />
           <TextField
             label="Location"
             value={formData.location}
             onChange={(e) => setFormData({ ...formData, location: e.target.value })}
             fullWidth
+            size="small"
           />
           <TextField
             label="Contact Number"
             value={formData.contact_number}
             onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })}
             fullWidth
+            size="small"
           />
           <TextField
             label="Employment Type"
             value={formData.employment_type}
             onChange={(e) => setFormData({ ...formData, employment_type: e.target.value })}
             fullWidth
+            size="small"
           />
           <TextField
-            label="Profile Photo URL"
-            value={formData.photo_url}
-            onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
-            fullWidth
-          />
-          <TextField
-            label="Contract End"
+            label="Contract End Date"
             type="date"
             value={formData.contract_end}
             onChange={(e) => setFormData({ ...formData, contract_end: e.target.value })}
-            InputLabelProps={{ shrink: true }}
             fullWidth
+            size="small"
+            InputLabelProps={{ shrink: true }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleAddEmployee} sx={{ background: 'primary.main', color: 'primary.contrastText' }}>
-            Save
+        <DialogActions sx={{ p: 2, gap: 1 }}>
+          <Button onClick={() => setOpenDialog(false)} sx={{ textTransform: 'none' }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleAddEmployee}
+            variant="contained"
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          >
+            Add Employee
           </Button>
         </DialogActions>
       </Dialog>

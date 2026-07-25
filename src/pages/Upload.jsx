@@ -229,7 +229,25 @@ export default function Upload() {
       />
       <Typography sx={{ mb: 3, color: 'text.secondary', lineHeight: 1.8 }}>
         Upload a Microsoft Excel file containing employees, projects, locations, contract data, contact details, and document flags.
-        The app will import or update staff records automatically.
+        The app will import or update staff records automatically. Supported document column headers include:
+        <br />
+        • <strong>APPLICATION & RESUME</strong> | <strong>APPLICATION  & RESUME</strong>
+        <br />
+        • <strong>APPOINTMENT LETTER & JOB DESCRIPTION</strong> | <strong>APPOINTMENT LETTER /JOB DESCRIPTION</strong>
+        <br />
+        • <strong>ACADEMIC DOCUMENTS</strong>
+        <br />
+        • <strong>RECRUITMENT/INTERVIEW NOTE (SCORE SHEETS, REPORT, ETC)</strong> | <strong>RECRUITMENT RESULTS & RECRUITMENT REPORT</strong>
+        <br />
+        • <strong>EMPLOYEE DATA SHEET & STAFF ID FORM</strong> | <strong>EMPLOYEE DATA FORM & STAFF ID FORM</strong>
+        <br />
+        • <strong>PERFORMANCE APPRAISALS</strong> | <strong>PERFORMANCE APPRAISAL</strong>
+        <br />
+        • <strong>NATIONAL ID /DRIVING PERMIT</strong>
+        <br />
+        • <strong>POLICY DECLARATION</strong>
+        <br />
+        • <strong>END OF CONTRACT NOTICE</strong>
       </Typography>
 
       <Paper sx={{ p: 4, mb: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
@@ -245,7 +263,7 @@ export default function Upload() {
             sx={{ bgcolor: 'background.paper', p: 1, borderRadius: 2 }}
           />
           <Typography variant="body2" color="text.secondary">
-            Select one or more Excel files from the HR upload package. The system supports employee records, contracts, and document status fields.
+            Select one or more Excel files from the HR template package. The system supports employee records from the TPO Staff Contract & Personnel File Tracking workbook. Headers are normalized to match template variants such as "CONTACT NO", "CURRENT CONTRACT DATE", "END OF PROBATION DATE", "NOTICE PERIOD", and document column names.
           </Typography>
           <Button
             variant="contained"

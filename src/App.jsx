@@ -35,11 +35,13 @@ import ContractGeneration from './pages/ContractGeneration';
 import Documents from './pages/Documents';
 import InterviewScheduling from './pages/InterviewScheduling';
 import DocumentManagement from './pages/DocumentManagement';
+import DocumentGenerator from './pages/DocumentGenerator';
 import PersonnelFile from './pages/PersonnelFile';
 import PayrollManagement from './pages/PayrollManagement';
 import ExcelImport from './pages/ExcelImport';
+import EmployeeProfile from './pages/EmployeeProfile';
 import ProtectedRoute from './components/ProtectedRoute';
-import { useAuth } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -69,6 +71,7 @@ function AppContent() {
             >
               <Route index element={<Dashboard />} />
               {/* Removed duplicate 'My Dashboard' route; single Dashboard at '/' */}
+              <Route path="profile" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay']}><EmployeeProfile /></ProtectedRoute>} />
               <Route path="staff" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><StaffDirectory /></ProtectedRoute>} />
               <Route path="recruitment" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Recruitment /></ProtectedRoute>} />
               <Route path="recruitment-admin" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><JobAdmin /></ProtectedRoute>} />
@@ -86,6 +89,7 @@ function AppContent() {
               <Route path="onboarding" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Onboarding /></ProtectedRoute>} />
               <Route path="contracts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><ContractGeneration /></ProtectedRoute>} />
               <Route path="documents" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><DocumentManagement /></ProtectedRoute>} />
+              <Route path="document-generator" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><DocumentGenerator /></ProtectedRoute>} />
               <Route path="interviews" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><InterviewScheduling /></ProtectedRoute>} />
               <Route path="internships" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Internship /></ProtectedRoute>} />
               <Route path="finance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay']}><Finance /></ProtectedRoute>} />
@@ -95,8 +99,7 @@ function AppContent() {
               <Route path="appraisals" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><PerformanceAppraisal /></ProtectedRoute>} />
               <Route path="sheet" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><IndependentSheet /></ProtectedRoute>} />
               <Route path="notifications" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Notifications /></ProtectedRoute>} />
-              <Route path="upload" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Upload /></ProtectedRoute>} />
-              <Route path="documents" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><DocumentManagement /></ProtectedRoute>} />
+              <Route path="upload" element={<ProtectedRoute allowedRoles={['hr_admin']}><Upload /></ProtectedRoute>} />
               <Route path="personnel-file" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><PersonnelFile /></ProtectedRoute>} />
               <Route path="payroll" element={<ProtectedRoute allowedRoles={['hr_admin', 'finance']}><PayrollManagement /></ProtectedRoute>} />
               <Route path="excel-import" element={<ProtectedRoute allowedRoles={['hr_admin']}><ExcelImport /></ProtectedRoute>} />
@@ -112,9 +115,11 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <NotificationProvider>
-        <AppContent />
-      </NotificationProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <AppContent />
+        </NotificationProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

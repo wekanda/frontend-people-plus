@@ -75,6 +75,21 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const register = async ({ email, password, full_name, role, employee_id }) => {
+    try {
+      await api.post('/auth/register', {
+        email,
+        password,
+        full_name,
+        role,
+        employee_id,
+      });
+    } catch (err) {
+      console.error('Registration failed:', err);
+      throw err;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -90,7 +105,7 @@ export function AuthProvider({ children }) {
     );
   }
 
-  return <AuthContext.Provider value={{ user, token, loading: loadingAuth, login, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, token, loading: loadingAuth, login, logout, register }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
