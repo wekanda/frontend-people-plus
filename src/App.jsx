@@ -41,7 +41,7 @@ import PayrollManagement from './pages/PayrollManagement';
 import ExcelImport from './pages/ExcelImport';
 import EmployeeProfile from './pages/EmployeeProfile';
 import ProtectedRoute from './components/ProtectedRoute';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -51,7 +51,13 @@ function AppContent() {
   const colorMode = { toggleColorMode: () => setMode(prev => prev === 'light' ? 'dark' : 'light') };
   const theme = mode === 'light' ? lightTheme : darkTheme;
 
-  const { user } = useAuth();
+  let user = null;
+  try {
+    const stored = localStorage.getItem('user');
+    if (stored) user = JSON.parse(stored);
+  } catch (e) {
+    user = null;
+  }
 
   return (
     <ColorModeContext.Provider value={colorMode}>

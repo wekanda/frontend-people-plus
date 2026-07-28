@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const DEFAULT_BACKEND_URL = 'https://people-pluse-backend-1.onrender.com';
-const LOCAL_BACKEND_URL = 'http://localhost:8000';
+const DEFAULT_LOCAL_PORT = 8000;
 
 function getViteEnvValue() {
   try {
@@ -13,12 +13,16 @@ function getViteEnvValue() {
 
 export function getBaseUrl(hostname = typeof window !== 'undefined' ? window.location.hostname : '') {
   const normalizedHostname = (hostname || '').toLowerCase();
-  if (!normalizedHostname || normalizedHostname === 'localhost' || normalizedHostname === '127.0.0.1' || normalizedHostname.startsWith('127.0.0.1')) {
-    return LOCAL_BACKEND_URL;
+
+  // Local development: use the same hostname as the page (ensures 127.0.0.1 vs localhost match)
+  if (!normalizedHostname || normalizedHostname === 'localhost' || normalizedHostname.startsWith('127.')) {
+    const host = normalizedHostname || 'localhost';
+    return `http://${host}:${DEFAULT_LOCAL_PORT}`;
   }
 
+  // Common LAN ranges -> assume backend running on same host:8000
   if (normalizedHostname.startsWith('192.168.') || normalizedHostname.startsWith('10.') || normalizedHostname.startsWith('172.')) {
-    return LOCAL_BACKEND_URL;
+    return `http://${normalizedHostname}:${DEFAULT_LOCAL_PORT}`;
   }
 
   return getViteEnvValue() || DEFAULT_BACKEND_URL;
