@@ -7,5 +7,5 @@ test('uses the local backend for 127.0.0.1 hosts', () => {
 });
 
 test('uses the production backend for non-local hosts', () => {
-  assert.equal(getBaseUrl('people-pluse-app.com'), 'https://people-pluse-backend-1.onrender.com');
+  assert.equal(getBaseUrl('people-pluse-app.com'), 'https://backend-people-plus.onrender.com');
 });

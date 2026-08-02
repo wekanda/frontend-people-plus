@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const DEFAULT_BACKEND_URL = 'https://people-pluse-backend-1.onrender.com';
+const DEFAULT_BACKEND_URL = 'https://backend-people-plus.onrender.com';
 const DEFAULT_LOCAL_PORT = 8000;
 
 function getViteEnvValue() {
