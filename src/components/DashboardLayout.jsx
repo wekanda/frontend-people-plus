@@ -6,7 +6,6 @@ import { useNotifications } from '../contexts/NotificationContext';
 
 const navItems = [
   { label: '📊 Dashboard', path: '/', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
-  { label: '👤 My Profile', path: '/profile', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
   { label: '🧾 Payslips', path: '/payslips', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
   { label: '💼 Recruitment', path: '/recruitment', roles: ['hr_admin', 'project_manager'] },
   { label: '🧾 Job Admin', path: '/recruitment-admin', roles: ['hr_admin', 'project_manager'] },

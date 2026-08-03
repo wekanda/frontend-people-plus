@@ -39,7 +39,6 @@ import DocumentGenerator from './pages/DocumentGenerator';
 import PersonnelFile from './pages/PersonnelFile';
 import PayrollManagement from './pages/PayrollManagement';
 import ExcelImport from './pages/ExcelImport';
-import EmployeeProfile from './pages/EmployeeProfile';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -77,7 +76,6 @@ function AppContent() {
             >
               <Route index element={<Dashboard />} />
               {/* Removed duplicate 'My Dashboard' route; single Dashboard at '/' */}
-              <Route path="profile" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay']}><EmployeeProfile /></ProtectedRoute>} />
               <Route path="staff" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><StaffDirectory /></ProtectedRoute>} />
               <Route path="recruitment" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Recruitment /></ProtectedRoute>} />
               <Route path="recruitment-admin" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><JobAdmin /></ProtectedRoute>} />

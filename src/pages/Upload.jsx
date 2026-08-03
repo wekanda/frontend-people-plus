@@ -39,6 +39,7 @@ export default function Upload() {
   const [payslipUploading, setPayslipUploading] = useState(false);
   const [detectedHeaders, setDetectedHeaders] = useState([]);
   const [missingHeaders, setMissingHeaders] = useState([]);
+  const [detectionMessage, setDetectionMessage] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleFileChange = (event) => {
@@ -75,27 +76,49 @@ export default function Upload() {
       const firstSheetName = workbook.SheetNames[0];
       const ws = workbook.Sheets[firstSheetName];
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-      const headers = (rows && rows[0]) ? rows[0].map(h => String(h || '').trim()) : [];
-      const normalized = headers.map(h => String(h || '').trim().toLowerCase());
+      const populatedRows = rows.filter((row) => Array.isArray(row) && row.some((cell) => String(cell || '').trim()));
 
-      // Acceptable header variants
       const requiredGroups = [
-        ['file code', 'employee code', 'employee id', 'file_code', 'employee_id'],
-        ['period start', 'period_start', 'start', 'start_date'],
-        ['period end', 'period_end', 'end', 'end_date'],
-        ['gross', 'gross_pay', 'gross pay'],
-        ['tax'],
-        ['deductions']
+        ['file code', 'employee code', 'employee id', 'file_code', 'employee_id', 'staff no', 'employee no'],
+        ['period start', 'period_start', 'start', 'start_date', 'from'],
+        ['period end', 'period_end', 'end', 'end_date', 'to'],
+        ['gross', 'gross_pay', 'gross pay', 'gross salary', 'basic salary'],
+        ['tax', 'income tax', 'withholding tax'],
+        ['deductions', 'deduction', 'total deductions']
       ];
 
+      let bestCandidate = null;
+      let bestScore = 0;
+
+      populatedRows.forEach((row) => {
+        const normalized = row.map((h) => String(h || '').trim().toLowerCase());
+        const rowScore = requiredGroups.reduce((score, group) => {
+          const found = group.some((variant) => normalized.some((value) => value === variant || value.includes(variant)));
+          return score + (found ? 1 : 0);
+        }, 0);
+
+        if (rowScore > bestScore) {
+          bestScore = rowScore;
+          bestCandidate = { row, normalized };
+        }
+      });
+
+      const headers = bestCandidate ? bestCandidate.row.map((h) => String(h || '').trim()) : [];
+      const normalized = bestCandidate ? bestCandidate.normalized : [];
       const missing = [];
-      requiredGroups.forEach(group => {
-        const found = group.some(variant => normalized.includes(variant));
+      requiredGroups.forEach((group) => {
+        const found = group.some((variant) => normalized.some((value) => value === variant || value.includes(variant)));
         if (!found) missing.push(group[0]);
       });
 
+      const structuredRow = bestScore >= 3;
       setDetectedHeaders(headers);
       setMissingHeaders(missing);
+      setDetectionMessage(
+        structuredRow
+          ? 'Detected a structured payroll header row.'
+          : 'This workbook looks like a form-style payslip layout rather than a structured payslip table. The row-by-row importer cannot safely read it.'
+      );
       setModalOpen(true);
     } catch (e) {
       console.error('Header detection failed', e);
@@ -118,12 +141,13 @@ export default function Upload() {
       try {
         const formData = new FormData();
         formData.append('file', fileItem);
-        const res = await api.post('/upload/excel', formData, {
+        const res = await api.post('/api/excel/import-employees', formData, {
           headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
           },
         });
-        uploadResults.push({ file: fileItem.name, success: true, message: res.data.message });
+        uploadResults.push({ file: fileItem.name, success: true, message: res.data.message || 'Imported successfully' });
       } catch (err) {
         const errorMessage = err.response?.data?.detail || err.message || 'Upload failed';
         uploadResults.push({ file: fileItem.name, success: false, message: errorMessage });
@@ -133,6 +157,23 @@ export default function Upload() {
     setResults(uploadResults);
     setStatus('Upload process finished.');
     setUploading(false);
+  };
+
+  const handleImportWorkspaceFolder = async () => {
+    try {
+      setUploading(true);
+      setError('');
+      setStatus('Importing workbook files from the workspace Excel folder...');
+      const res = await api.post('/api/excel/import-folder', {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setResults([{ file: 'workspace excel folder', success: true, message: res.data.message }]);
+      setStatus('Workspace import finished.');
+    } catch (err) {
+      setError(err.response?.data?.detail || err.message || 'Workspace import failed');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleWordUpload = async () => {
@@ -265,14 +306,27 @@ export default function Upload() {
           <Typography variant="body2" color="text.secondary">
             Select one or more Excel files from the HR template package. The system supports employee records from the TPO Staff Contract & Personnel File Tracking workbook. Headers are normalized to match template variants such as "CONTACT NO", "CURRENT CONTRACT DATE", "END OF PROBATION DATE", "NOTICE PERIOD", and document column names.
           </Typography>
-          <Button
-            variant="contained"
-            onClick={handleUpload}
-            disabled={files.length === 0 || uploading}
-            sx={{ background: 'primary.main', width: 220, textTransform: 'none' }}
-          >
-            Upload {files.length > 0 ? `${files.length} file${files.length > 1 ? 's' : ''}` : 'Excel'}
-          </Button>
+          <Alert severity="info">
+            Use the folder import action below to load every workbook in the workspace Excel directory into the staff records in one pass.
+          </Alert>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <Button
+              variant="contained"
+              onClick={handleUpload}
+              disabled={files.length === 0 || uploading}
+              sx={{ background: 'primary.main', width: 220, textTransform: 'none' }}
+            >
+              Upload {files.length > 0 ? `${files.length} file${files.length > 1 ? 's' : ''}` : 'Excel'}
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={handleImportWorkspaceFolder}
+              disabled={uploading}
+              sx={{ width: 320, textTransform: 'none' }}
+            >
+              Bulk Import All Excel Workbooks
+            </Button>
+          </Stack>
           {files.length > 0 && (
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
               Selected files: {files.map((file) => file.name).join(', ')}
@@ -363,6 +417,9 @@ export default function Upload() {
           >
             Upload Payslips Excel
           </Button>
+          <Typography variant="caption" color="text.secondary">
+            Note: payslip workbooks that are styled as form layouts (for example the provided payslip template) are not a structured table and may not import row-by-row.
+          </Typography>
           {payslipFiles.length > 0 && (
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
               Selected file: {payslipFiles.map((file) => file.name).join(', ')}
@@ -394,12 +451,12 @@ export default function Upload() {
             ))}
           </List>
           {missingHeaders.length > 0 ? (
-            <Alert severity="warning">Missing columns: {missingHeaders.join(', ')}</Alert>
+            <Alert severity="warning">Missing columns: {missingHeaders.join(', ')}. This workbook appears to be a form-style payslip layout rather than a structured payroll table.</Alert>
           ) : (
             <Alert severity="success">All required columns detected.</Alert>
           )}
           <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-            If the file looks correct, confirm to start the import. Critical missing columns will block upload.
+            If the file looks correct, confirm to start the import. For multi-workbook imports, use the folder import control shown above instead of the payslip-only upload.
           </Typography>
         </DialogContent>
         <DialogActions>

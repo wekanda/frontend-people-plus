@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import api from '../api';
-import { Container, Grid, Paper, Typography, Box, Button, List, ListItem, ListItemText, Stack, Alert, Input, FormControlLabel, Switch } from '@mui/material';
+import { Container, Grid, Paper, Typography, Box, Button, List, ListItem, ListItemText, Stack, Alert, Input, FormControlLabel, Switch, TextField } from '@mui/material';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -13,18 +13,24 @@ export default function Documents() {
   const [message, setMessage] = useState('');
   const excelRef = useRef();
   const wordRef = useRef();
+  const wordFolderRef = useRef();
+  const [wordDocuments, setWordDocuments] = useState([]);
+  const [sendDepartment, setSendDepartment] = useState('finance');
+  const [selectedWordDocument, setSelectedWordDocument] = useState('');
   const [policies, setPolicies] = useState({ allow_project_manager_uploads: false, allow_staff_uploads: false });
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
-        const [filesRes, sentRes] = await Promise.all([
+        const [filesRes, sentRes, wordRes] = await Promise.all([
           api.get('/documents/files', { headers: { Authorization: `Bearer ${token}` } }),
           api.get('/documents/sent', { headers: { Authorization: `Bearer ${token}` } }),
+          api.get('/api/documents/word-documents', { headers: { Authorization: `Bearer ${token}` } }),
         ]);
         setFiles(filesRes.data.files || []);
         setSentFiles(sentRes.data.files || []);
+        setWordDocuments(wordRes.data.documents || []);
         setError('');
       } catch (err) {
         console.error('Failed to load documents or history', err);
@@ -116,12 +122,84 @@ export default function Documents() {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
       });
       setMessage(res.data.message || 'Upload successful');
-      // clear input
       input.value = null;
       await refresh();
     } catch (err) {
       console.error('Upload error', err);
       setMessage(err.response?.data?.detail || err.message || 'Upload failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBulkWordFolderUpload = async () => {
+    const input = wordFolderRef.current;
+    if (!input || !input.files || input.files.length === 0) {
+      setMessage('Please choose a Word folder first.');
+      return;
+    }
+
+    const form = new FormData();
+    Array.from(input.files).forEach((file) => {
+      form.append('files', file);
+    });
+
+    try {
+      setLoading(true);
+      const res = await api.post('/api/documents/word-documents/bulk-upload', form, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessage(res.data.message || 'Word documents uploaded');
+      input.value = null;
+      const wordRes = await api.get('/api/documents/word-documents', { headers: { Authorization: `Bearer ${token}` } });
+      setWordDocuments(wordRes.data.documents || []);
+    } catch (err) {
+      console.error('Bulk Word upload failed', err);
+      setMessage(err.response?.data?.detail || err.message || 'Bulk Word upload failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadWordDocument = async (fileName) => {
+    try {
+      const res = await api.get('/api/documents/word-documents/download', {
+        params: { file_name: fileName },
+        responseType: 'blob',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Word document download failed', err);
+      setMessage(err.response?.data?.detail || err.message || 'Word document download failed');
+    }
+  };
+
+  const handleSendWordDocument = async () => {
+    if (!selectedWordDocument) {
+      setMessage('Choose a Word document before sending it.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await api.post('/api/documents/word-documents/send', {
+        document_name: selectedWordDocument,
+        department: sendDepartment,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessage(res.data.message || 'Document sent');
+    } catch (err) {
+      console.error('Send Word document failed', err);
+      setMessage(err.response?.data?.detail || err.message || 'Send failed');
     } finally {
       setLoading(false);
     }
@@ -181,11 +259,13 @@ export default function Documents() {
           <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
             <Typography variant="h6" sx={{ mb: 2 }}>Templates</Typography>
             <Typography variant="body2" sx={{ mb: 1 }}>Upload templates (Excel/Word) to import employee data.</Typography>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2, flexWrap: 'wrap' }}>
               <input ref={excelRef} type="file" accept=".xlsx,.xls" />
               <Button variant="contained" size="small" onClick={() => handleUpload('excel')} disabled={!canUpload() || loading}>Upload Excel</Button>
-              <input ref={wordRef} type="file" accept=".docx" />
+              <input ref={wordRef} type="file" accept=".docx,.doc" />
               <Button variant="contained" size="small" onClick={() => handleUpload('word')} disabled={!canUpload() || loading}>Upload Word</Button>
+              <input ref={wordFolderRef} type="file" accept=".docx,.doc" multiple webkitdirectory="" directory="" />
+              <Button variant="outlined" size="small" onClick={handleBulkWordFolderUpload} disabled={loading}>Bulk Upload Word Folder</Button>
             </Box>
             <Box sx={{ mb: 2 }}>
               <Typography variant="caption">Your role: {user?.role || 'unknown'}</Typography>
@@ -204,6 +284,34 @@ export default function Documents() {
               </List>
               {files.length === 0 && !loading && <Typography variant="body2">No templates found.</Typography>}
             </Box>
+          </Paper>
+
+          <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>Word Documents Repository</Typography>
+            <Box>
+              <List>
+                {wordDocuments.map((doc) => (
+                  <ListItem key={doc.path} secondaryAction={(
+                    <Stack direction="row" spacing={1}>
+                      <Button variant="outlined" size="small" onClick={() => handleDownloadWordDocument(doc.name)}>Download</Button>
+                      <Button variant="contained" size="small" onClick={() => setSelectedWordDocument(doc.name)}>Select</Button>
+                    </Stack>
+                  )}>
+                    <ListItemText primary={doc.name} secondary={doc.path} />
+                  </ListItem>
+                ))}
+              </List>
+              {wordDocuments.length === 0 && !loading && <Typography variant="body2">No Word documents are currently available in the repository.</Typography>}
+            </Box>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 2 }}>
+              <TextField
+                label="Send to department"
+                value={sendDepartment}
+                onChange={(e) => setSendDepartment(e.target.value)}
+                size="small"
+              />
+              <Button variant="contained" size="small" onClick={handleSendWordDocument} disabled={!selectedWordDocument || loading}>Send Selected Word Document</Button>
+            </Stack>
           </Paper>
 
           <Paper sx={{ p: 3, borderRadius: 3 }}>
