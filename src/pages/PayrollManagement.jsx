@@ -91,17 +91,21 @@ export default function PayrollManagement() {
   };
 
   const handleGeneratePayroll = async () => {
-    if (!selectedEmployee || !payPeriodStart || !payPeriodEnd || !basicSalary) {
-      setError('Please fill all fields');
+    if (!selectedEmployee) {
+      setError('Please select an employee');
       return;
     }
+
+    const startDate = payPeriodStart || new Date().toISOString().slice(0, 10);
+    const endDate = payPeriodEnd || new Date().toISOString().slice(0, 10);
+    const salary = basicSalary ? parseFloat(basicSalary) : 1000000;
 
     try {
       await api.post('/api/payroll/generate', {
         employee_id: parseInt(selectedEmployee),
-        pay_period_start: payPeriodStart,
-        pay_period_end: payPeriodEnd,
-        basic_salary: parseFloat(basicSalary),
+        pay_period_start: startDate,
+        pay_period_end: endDate,
+        basic_salary: salary,
       });
 
       setSuccess('Payroll generated successfully');

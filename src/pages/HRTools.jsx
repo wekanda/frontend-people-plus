@@ -10,9 +10,9 @@ export default function HRTools(){
         <li><Link to="/pipeline">Pipeline</Link></li>
         <li><Link to="/talent-pool">Talent Pool</Link></li>
         <li><Link to="/referrals">Referrals</Link></li>
-        <li><a href="#" onClick={(e)=>{e.preventDefault(); alert('Screening tools (TODO)')}}>Screening</a></li>
-        <li><a href="#" onClick={(e)=>{e.preventDefault(); alert('Offers management (TODO)')}}>Offer Management</a></li>
-        <li><a href="#" onClick={(e)=>{e.preventDefault(); alert('Background checks (TODO)')}}>Background Verification</a></li>
+        <li><Link to="/applicants">Screening</Link></li>
+        <li><Link to="/offers">Offer Management</Link></li>
+        <li><Link to="/background-checks">Background Verification</Link></li>
       </ul>
     </div>
   )

@@ -30,8 +30,9 @@ import {
   DialogActions,
   Checkbox,
   FormControlLabel,
+  Tooltip,
 } from '@mui/material';
-import { Download, Printer, Share2 } from 'lucide-react';
+import { Download, Printer, Share2, Info, Mail } from 'lucide-react';
 import api from '../api';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../contexts/AuthContext';
@@ -101,6 +102,11 @@ export default function DocumentGenerator() {
     management: false,
   });
   const [departments, setDepartments] = useState([]);
+  const [emailStatus, setEmailStatus] = useState(null);
+  const [shareStatusMessage, setShareStatusMessage] = useState('');
+  const [testEmailLoading, setTestEmailLoading] = useState(false);
+  const [testEmailMessage, setTestEmailMessage] = useState('');
+  const [testEmailRecipient, setTestEmailRecipient] = useState('');
 
   useEffect(() => {
     // Initialize form data with default values
@@ -115,6 +121,24 @@ export default function DocumentGenerator() {
     setPreview('');
   }, [selectedTemplate]);
 
+  useEffect(() => {
+    const fetchEmailStatus = async () => {
+      try {
+        const response = await api.get('/hr/email-status');
+        setEmailStatus(response.data?.email_configured ?? false);
+      } catch (err) {
+        setEmailStatus(false);
+      }
+    };
+    fetchEmailStatus();
+  }, []);
+
+  useEffect(() => {
+    if (user?.email) {
+      setTestEmailRecipient(user.email);
+    }
+  }, [user]);
+
   const handleFieldChange = (fieldName, value) => {
     setFormData(prev => ({
       ...prev,
@@ -122,8 +146,7 @@ export default function DocumentGenerator() {
     }));
   };
 
-  const handleGeneratePreview = () => {
-    // Validate required fields
+  const handleGeneratePreview = async () => {
     const template = DOCUMENT_TEMPLATES[selectedTemplate];
     const missingFields = template.fields
       .filter(f => f.required && !formData[f.name])
@@ -134,42 +157,70 @@ export default function DocumentGenerator() {
       return;
     }
 
-    // Generate simple preview (in real scenario, would call backend)
-    const previewText = `
-═══════════════════════════════════════════
-${template.name.toUpperCase()}
-═══════════════════════════════════════════
+    try {
+      setLoading(true);
+      setError('');
+      const response = await api.post('/documents/generate', {
+        template_type: selectedTemplate,
+        ...formData,
+      });
 
-Generated on: ${new Date().toLocaleDateString()}
-
-Document Details:
-${template.fields.map(field => {
-  const value = formData[field.name] || '[Not provided]';
-  return `${field.label}: ${value}`;
-}).join('\n')}
-
-═══════════════════════════════════════════
-    `;
-    setPreview(previewText);
-    setShowPreview(true);
-    setError('');
+      setPreview(response.data.content || '');
+      setShowPreview(true);
+      setSuccess('Preview generated successfully.');
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to generate preview');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDownload = async () => {
+  const handleDownloadHtml = async () => {
     try {
       setLoading(true);
       setError('');
 
-      // Call backend to generate document
       const response = await api.post('/documents/generate', {
         template_type: selectedTemplate,
-        ...formData
+        ...formData,
+      });
+
+      const html = response.data?.content || preview || '';
+      const blob = new Blob([html], {
+        type: 'text/html; charset=utf-8',
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${selectedTemplate}_${Date.now()}.html`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      setSuccess('HTML document downloaded successfully!');
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to generate document');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      const response = await api.post('/documents/generate-pdf', {
+        template_type: selectedTemplate,
+        ...formData,
       }, {
         responseType: 'blob',
       });
 
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(new Blob([response.data], {
+        type: 'application/pdf',
+      }));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `${selectedTemplate}_${Date.now()}.pdf`);
@@ -178,12 +229,27 @@ ${template.fields.map(field => {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      setSuccess('Document downloaded successfully!');
+      setSuccess('PDF document downloaded successfully!');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to generate document');
+      setError(err.response?.data?.detail || 'Failed to generate PDF document');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownload = () => {
+    const html = preview || '';
+    const blob = new Blob([html], {
+      type: 'text/html; charset=utf-8',
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${selectedTemplate}_${Date.now()}.html`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
   };
 
   const handlePrint = () => {
@@ -196,6 +262,8 @@ ${template.fields.map(field => {
   const handleShare = async () => {
     try {
       setLoading(true);
+      setError('');
+      setShareStatusMessage('');
       const selectedDepts = Object.keys(shareDepartments).filter(dept => shareDepartments[dept]);
 
       if (selectedDepts.length === 0) {
@@ -203,20 +271,43 @@ ${template.fields.map(field => {
         return;
       }
 
-      // Call backend to share document
-      await api.post('/documents/share', {
+      const response = await api.post('/documents/send', {
         template_type: selectedTemplate,
+        email: user?.email || 'hr@peoplepluse.com',
         departments: selectedDepts,
-        shared_by: user.email,
-        ...formData
+        ...formData,
       });
 
-      setSuccess(`Document shared with: ${selectedDepts.join(', ')}`);
+      const message = response.data?.message || `Document shared with: ${selectedDepts.join(', ')}`;
+      setSuccess(message);
+      setShareStatusMessage(message);
       setShareDialogOpen(false);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to share document');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSendTestEmail = async () => {
+    try {
+      setTestEmailLoading(true);
+      setError('');
+      setTestEmailMessage('');
+      const response = await api.post('/hr/test-email', {
+        email: testEmailRecipient || user?.email || 'hr@peoplepluse.com',
+      });
+
+      setTestEmailMessage(response.data?.message || 'Test email request completed.');
+      if (!response.data?.email_sent) {
+        setError(response.data?.message || 'Test email failed.');
+      } else {
+        setSuccess(response.data?.message || 'Test email sent successfully.');
+      }
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to send test email');
+    } finally {
+      setTestEmailLoading(false);
     }
   };
 
@@ -266,6 +357,28 @@ ${template.fields.map(field => {
                 <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
                   Quick Actions
                 </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
+                  <Typography variant="body2" sx={{ color: emailStatus === null ? 'text.secondary' : emailStatus ? 'success.main' : 'error.main' }}>
+                    Email delivery is {emailStatus === null ? 'checking...' : emailStatus ? 'configured' : 'not configured'}.
+                  </Typography>
+                  <Tooltip title="Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, and optional SMTP_FROM in environment variables.">
+                    <Info size={16} style={{ cursor: 'help' }} />
+                  </Tooltip>
+                </Box>
+                {shareStatusMessage ? (
+                  <Typography variant="body2" sx={{ mb: 1, color: 'text.primary' }}>
+                    {shareStatusMessage}
+                  </Typography>
+                ) : null}
+                <TextField
+                  fullWidth
+                  label="Test email recipient"
+                  placeholder="Leave blank to use your login email"
+                  value={testEmailRecipient}
+                  onChange={(e) => setTestEmailRecipient(e.target.value)}
+                  helperText={testEmailRecipient ? '' : 'Enter any email address to send a test message'}
+                  sx={{ mb: 2 }}
+                />
                 <Stack spacing={1}>
                   <Button
                     variant="outlined"
@@ -279,10 +392,28 @@ ${template.fields.map(field => {
                     variant="contained"
                     fullWidth
                     startIcon={<Download size={18} />}
-                    onClick={handleDownload}
+                    onClick={handleDownloadDocx}
+                    disabled={loading || !preview}
+                  >
+                    Download Word
+                  </Button>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    startIcon={<Download size={18} />}
+                    onClick={handleDownloadPdf}
                     disabled={loading || !preview}
                   >
                     Download PDF
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<Download size={18} />}
+                    onClick={handleDownloadHtml}
+                    disabled={loading || !preview}
+                  >
+                    Download HTML
                   </Button>
                   <Button
                     variant="outlined"
@@ -302,6 +433,20 @@ ${template.fields.map(field => {
                   >
                     Share
                   </Button>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<Mail size={18} />}
+                    onClick={handleSendTestEmail}
+                    disabled={testEmailLoading}
+                  >
+                    {testEmailLoading ? 'Sending Test Email…' : 'Send Test Email'}
+                  </Button>
+                  {emailStatus === false ? (
+                    <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'warning.main' }}>
+                      SMTP is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASSWORD to send test emails.
+                    </Typography>
+                  ) : null}
                 </Stack>
               </Box>
             </CardContent>

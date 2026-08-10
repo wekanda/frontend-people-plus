@@ -25,9 +25,17 @@ export function NotificationProvider({ children }) {
       });
       setUnreadCount(res.data?.unread_count || 0);
     } catch (err) {
+      if (err?.response?.status === 401) {
+        setUnreadCount(0);
+        if (typeof auth?.logout === 'function') {
+          auth.logout();
+        }
+        return;
+      }
+
       console.error('Failed to refresh unread count:', err);
     }
-  }, [token]);
+  }, [token, auth]);
 
   const markAllRead = useCallback(async () => {
     if (!token) return;
