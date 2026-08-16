@@ -35,7 +35,7 @@ import ContractGeneration from './pages/ContractGeneration';
 import Documents from './pages/Documents';
 import InterviewScheduling from './pages/InterviewScheduling';
 import DocumentManagement from './pages/DocumentManagement';
-import DocumentGenerator from './pages/DocumentGenerator';
+import DocumentForms from './pages/DocumentForms';
 import PersonnelFile from './pages/PersonnelFile';
 import PayrollManagement from './pages/PayrollManagement';
 import ExcelImport from './pages/ExcelImport';
@@ -93,7 +93,7 @@ function AppContent() {
               <Route path="onboarding" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Onboarding /></ProtectedRoute>} />
               <Route path="contracts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><ContractGeneration /></ProtectedRoute>} />
               <Route path="documents" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><DocumentManagement /></ProtectedRoute>} />
-              <Route path="document-generator" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><DocumentGenerator /></ProtectedRoute>} />
+              <Route path="forms" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><DocumentForms /></ProtectedRoute>} />
               <Route path="interviews" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><InterviewScheduling /></ProtectedRoute>} />
               <Route path="internships" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Internship /></ProtectedRoute>} />
               <Route path="finance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay']}><Finance /></ProtectedRoute>} />
