@@ -21,6 +21,7 @@ const navItems = [
   { label: '📝 Contracts', path: '/contracts', roles: ['hr_admin', 'project_manager'] },
   { label: '📄 Documents', path: '/documents', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
   { label: '📄 Forms Library', path: '/forms', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+  { label: '🔐 Permissions Matrix', path: '/permissions', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
   { label: '� Interviews', path: '/interviews', roles: ['hr_admin', 'project_manager'] },
   { label: '�🎓 Internships', path: '/internships', roles: ['hr_admin', 'project_manager'] },
   { label: '👥 Staff Directory', path: '/staff', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
