@@ -31,6 +31,15 @@ export default function DocumentForms() {
   const [notice, setNotice] = useState(null);
   const iframeRef = useRef(null);
   const fileInputRef = useRef(null);
+  const [employees, setEmployees] = useState([]);
+  const [empKey, setEmpKey] = useState('');
+
+  useEffect(() => {
+    // Load employee list for auto-fill (single source of truth)
+    api.get('/api/employees')
+      .then((res) => setEmployees(Array.isArray(res.data) ? res.data : []))
+      .catch((err) => console.error('Failed to load employees', err));
+  }, []);
 
   useEffect(() => {
     api.get('/api/form-documents')
@@ -158,6 +167,29 @@ const handlePrint = () => {
     }
   };
 
+  const handleEmployeeLoad = async (e) => {
+    const empId = e.target.value;
+    setEmpKey(empId);
+    if (!empId) return;
+    setBusy(true);
+    setNotice(null);
+    try {
+      const res = await api.get(`/api/form-documents/employee-autofill/${empId}`);
+      const cur = res.data?.forms?.[activeKey];
+      const name = res.data?.employee?.full_name || empId;
+      if (cur?.values) {
+        setValues((prev) => ({ ...prev, ...cur.values }));
+        setNotice({ ok: true, text: `Auto-filled from employee record: ${name}.` });
+      } else {
+        setNotice({ ok: true, text: `No fields matched for this document from employee: ${name}.` });
+      }
+    } catch (err) {
+      setNotice({ ok: false, text: err.response?.data?.detail || 'Employee auto-fill failed' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const resetForm = () => {
     if (!activeForm) return;
     const defaults = {};
@@ -241,6 +273,25 @@ if (loadingList) {
             </Button>
           </Stack>
           <input ref={fileInputRef} type="file" accept=".xlsx,.xlsm" style={{ display: 'none' }} onChange={handleExcelUpload} />
+          {employees.length > 0 && (
+            <TextField
+              select
+              size="small"
+              fullWidth
+              label="Load from Employee (auto-fill)"
+              value={empKey}
+              onChange={handleEmployeeLoad}
+              disabled={busy}
+              sx={{ mb: 1 }}
+            >
+              <MenuItem value="">— Select an employee —</MenuItem>
+              {employees.map((emp) => (
+                <MenuItem key={emp.id} value={String(emp.id)}>
+                  {emp.full_name || emp.name} {emp.file_code ? `(${emp.file_code})` : ''}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
           <Divider sx={{ mb: 1 }} />
           <Box sx={{ maxHeight: 'calc(100vh - 260px)', overflowY: 'auto' }}>
             {forms.map((f) => (
