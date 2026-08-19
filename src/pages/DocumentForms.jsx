@@ -72,33 +72,35 @@ export default function DocumentForms() {
       .finally(() => setLoadingList(false));
   }, []);
 
-  // Debounced live render of the chosen document.
+  // Debounced live render of the chosen document (permissions enforced by backend).
   useEffect(() => {
     if (!activeKey) return;
-    const form = forms.find((f) => f.key === activeKey);
-    if (form && !(form.generate_roles || []).includes(role)) {
-      setPreview('');
-      setNotice({ ok: false, text: '🔒 This document is restricted to HR Admin. You can fill it for reference, but generation/printing is Admin-only.' });
-      setRendering(false);
-      return;
-    }
     const t = setTimeout(() => {
       setRendering(true);
       api.post(`/api/form-documents/${activeKey}/render`, { values })
-        .then((res) => setPreview(res.data?.html || ''))
+        .then((res) => {
+          setPreview(res.data?.html || '');
+          setNotice(null);
+        })
         .catch((e) => {
           if (e.response?.status === 403) {
             setNotice({ ok: false, text: '🔒 Only HR Admin can generate this document.' });
             setPreview('');
+          } else {
+            console.error('Render failed', e);
+            setPreview('');
+            setNotice({ ok: false, text: 'Could not render the preview. Please try again.' });
           }
         })
         .finally(() => setRendering(false));
     }, 350);
     return () => clearTimeout(t);
-  }, [activeKey, values, role, forms]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeKey, values]);
 
   const activeForm = forms.find((f) => f.key === activeKey);
-  const canGenerate = activeForm ? (activeForm.generate_roles || []).includes(role) : false;
+  // Frontend convenience only — the backend enforces permissions.
+  const canGenerate = activeForm ? (activeForm.generate_roles == null || (activeForm.generate_roles || []).includes(role)) : false;
 
   const selectForm = (key) => {
     const form = forms.find((f) => f.key === key);
@@ -383,7 +385,7 @@ if (loadingList) {
                   {CATEGORY_ICON[f.category] || '📄'} {f.name}
                 </Typography>
                 <Typography variant="caption" sx={{ opacity: 0.8 }}>{f.category}</Typography>
-                {!(f.generate_roles || []).includes(role) && (
+                {f.generate_roles && !f.generate_roles.includes(role) && (
                   <Chip size="small" label="🔒 HRM only" color="warning" sx={{ mt: 0.5, height: 18, fontSize: 10 }} />
                 )}
               </Box>
@@ -463,9 +465,14 @@ if (loadingList) {
                 sandbox="allow-same-origin allow-modals"
                 style={{ width: '100%', minWidth: 780, height: '1180px', border: 'none', background: '#fff', display: 'block', margin: '0 auto', boxShadow: '0 4px 24px rgba(0,0,0,0.4)' }}
               />
+            ) : rendering ? (
+              <Box sx={{ color: '#eee', textAlign: 'center', py: 10 }}><CircularProgress /></Box>
             ) : (
-              <Box sx={{ color: '#eee', textAlign: 'center', py: 8 }}>
-                <CircularProgress />
+              <Box sx={{ color: '#eee', textAlign: 'center', py: 10 }}>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  {canGenerate ? 'The A4 preview will appear here — fill the form on the left.' : '🔒 This document is restricted to HR Admin for generation.'}
+                </Typography>
+                <Typography variant="caption">Fill the fields to update the preview live.</Typography>
               </Box>
             )}
           </Box>
