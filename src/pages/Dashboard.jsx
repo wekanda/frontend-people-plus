@@ -153,6 +153,26 @@ export default function Dashboard() {
         ]}
       />
 
+      {(() => {
+        const actions =
+          role === 'hr_admin'
+            ? [['📝 Generate Documents', '/forms'], ['👥 Employees', '/staff'], ['💰 Payroll', '/payroll'], ['📥 Excel Import', '/upload'], ['🔐 Permissions', '/permissions']]
+            : role === 'project_manager'
+              ? [['👥 My Team', '/staff'], ['🏖️ Approve Leave', '/leave'], ['⏱️ Timesheets', '/timesheet'], ['📄 Forms Library', '/forms'], ['🔐 Permissions', '/permissions']]
+              : isFinance
+                ? [['🧾 Payslips', '/payslips'], ['💰 Finance', '/finance'], ['📄 Forms Library', '/forms']]
+                : [['📄 My Documents', '/documents'], ['🏖️ Apply Leave', '/leave'], ['⏱️ My Timesheet', '/timesheet'], ['🧾 My Payslips', '/payslips'], ['📄 Forms Library', '/forms']];
+        return (
+          <Stack direction="row" spacing={1} sx={{ mb: 3, flexWrap: 'wrap' }}>
+            {actions.map(([label, path]) => (
+              <Button key={path + label} size="small" variant="outlined" sx={{ textTransform: 'none', borderRadius: 20 }} onClick={() => navigate(path)}>
+                {label}
+              </Button>
+            ))}
+          </Stack>
+        );
+      })()}
+
       {birthdayMessage && (
         <Paper sx={{ p: 3, mb: 3, borderRadius: 3, bgcolor: '#dbeafe', border: '1px solid #bfdbfe' }} elevation={0}>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>

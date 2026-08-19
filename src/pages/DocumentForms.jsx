@@ -11,6 +11,7 @@ import {
 import { Printer, Download, Upload, RefreshCcw, FileSpreadsheet, ExternalLink } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import api from '../api';
+import { useAuth } from '../contexts/AuthContext';
 
 const CATEGORY_ICON = {
   'Contracts & Letters': '📜',
@@ -18,9 +19,16 @@ const CATEGORY_ICON = {
   'HR & Finance': '🏦',
   'Operations': '🧾',
   'Performance': '⭐',
+  'Leave': '🏖️',
+  'Payroll': '💰',
+  'Employee Records': '👥',
+  'Communications': '📣',
 };
 
 export default function DocumentForms() {
+  const { user } = useAuth();
+  const role = user?.role;
+  const isAdmin = role === 'hr_admin';
   const [forms, setForms] = useState([]);
   const [activeKey, setActiveKey] = useState('');
   const [values, setValues] = useState({});
@@ -29,6 +37,7 @@ export default function DocumentForms() {
   const [rendering, setRendering] = useState(false);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState(null);
+  const [savedDrafts, setSavedDrafts] = useState([]);
   const iframeRef = useRef(null);
   const fileInputRef = useRef(null);
   const [employees, setEmployees] = useState([]);
@@ -39,6 +48,12 @@ export default function DocumentForms() {
     api.get('/api/employees')
       .then((res) => setEmployees(Array.isArray(res.data) ? res.data : []))
       .catch((err) => console.error('Failed to load employees', err));
+  }, []);
+
+  useEffect(() => {
+    api.get('/api/form-documents/saved')
+      .then((res) => setSavedDrafts(res.data?.saved || []))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -60,17 +75,30 @@ export default function DocumentForms() {
   // Debounced live render of the chosen document.
   useEffect(() => {
     if (!activeKey) return;
+    const form = forms.find((f) => f.key === activeKey);
+    if (form && !(form.generate_roles || []).includes(role)) {
+      setPreview('');
+      setNotice({ ok: false, text: '🔒 This document is restricted to HR Admin. You can fill it for reference, but generation/printing is Admin-only.' });
+      setRendering(false);
+      return;
+    }
     const t = setTimeout(() => {
       setRendering(true);
       api.post(`/api/form-documents/${activeKey}/render`, { values })
         .then((res) => setPreview(res.data?.html || ''))
-        .catch((e) => console.error('Render failed', e))
+        .catch((e) => {
+          if (e.response?.status === 403) {
+            setNotice({ ok: false, text: '🔒 Only HR Admin can generate this document.' });
+            setPreview('');
+          }
+        })
         .finally(() => setRendering(false));
     }, 350);
     return () => clearTimeout(t);
-  }, [activeKey, values]);
+  }, [activeKey, values, role, forms]);
 
   const activeForm = forms.find((f) => f.key === activeKey);
+  const canGenerate = activeForm ? (activeForm.generate_roles || []).includes(role) : false;
 
   const selectForm = (key) => {
     const form = forms.find((f) => f.key === key);
@@ -84,6 +112,7 @@ export default function DocumentForms() {
 
   const setField = (name, val) => setValues((prev) => ({ ...prev, [name]: val }));
 const handlePrint = () => {
+    if (!canGenerate) { setNotice({ ok: false, text: '🔒 Generation is Admin-only for this document.' }); return; }
     const win = iframeRef.current;
     if (win?.contentWindow) {
       win.contentWindow.focus();
@@ -101,7 +130,46 @@ const handlePrint = () => {
     setTimeout(() => win.print(), 500);
   };
 
+  const handleSaveDraft = async () => {
+    try {
+      setBusy(true);
+      const res = await api.post(`/api/form-documents/${activeKey}/save`, { values });
+      setNotice({ ok: true, text: `Draft saved (id ${res.data.id}).` });
+      await loadSavedDrafts();
+    } catch (err) {
+      setNotice({ ok: false, text: err.response?.data?.detail || 'Save failed' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const loadSavedDrafts = async () => {
+    try {
+      const res = await api.get('/api/form-documents/saved');
+      setSavedDrafts(res.data?.saved || []);
+    } catch (e) { /* ignore */ }
+  };
+
+  const handleLoadSaved = async (e) => {
+    const id = e.target.value;
+    if (!id) return;
+    try {
+      const res = await api.get('/api/form-documents/saved');
+      const draft = (res.data?.saved || []).find((d) => String(d.id) === String(id));
+      if (!draft) return;
+      const form = forms.find((f) => f.key === draft.form_key);
+      if (form) {
+        setActiveKey(form.key);
+        setValues((prev) => ({ ...prev, ...(draft.values || {}) }));
+        setNotice({ ok: true, text: `Loaded saved draft: ${draft.form_name}.` });
+      }
+    } catch (err) {
+      setNotice({ ok: false, text: 'Failed to load saved draft' });
+    }
+  };
+
   const handleDownload = async () => {
+    if (!canGenerate) { setNotice({ ok: false, text: '🔒 Only HR Admin can download official documents.' }); return; }
     try {
       setBusy(true);
       const res = await api.post(`/api/form-documents/${activeKey}/download`, { values }, { responseType: 'blob' });
@@ -257,23 +325,27 @@ if (loadingList) {
           <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
             Documents ({forms.length})
           </Typography>
-          <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-            <Button
-              size="small"
-              variant="contained"
-              startIcon={busy ? <CircularProgress size={13} color="inherit" /> : <Upload size={14} />}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={busy}
-              sx={{ textTransform: 'none' }}
-            >
-              Excel Autofill
-            </Button>
-            <Button size="small" variant="outlined" onClick={handleDownloadTemplate} disabled={busy} sx={{ textTransform: 'none' }}>
-              Template
-            </Button>
-          </Stack>
+          {isAdmin ? (
+            <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+              <Button
+                size="small"
+                variant="contained"
+                startIcon={busy ? <CircularProgress size={13} color="inherit" /> : <Upload size={14} />}
+                onClick={() => fileInputRef.current?.click()}
+                disabled={busy}
+                sx={{ textTransform: 'none' }}
+              >
+                Excel Autofill
+              </Button>
+              <Button size="small" variant="outlined" onClick={handleDownloadTemplate} disabled={busy} sx={{ textTransform: 'none' }}>
+                Template
+              </Button>
+            </Stack>
+          ) : (
+            <Chip sx={{ mb: 1 }} size="small" color="warning" label="HR Admin tools hidden — Manager/Staff cannot generate contracts" />
+          )}
           <input ref={fileInputRef} type="file" accept=".xlsx,.xlsm" style={{ display: 'none' }} onChange={handleExcelUpload} />
-          {employees.length > 0 && (
+          {isAdmin && employees.length > 0 && (
             <TextField
               select
               size="small"
@@ -311,17 +383,49 @@ if (loadingList) {
                   {CATEGORY_ICON[f.category] || '📄'} {f.name}
                 </Typography>
                 <Typography variant="caption" sx={{ opacity: 0.8 }}>{f.category}</Typography>
+                {!(f.generate_roles || []).includes(role) && (
+                  <Chip size="small" label="🔒 HRM only" color="warning" sx={{ mt: 0.5, height: 18, fontSize: 10 }} />
+                )}
               </Box>
             ))}
           </Box>
+          {savedDrafts.length > 0 && (
+            <>
+              <Divider sx={{ my: 1 }} />
+              <TextField
+                select
+                size="small"
+                fullWidth
+                label="Saved drafts"
+                value=""
+                onChange={handleLoadSaved}
+                sx={{ mb: 1 }}
+              >
+                <MenuItem value="">— Load a saved draft —</MenuItem>
+                {savedDrafts.map((d) => (
+                  <MenuItem key={d.id} value={String(d.id)}>
+                    {d.form_name} ({new Date(d.saved_at).toLocaleDateString()})
+                  </MenuItem>
+                ))}
+              </TextField>
+            </>
+          )}
         </Paper>
 {/* ---- Fillable form ---- */}
         <Paper sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
             <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{activeForm.name}</Typography>
-            <Tooltip title="Clear all fields">
-              <IconButton size="small" onClick={resetForm}><RefreshCcw size={15} /></IconButton>
-            </Tooltip>
+            <Stack direction="row" spacing={0.5}>
+              {!canGenerate && (
+                <Chip size="small" color="warning" label="🔒 Read-only for HR Admin only" />
+              )}
+              <Button size="small" variant="outlined" onClick={handleSaveDraft} disabled={busy} sx={{ textTransform: 'none' }}>
+                Save draft
+              </Button>
+              <Tooltip title="Clear all fields">
+                <IconButton size="small" onClick={resetForm}><RefreshCcw size={15} /></IconButton>
+              </Tooltip>
+            </Stack>
           </Stack>
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
             {activeForm.description}
