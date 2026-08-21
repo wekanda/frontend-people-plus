@@ -156,9 +156,9 @@ export default function Dashboard() {
       {(() => {
         const actions =
           role === 'hr_admin'
-            ? [['📝 Generate Documents', '/forms'], ['👥 Employees', '/staff'], ['💰 Payroll', '/payroll'], ['📥 Excel Import', '/upload'], ['🔐 Permissions', '/permissions']]
+            ? [['📝 Generate Documents', '/forms'], ['👥 Employees', '/staff'], ['💰 Payroll', '/payroll'], ['📥 Excel Import', '/upload']]
             : role === 'project_manager'
-              ? [['👥 My Team', '/staff'], ['🏖️ Approve Leave', '/leave'], ['⏱️ Timesheets', '/timesheet'], ['📄 Forms Library', '/forms'], ['🔐 Permissions', '/permissions']]
+              ? [['👥 My Team', '/staff'], ['🏖️ Approve Leave', '/leave'], ['⏱️ Timesheets', '/timesheet'], ['📄 Forms Library', '/forms']]
               : isFinance
                 ? [['🧾 Payslips', '/payslips'], ['💰 Finance', '/finance'], ['📄 Forms Library', '/forms']]
                 : [['📄 My Documents', '/documents'], ['🏖️ Apply Leave', '/leave'], ['⏱️ My Timesheet', '/timesheet'], ['🧾 My Payslips', '/payslips'], ['📄 Forms Library', '/forms']];

@@ -36,7 +36,6 @@ import Documents from './pages/Documents';
 import InterviewScheduling from './pages/InterviewScheduling';
 import DocumentManagement from './pages/DocumentManagement';
 import DocumentForms from './pages/DocumentForms';
-import PermissionsMatrix from './pages/PermissionsMatrix';
 import PersonnelFile from './pages/PersonnelFile';
 import PayrollManagement from './pages/PayrollManagement';
 import ExcelImport from './pages/ExcelImport';
@@ -95,7 +94,6 @@ function AppContent() {
               <Route path="contracts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><ContractGeneration /></ProtectedRoute>} />
               <Route path="documents" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><DocumentManagement /></ProtectedRoute>} />
               <Route path="forms" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><DocumentForms /></ProtectedRoute>} />
-              <Route path="permissions" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><PermissionsMatrix /></ProtectedRoute>} />
               <Route path="interviews" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><InterviewScheduling /></ProtectedRoute>} />
               <Route path="internships" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Internship /></ProtectedRoute>} />
               <Route path="finance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay']}><Finance /></ProtectedRoute>} />
