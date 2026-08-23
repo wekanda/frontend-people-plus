@@ -4,6 +4,7 @@
  * upload an Excel file to auto-populate every document automatically.
  */
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Container, Paper, Box, Typography, TextField, Button, MenuItem, Chip,
   CircularProgress, Alert, Stack, Divider, IconButton, Tooltip,
@@ -15,13 +16,19 @@ import { useAuth } from '../contexts/AuthContext';
 
 const CATEGORY_ICON = {
   'Contracts & Letters': '📜',
-  'Internships': '🎓',
+  'Internships & Volunteers': '🎓',
   'HR & Finance': '🏦',
-  'Operations': '🧾',
-  'Performance': '⭐',
-  'Leave': '🏖️',
-  'Payroll': '💰',
+  'Procurement & Stores': '🧾',
+  'Performance & Appraisals': '⭐',
+  'Leave & Attendance': '🏖️',
+  'Payroll & Benefits': '💰',
   'Employee Records': '👥',
+  'Communications & Engagement': '📣',
+  'Operations': '🧾',
+  'Payroll': '💰',
+  'Leave': '🏖️',
+  'Performance': '⭐',
+  'Internships': '🎓',
   'Communications': '📣',
 };
 
@@ -29,6 +36,7 @@ export default function DocumentForms() {
   const { user } = useAuth();
   const role = user?.role;
   const isAdmin = role === 'hr_admin';
+  const [params, setParams] = useSearchParams();
   const [forms, setForms] = useState([]);
   const [activeKey, setActiveKey] = useState('');
   const [values, setValues] = useState({});
@@ -42,6 +50,19 @@ export default function DocumentForms() {
   const fileInputRef = useRef(null);
   const [employees, setEmployees] = useState([]);
   const [empKey, setEmpKey] = useState('');
+  // Category filter from the sidebar deep-links (e.g. /forms?category=Payroll & Benefits)
+  const activeCategory = params.get('category') || 'All';
+  const setActiveCategory = (cat) => {
+    const next = new URLSearchParams(params);
+    if (cat === 'All' || !cat) next.delete('category');
+    else next.set('category', cat);
+    setParams(next, { replace: true });
+  };
+  // Preserve the sidebar category across component remounts by keying list on category.
+  const filteredForms = activeCategory === 'All'
+    ? forms
+    : forms.filter((f) => (f.category || '').trim() === activeCategory);
+  const categoryList = forms.length ? ['All', ...Array.from(new Set(forms.map((f) => f.category)))] : ['All'];
 
   useEffect(() => {
     // Load employee list for auto-fill (single source of truth)
@@ -57,19 +78,41 @@ export default function DocumentForms() {
   }, []);
 
   useEffect(() => {
+    if (!forms.length) return;
+    // When category filter active, auto-select the first form in that category.
+    const candidates = activeCategory === 'All' ? forms : forms.filter((f) => (f.category || '').trim() === activeCategory);
+    const list = candidates.length ? candidates : forms;
+    const keep = list.find((f) => f.key === activeKey);
+    setActiveKey(keep ? keep.key : list[0].key);
+    if (list.length && !keep) {
+      const defaults = {};
+      list[0].fields.forEach((f) => { if (f.default) defaults[f.name] = f.default; });
+      setValues(defaults);
+      setNotice(null);
+    }
+  }, [activeCategory, forms]);
+
+  useEffect(() => {
     api.get('/api/form-documents')
       .then((res) => {
         const list = res.data?.forms || [];
         setForms(list);
         if (list.length) {
-          setActiveKey(list[0].key);
+          let first = list[0];
+          const wanted = params.get('category');
+          if (wanted) {
+            const match = list.find((f) => (f.category || '').trim() === wanted);
+            if (match) first = match;
+          }
+          setActiveKey(first.key);
           const defaults = {};
-          list[0].fields.forEach((f) => { if (f.default) defaults[f.name] = f.default; });
+          first.fields.forEach((f) => { if (f.default) defaults[f.name] = f.default; });
           setValues(defaults);
         }
       })
       .catch((err) => console.error('Failed to load forms', err))
       .finally(() => setLoadingList(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Debounced live render of the chosen document (permissions enforced by backend).
@@ -325,8 +368,20 @@ if (loadingList) {
         {/* ---- Document library ---- */}
         <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
-            Documents ({forms.length})
+            Documents ({filteredForms.length})
           </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
+            {categoryList.map((cat) => (
+              <Chip
+                key={cat}
+                size="small"
+                label={cat === 'All' ? 'All' : `${CATEGORY_ICON[cat] || '📄'} ${cat}`}
+                onClick={() => setActiveCategory(cat)}
+                color={activeCategory === cat ? 'primary' : 'default'}
+                variant={activeCategory === cat ? 'filled' : 'outlined'}
+              />
+            ))}
+          </Box>
           {isAdmin ? (
             <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
               <Button
@@ -368,7 +423,7 @@ if (loadingList) {
           )}
           <Divider sx={{ mb: 1 }} />
           <Box sx={{ maxHeight: 'calc(100vh - 260px)', overflowY: 'auto' }}>
-            {forms.map((f) => (
+            {filteredForms.map((f) => (
               <Box
                 key={f.key}
                 onClick={() => selectForm(f.key)}

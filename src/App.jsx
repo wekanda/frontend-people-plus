@@ -5,13 +5,13 @@ import { lightTheme, darkTheme } from './theme';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
 import Dashboard from './pages/Dashboard';
+import Alerts from './pages/Alerts';
 import StaffDirectory from './pages/StaffDirectory';
 import LeaveManagement from './pages/LeaveManagement';
 import Timesheet from './pages/Timesheet';
 import PerformanceAppraisal from './pages/PerformanceAppraisal';
 import Upload from './pages/Upload';
 import Notifications from './pages/Notifications';
-import IndependentSheet from './pages/IndependentSheet';
 import Login from './pages/Login';
 import DashboardLayout from './components/DashboardLayout';
 import Recruitment from './pages/Recruitment';
@@ -101,7 +101,7 @@ function AppContent() {
               <Route path="leave" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><LeaveManagement /></ProtectedRoute>} />
               <Route path="timesheet" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><Timesheet /></ProtectedRoute>} />
               <Route path="appraisals" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><PerformanceAppraisal /></ProtectedRoute>} />
-              <Route path="sheet" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><IndependentSheet /></ProtectedRoute>} />
+              <Route path="alerts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Alerts /></ProtectedRoute>} />
               <Route path="notifications" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Notifications /></ProtectedRoute>} />
               <Route path="upload" element={<ProtectedRoute allowedRoles={['hr_admin']}><Upload /></ProtectedRoute>} />
               <Route path="personnel-file" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><PersonnelFile /></ProtectedRoute>} />

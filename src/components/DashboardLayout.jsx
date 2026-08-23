@@ -2,40 +2,89 @@ import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { Box, Typography, Avatar, Button, Divider, Stack, List, ListItemButton, ListItemText, Paper, Badge } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
-import { useNotifications } from '../contexts/NotificationContext';
+import NotificationBell from './NotificationBell';
 
-const navItems = [
-  { label: '📊 Dashboard', path: '/', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
-  { label: '🧾 Payslips', path: '/payslips', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
-  { label: '💼 Recruitment', path: '/recruitment', roles: ['hr_admin', 'project_manager'] },
-  { label: '🧾 Job Admin', path: '/recruitment-admin', roles: ['hr_admin', 'project_manager'] },
-  { label: '👤 Applicants', path: '/applicants', roles: ['hr_admin', 'project_manager'] },
-  { label: '📈 Pipeline', path: '/pipeline', roles: ['hr_admin', 'project_manager'] },
-  { label: '🧰 HR Tools', path: '/hr-tools', roles: ['hr_admin', 'project_manager'] },
-  { label: '🎯 Assessments', path: '/assessments', roles: ['hr_admin', 'project_manager'] },
-  { label: '📄 Offer Management', path: '/offers', roles: ['hr_admin', 'project_manager'] },
-  { label: '🔍 Background Checks', path: '/background-checks', roles: ['hr_admin', 'project_manager'] },
-  { label: '🔐 Compliance', path: '/compliance', roles: ['hr_admin', 'project_manager'] },
-  { label: '📊 Analytics', path: '/reporting', roles: ['hr_admin', 'project_manager'] },
-  { label: '🚀 Onboarding', path: '/onboarding', roles: ['hr_admin', 'project_manager'] },
-  { label: '📝 Contracts', path: '/contracts', roles: ['hr_admin', 'project_manager'] },
-  { label: '📄 Documents', path: '/documents', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
-  { label: '📄 Forms Library', path: '/forms', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
-  { label: '� Interviews', path: '/interviews', roles: ['hr_admin', 'project_manager'] },
-  { label: '�🎓 Internships', path: '/internships', roles: ['hr_admin', 'project_manager'] },
-  { label: '👥 Staff Directory', path: '/staff', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
-  { label: '💰 Finance', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
-  { label: '🏖️ Leave Management', path: '/leave', roles: ['hr_admin', 'project_manager', 'staff'] },
-  { label: '⏱️ Timesheet', path: '/timesheet', roles: ['hr_admin', 'project_manager', 'staff'] },
-  { label: '⭐ Appraisals', path: '/appraisals', roles: ['hr_admin', 'project_manager', 'staff'] },
-  { label: '📋 Independent Sheet', path: '/sheet', roles: ['hr_admin', 'project_manager', 'staff'] },
-  { label: '🔔 Notifications', path: '/notifications', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
-  { label: '📥 Excel Import', path: '/upload', roles: ['hr_admin'] },
+/**
+ * Navigation is grouped into logical sections so related documents, forms and
+ * tools live under one heading (Payroll & Benefits, Procurement & Stores,
+ * Documentation, HR Tools, Alerts, Pipeline, Internships & Volunteers...).
+ */
+const NAV_SECTIONS = [
+  {
+    heading: 'Overview',
+    items: [
+      { label: '📊 Dashboard', path: '/', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
+      { label: '🔔 Smart Alerts', path: '/alerts', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+    ],
+  },
+  {
+    heading: 'Payroll & Benefits',
+    items: [
+      { label: '💰 Payroll', path: '/payroll', roles: ['hr_admin', 'finance'] },
+      { label: '🧾 Payslips', path: '/payslips', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
+      { label: '🏦 Finance', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
+      { label: '💳 Payslips, Medical & Benefits', path: '/forms?category=Payroll%20%26%20Benefits', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+    ],
+  },
+  {
+    heading: 'Procurement & Stores',
+    items: [
+      { label: '🧾 Stores & Procurement Forms', path: '/forms?category=Procurement%20%26%20Stores', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+    ],
+  },
+  {
+    heading: 'People & Performance',
+    items: [
+      { label: '👥 Staff Directory', path: '/staff', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
+      { label: '🎓 Internships & Volunteers', path: '/internships', roles: ['hr_admin', 'project_manager'] },
+      { label: '⭐ Performance Appraisals', path: '/appraisals', roles: ['hr_admin', 'project_manager', 'staff'] },
+      { label: '⏱️ Leave & Timesheets', path: '/timesheet', roles: ['hr_admin', 'project_manager', 'staff'] },
+      { label: '🏖️ Leave Management', path: '/leave', roles: ['hr_admin', 'project_manager', 'staff'] },
+      { label: '🚀 Onboarding', path: '/onboarding', roles: ['hr_admin', 'project_manager'] },
+      { label: '📁 Personnel File', path: '/personnel-file', roles: ['hr_admin', 'project_manager'] },
+    ],
+  },
+  {
+    heading: 'Documentation & Contracts',
+    items: [
+      { label: '📄 Forms Library', path: '/forms', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+      { label: '📑 Contract & Letters', path: '/forms?category=Contracts%20%26%20Letters', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+      { label: '📝 Contract Generation', path: '/contracts', roles: ['hr_admin', 'project_manager'] },
+      { label: '📋 Document Management', path: '/documents', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+    ],
+  },
+  {
+    heading: 'HR Resources & Tools',
+    items: [
+      { label: '🧰 HR Tools & Resources', path: '/hr-tools', roles: ['hr_admin', 'project_manager'] },
+      { label: '📥 Excel Import', path: '/excel-import', roles: ['hr_admin'] },
+      { label: '🚚 Upload Data', path: '/upload', roles: ['hr_admin'] },
+    ],
+  },
+  {
+    heading: 'Recruitment & Pipeline',
+    items: [
+      { label: '📈 Pipeline & Upcoming', path: '/pipeline', roles: ['hr_admin', 'project_manager'] },
+      { label: '💼 Recruitment', path: '/recruitment', roles: ['hr_admin', 'project_manager'] },
+      { label: '🧾 Job Admin', path: '/recruitment-admin', roles: ['hr_admin', 'project_manager'] },
+      { label: '👤 Applicants', path: '/applicants', roles: ['hr_admin', 'project_manager'] },
+      { label: '🎯 Assessments', path: '/assessments', roles: ['hr_admin', 'project_manager'] },
+      { label: '💬 Interviews', path: '/interviews', roles: ['hr_admin', 'project_manager'] },
+      { label: '📄 Offer Management', path: '/offers', roles: ['hr_admin', 'project_manager'] },
+      { label: '🔍 Background Checks', path: '/background-checks', roles: ['hr_admin', 'project_manager'] },
+    ],
+  },
+  {
+    heading: 'Compliance & Analytics',
+    items: [
+      { label: '⚖️ Compliance', path: '/compliance', roles: ['hr_admin', 'project_manager'] },
+      { label: '📊 Analytics', path: '/reporting', roles: ['hr_admin', 'project_manager'] },
+    ],
+  },
 ];
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
-  const { unreadCount } = useNotifications();
   const initials = (user?.full_name || user?.email || 'U')
     .split(' ')
     .map((part) => part[0])
@@ -89,58 +138,61 @@ export default function DashboardLayout() {
           </Stack>
         </Box>
 
-        {/* Navigation Menu */}
+        {/* Navigation Menu (grouped by section) */}
         <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0, '&::-webkit-scrollbar': { width: '6px' }, '&::-webkit-scrollbar-track': { bgcolor: 'rgba(255,255,255,0.1)' }, '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.3)', borderRadius: '3px' } }}>
           <List disablePadding sx={{ gap: 0.25, display: 'flex', flexDirection: 'column' }}>
-            {navItems
-              .filter((item) => !item.roles || item.roles.includes(user?.role))
-              .map((item) => (
-                <ListItemButton
-                  key={item.path}
-                  component={NavLink}
-                  to={item.path}
-                  end={item.path === '/'}
-                  sx={{
-                    color: 'inherit',
-                    borderRadius: 1,
-                    mb: 0.25,
-                    py: { xs: 1, md: 1.25 },
-                    px: { xs: 1.5, md: 2 },
-                    fontSize: { xs: '0.9rem', md: '0.95rem' },
-                    transition: 'all 0.2s ease',
-                    '&.active': {
-                      bgcolor: 'rgba(255, 255, 255, 0.15)',
-                      borderLeft: '3px solid white',
+            {NAV_SECTIONS.map((section, si) => {
+              const items = section.items.filter((item) => !item.roles || item.roles.includes(user?.role));
+              if (!items.length) return null;
+              return (
+                <Box key={section.heading} sx={{ mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: 'block',
+                      px: { xs: 1.5, md: 2 },
+                      mt: si > 0 ? 1 : 0,
+                      mb: 0.5,
+                      color: 'rgba(255,255,255,0.55)',
+                      textTransform: 'uppercase',
+                      letterSpacing: 1,
                       fontWeight: 700,
-                      paddingLeft: 'calc(2rem - 3px)',
-                    },
-                    '&:hover': {
-                      bgcolor: 'rgba(255, 255, 255, 0.08)',
-                    },
-                  }}
-                >
-                  <ListItemText
-                    primary={
-                      item.path === '/notifications' ? (
-                        <Badge
-                          badgeContent={unreadCount}
-                          color="secondary"
-                          showZero={false}
-                          max={99}
-                          sx={{ '& .MuiBadge-badge': { right: -18, top: 6, fontSize: '0.65rem' } }}
-                        >
-                          <Typography sx={{ fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit' }}>
-                            {item.label}
-                          </Typography>
-                        </Badge>
-                      ) : (
-                        item.label
-                      )
-                    }
-                    primaryTypographyProps={{ fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit' }}
-                  />
-                </ListItemButton>
-              ))}
+                      fontSize: '0.65rem',
+                    }}
+                  >
+                    {section.heading}
+                  </Typography>
+                  {items.map((item) => (
+                    <ListItemButton
+                      key={item.path}
+                      component={NavLink}
+                      to={item.path}
+                      end={item.path === '/'}
+                      sx={{
+                        color: 'inherit',
+                        borderRadius: 1,
+                        mb: 0.25,
+                        py: { xs: 0.85, md: 1 },
+                        px: { xs: 1.5, md: 2 },
+                        fontSize: { xs: '0.9rem', md: '0.92rem' },
+                        transition: 'all 0.2s ease',
+                        '&.active': {
+                          bgcolor: 'rgba(255, 255, 255, 0.15)',
+                          borderLeft: '3px solid white',
+                          fontWeight: 700,
+                          paddingLeft: 'calc(2rem - 3px)',
+                        },
+                        '&:hover': {
+                          bgcolor: 'rgba(255, 255, 255, 0.08)',
+                        },
+                      }}
+                    >
+                      <ListItemText primary={item.label} primaryTypographyProps={{ fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit' }} />
+                    </ListItemButton>
+                  ))}
+                </Box>
+              );
+            })}
           </List>
         </Box>
 
@@ -197,6 +249,7 @@ export default function DashboardLayout() {
             </Typography>
           </Box>
           <Stack direction="row" spacing={1} display={{ xs: 'none', md: 'flex' }}>
+            <NotificationBell />
             <Button variant="outlined" color="primary" size="small" onClick={logout} sx={{ textTransform: 'none', fontWeight: 600 }}>
               🚪 Logout
             </Button>
