@@ -44,14 +44,24 @@ export default function HRTools() {
     load();
   }, []);
 
-  const download = (folder, name) => {
-    const url = `${api.defaults.baseURL}/api/hr-resources/file?folder=${encodeURIComponent(folder)}&filename=${encodeURIComponent(name)}`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+  const download = async (folder, name) => {
+    try {
+      const res = await api.get('/api/hr-resources/file', {
+        params: { folder, filename: name },
+        responseType: 'blob',
+      });
+      const url = URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Download failed', e);
+      setError('Download failed. Check your permissions.');
+    }
   };
 
   const excelFiles = (groups.find((g) => g.key === 'hr_tools') || {}).files || [];
