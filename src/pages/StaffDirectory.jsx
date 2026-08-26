@@ -5,7 +5,7 @@ import {
   Container, TextField, Button, Card, CardContent, Typography, Box,
   Grid, Chip, CircularProgress, ButtonGroup, Dialog, DialogTitle,
   DialogContent, DialogActions, Stack, Alert, Avatar, Paper, Table,
-  TableHead, TableBody, TableRow, TableCell, IconButton, Divider
+  TableHead, TableBody, TableRow, TableCell, IconButton, Divider, MenuItem
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import PageHeader from '../components/PageHeader';
@@ -30,6 +30,7 @@ export default function StaffDirectory() {
     contact_number: '',
     employment_type: '',
     photo_url: '',
+    gender: '',
     contract_end: ''
   });
   const [message, setMessage] = useState('');
@@ -75,7 +76,7 @@ export default function StaffDirectory() {
       });
       setMessage('Employee added successfully.');
       setOpenDialog(false);
-      setFormData({ file_code: '', full_name: '', project: '', position: '', location: '', contact_number: '', employment_type: '', contract_end: '' });
+      setFormData({ file_code: '', full_name: '', project: '', position: '', location: '', contact_number: '', employment_type: '', gender: '', contract_end: '' });
       fetchEmployees();
     } catch (err) {
       console.error('Error adding employee:', err);
@@ -292,6 +293,7 @@ export default function StaffDirectory() {
                       <TableCell>Position</TableCell>
                       <TableCell>Department</TableCell>
                       <TableCell>Status</TableCell>
+                      <TableCell>Gender</TableCell>
                       <TableCell>Location</TableCell>
                       <TableCell align="right">Actions</TableCell>
                     </TableRow>
@@ -325,6 +327,7 @@ export default function StaffDirectory() {
                             sx={{ fontWeight: 600 }}
                           />
                         </TableCell>
+                        <TableCell>{emp.gender || '—'}</TableCell>
                         <TableCell>{emp.location || 'N/A'}</TableCell>
                         <TableCell align="right">
                           {canManageEmployees ? (
@@ -421,6 +424,19 @@ export default function StaffDirectory() {
             fullWidth
             size="small"
           />
+          <TextField
+            select
+            label="Gender"
+            value={formData.gender}
+            onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+            fullWidth
+            size="small"
+          >
+            <MenuItem value="">— Select —</MenuItem>
+            <MenuItem value="Male">Male</MenuItem>
+            <MenuItem value="Female">Female</MenuItem>
+            <MenuItem value="Other">Other</MenuItem>
+          </TextField>
           <TextField
             label="Contract End Date"
             type="date"
