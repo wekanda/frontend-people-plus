@@ -155,13 +155,11 @@ export default function Dashboard() {
 
       {(() => {
         const actions =
-          role === 'hr_admin'
-            ? [['📝 Generate Documents', '/forms'], ['👥 Employees', '/staff'], ['💰 Payroll', '/payroll'], ['📥 Excel Import', '/upload']]
-            : role === 'project_manager'
-              ? [['👥 My Team', '/staff'], ['🏖️ Approve Leave', '/leave'], ['⏱️ Timesheets', '/timesheet'], ['📄 Forms Library', '/forms']]
-              : isFinance
-                ? [['🧾 Payslips', '/payslips'], ['💰 Finance', '/finance'], ['📄 Forms Library', '/forms']]
-                : [['📄 My Documents', '/documents'], ['🏖️ Apply Leave', '/leave'], ['⏱️ My Timesheet', '/timesheet'], ['🧾 My Payslips', '/payslips'], ['📄 Forms Library', '/forms']];
+          role === 'hr_admin' || role === 'project_manager'
+            ? [['🔔 Smart Alerts', '/alerts'], ['📄 Forms Library', '/forms'], ['🏖️ Leave', '/leave'], ['⏱️ Timesheets', '/timesheet']]
+            : isFinance
+              ? [['🔔 Smart Alerts', '/alerts'], ['🧾 Payslips', '/payslips'], ['🏦 Finance', '/finance'], ['📄 Forms Library', '/forms']]
+              : [['🔔 Smart Alerts', '/alerts'], ['📄 My Documents', '/documents'], ['🏖️ Apply Leave', '/leave'], ['⏱️ My Timesheet', '/timesheet']];
         return (
           <Stack direction="row" spacing={1} sx={{ mb: 3, flexWrap: 'wrap' }}>
             {actions.map(([label, path]) => (
@@ -309,50 +307,27 @@ export default function Dashboard() {
             </Paper>
 
             <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: '#d1d5db', bgcolor: '#f8fafc' }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#111827' }}>Staff Profile</Typography>
-              {featuredEmployee ? (
-                <>
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
-                    <Box sx={{ position: 'relative' }}>
-                      <Box
-                        component="img"
-                        src={featuredEmployee.photo_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(featuredEmployee.full_name) + '&background=1877f2&color=fff&rounded=true'}
-                        alt={featuredEmployee.full_name}
-                        sx={{ width: 72, height: 72, borderRadius: '18px', objectFit: 'cover', display: 'block' }}
-                      />
-                    </Box>
-                    <Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{featuredEmployee.full_name}</Typography>
-                      <Typography variant="body2" color="text.secondary">{featuredEmployee.position || 'Staff'}</Typography>
-                      <Typography variant="body2" color="text.secondary">{featuredEmployee.project || 'Unknown project'}</Typography>
-                    </Box>
-                  </Box>
-
-                  <Box sx={{ display: 'grid', gap: 1, mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary">File Code: <strong>{featuredEmployee.file_code}</strong></Typography>
-                    <Typography variant="body2" color="text.secondary">Contract End: <strong>{featuredEmployee.contract_end}</strong></Typography>
-                    <Typography variant="body2" color="text.secondary">Status: <strong>{featuredEmployee.status || 'Active'}</strong></Typography>
-                  </Box>
-
-                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Document Checklist</Typography>
-                  <Box sx={{ display: 'grid', gap: 1, mb: 2 }}>
-                    {documentChecklist.map((doc) => (
-                      <Box key={doc.label} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1, borderRadius: 2, bgcolor: doc.missing ? '#fef2f2' : '#ecfdf5' }}>
-                        <Typography variant="body2">{doc.label}</Typography>
-                        <Chip label={doc.missing ? 'Missing' : 'OK'} size="small" color={doc.missing ? 'error' : 'success'} />
-                      </Box>
-                    ))}
-                  </Box>
-
-                  <Button variant="contained" fullWidth sx={{ background: '#0f172a', textTransform: 'none' }} onClick={() => navigate('/staff')}>
-                    View Profile
-                  </Button>
-                </>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  No featured employee available right now.
-                </Typography>
-              )}
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#111827' }}>🔔 Smart Alerts Snapshot</Typography>
+              <Typography sx={{ mb: 2, color: '#475569' }}>
+                Key dates and actions needing attention.
+              </Typography>
+              <Box sx={{ display: 'grid', gap: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">Contracts expiring</Typography>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{dashboardData.contracts_expiring_soon}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">Staff with missing docs</Typography>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: dashboardData.staff_with_missing_docs ? '#b91c1c' : 'inherit' }}>{dashboardData.staff_with_missing_docs}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">Approvals pending</Typography>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{dashboardData.pending_timesheet_approvals}</Typography>
+                </Box>
+              </Box>
+              <Button variant="contained" fullWidth sx={{ mt: 2, bgcolor: '#0f172a', textTransform: 'none' }} onClick={() => navigate('/alerts')}>
+                Open Smart Alerts
+              </Button>
             </Paper>
 
             <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: '#d1d5db', bgcolor: '#f8fafc' }}>

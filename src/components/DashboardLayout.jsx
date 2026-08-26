@@ -11,74 +11,87 @@ import NotificationBell from './NotificationBell';
  */
 const NAV_SECTIONS = [
   {
-    heading: 'Overview',
+    heading: 'Dashboard',
     items: [
       { label: '📊 Dashboard', path: '/', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
       { label: '🔔 Smart Alerts', path: '/alerts', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+      { label: '📊 Analytics', path: '/reporting', roles: ['hr_admin', 'project_manager'] },
     ],
   },
   {
-    heading: 'Payroll & Benefits',
+    heading: 'Finance & Payroll',
     items: [
+      { label: '🏦 Finance', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
       { label: '💰 Payroll', path: '/payroll', roles: ['hr_admin', 'finance'] },
       { label: '🧾 Payslips', path: '/payslips', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
-      { label: '🏦 Finance', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
       { label: '💳 Payslips, Medical & Benefits', path: '/forms?category=Payroll%20%26%20Benefits', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
     ],
   },
   {
-    heading: 'Procurement & Stores',
+    heading: 'Procurement Management',
     items: [
-      { label: '🧾 Stores & Procurement Forms', path: '/forms?category=Procurement%20%26%20Stores', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+      { label: '🧾 Procurement & Stores Forms', path: '/forms?category=Procurement%20%26%20Stores', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+      { label: '🧰 Procurement Tools', path: '/hr-tools?tab=excel', roles: ['hr_admin', 'project_manager'] },
     ],
   },
   {
-    heading: 'People & Performance',
+    heading: 'Performance Management',
+    items: [
+      { label: '⭐ Performance Appraisals', path: '/appraisals', roles: ['hr_admin', 'project_manager', 'staff'] },
+      { label: '⏱️ Timesheets', path: '/timesheet', roles: ['hr_admin', 'project_manager', 'staff'] },
+      { label: '🏖️ Leave Management', path: '/leave', roles: ['hr_admin', 'project_manager', 'staff'] },
+      { label: '📝 Leave Application & Tracker', path: '/forms?category=Leave%20%26%20Attendance', roles: ['hr_admin', 'project_manager', 'staff'] },
+    ],
+  },
+  {
+    heading: 'Staff Directory',
     items: [
       { label: '👥 Staff Directory', path: '/staff', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
       { label: '🎓 Internships & Volunteers', path: '/internships', roles: ['hr_admin', 'project_manager'] },
-      { label: '⭐ Performance Appraisals', path: '/appraisals', roles: ['hr_admin', 'project_manager', 'staff'] },
-      { label: '⏱️ Leave & Timesheets', path: '/timesheet', roles: ['hr_admin', 'project_manager', 'staff'] },
-      { label: '🏖️ Leave Management', path: '/leave', roles: ['hr_admin', 'project_manager', 'staff'] },
-      { label: '🚀 Onboarding', path: '/onboarding', roles: ['hr_admin', 'project_manager'] },
-      { label: '📁 Personnel File', path: '/personnel-file', roles: ['hr_admin', 'project_manager'] },
     ],
   },
   {
-    heading: 'Documentation & Contracts',
+    heading: 'Personal Files',
     items: [
+      { label: '📁 Personnel File', path: '/personnel-file', roles: ['hr_admin', 'project_manager'] },
+      { label: '👤 Employee Records Form', path: '/forms?category=Employee%20Records', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+    ],
+  },
+  {
+    heading: 'HRM Templates & Tools',
+    items: [
+      { label: '🧰 HR Tools & Resources', path: '/hr-tools', roles: ['hr_admin', 'project_manager'] },
       { label: '📄 Forms Library', path: '/forms', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
-      { label: '📑 Contract & Letters', path: '/forms?category=Contracts%20%26%20Letters', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+      { label: '📜 Contractual Templates', path: '/forms?category=Contracts%20%26%20Letters', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+      { label: '🧾 Staff Form Templates', path: '/forms?category=Employee%20Records', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
       { label: '📝 Contract Generation', path: '/contracts', roles: ['hr_admin', 'project_manager'] },
       { label: '📋 Document Management', path: '/documents', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
     ],
   },
   {
-    heading: 'HR Resources & Tools',
+    heading: 'HRM TOOL (compiling & generation)',
     items: [
-      { label: '🧰 HR Tools & Resources', path: '/hr-tools', roles: ['hr_admin', 'project_manager'] },
-      { label: '📥 Excel Import', path: '/excel-import', roles: ['hr_admin'] },
+      { label: '📥 Employee / Excel Import', path: '/excel-import', roles: ['hr_admin'] },
       { label: '🚚 Upload Data', path: '/upload', roles: ['hr_admin'] },
+      { label: '🧮 Excel HR Tools', path: '/hr-tools?tab=excel', roles: ['hr_admin', 'project_manager'] },
     ],
   },
   {
-    heading: 'Recruitment & Pipeline',
+    heading: 'Recruitment & Onboarding Pipeline',
     items: [
       { label: '📈 Pipeline & Upcoming', path: '/pipeline', roles: ['hr_admin', 'project_manager'] },
       { label: '💼 Recruitment', path: '/recruitment', roles: ['hr_admin', 'project_manager'] },
       { label: '🧾 Job Admin', path: '/recruitment-admin', roles: ['hr_admin', 'project_manager'] },
-      { label: '👤 Applicants', path: '/applicants', roles: ['hr_admin', 'project_manager'] },
-      { label: '🎯 Assessments', path: '/assessments', roles: ['hr_admin', 'project_manager'] },
       { label: '💬 Interviews', path: '/interviews', roles: ['hr_admin', 'project_manager'] },
       { label: '📄 Offer Management', path: '/offers', roles: ['hr_admin', 'project_manager'] },
       { label: '🔍 Background Checks', path: '/background-checks', roles: ['hr_admin', 'project_manager'] },
+      { label: '🚀 Onboarding', path: '/onboarding', roles: ['hr_admin', 'project_manager'] },
     ],
   },
   {
-    heading: 'Compliance & Analytics',
+    heading: 'Compliance',
     items: [
-      { label: '⚖️ Compliance', path: '/compliance', roles: ['hr_admin', 'project_manager'] },
-      { label: '📊 Analytics', path: '/reporting', roles: ['hr_admin', 'project_manager'] },
+      { label: '⚖️ Compliance & Policies', path: '/compliance', roles: ['hr_admin', 'project_manager'] },
     ],
   },
 ];

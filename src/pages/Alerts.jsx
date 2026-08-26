@@ -14,12 +14,28 @@ const SECTIONS = [
   { key: 'project_end', label: '🏗️ End of Project', color: '#9c27b0', icon: '🏗️' },
   { key: 'probation_end', label: '🧑‍🎓 Probation Ends', color: '#0288d1', icon: '🧑‍🎓' },
   { key: 'review_due', label: '📝 Contract Review Due', color: '#7b1fa2', icon: '📝' },
+  { key: 'missing_docs', label: '📂 Missing Personal-File Docs', color: '#c62828', icon: '📂' },
 ];
 
 function daysLabel(d) {
   if (d === 0) return 'Today';
   if (d === 1) return 'Tomorrow';
   return `In ${d} days`;
+}
+
+// missing_docs is grouped: { "Recruitment documents": [...], ... } -> flatten to cards
+function flatItems(sectionKey, alerts) {
+  if (sectionKey !== 'missing_docs') return alerts[sectionKey] || [];
+  const groups = alerts.missing_docs || {};
+  const out = [];
+  Object.keys(groups).forEach((group) => {
+    (groups[group] || []).forEach((item) => out.push({ ...item, _group: group }));
+  });
+  return out;
+}
+
+function groupTitle(item) {
+  return item._group || item.group || '';
 }
 
 export default function Alerts() {
@@ -63,16 +79,16 @@ export default function Alerts() {
           {/* Overview cards */}
           <Grid container spacing={2} sx={{ mb: 3 }}>
             {SECTIONS.map((s) => (
-              <Grid item xs={6} sm={4} md={2} key={s.key}>
+              <Grid item xs={6} sm={4} md={3} key={s.key}>
                 <Paper
                   sx={{
                     p: 1.5, borderRadius: 3, textAlign: 'center',
                     border: '1px solid', borderColor: 'divider',
-                    bgcolor: (al[s.key] || []).length ? `${s.color}18` : 'background.paper',
+                    bgcolor: flatItems(s.key, al).length ? `${s.color}18` : 'background.paper',
                   }}
                 >
                   <Typography sx={{ fontSize: '1.6rem', lineHeight: 1 }}>{s.icon}</Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.3rem' }}>{(al[s.key] || []).length}</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.3rem' }}>{flatItems(s.key, al).length}</Typography>
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>{s.label}</Typography>
                 </Paper>
               </Grid>
@@ -82,7 +98,7 @@ export default function Alerts() {
           {/* Detailed alert lists */}
           <Grid container spacing={2}>
             {SECTIONS.map((s) => {
-              const items = al[s.key] || [];
+              const items = flatItems(s.key, al);
               return (
                 <Grid item xs={12} md={6} lg={4} key={s.key}>
                   <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
@@ -90,7 +106,7 @@ export default function Alerts() {
                     <Divider sx={{ mb: 1.5 }} />
                     {items.length === 0 ? (
                       <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
-                        No upcoming {s.label.toLowerCase().replace(/s$/, '')}s.
+                        No {s.label.toLowerCase().replace(/s$/, '')}.
                       </Typography>
                     ) : (
                       <Stack spacing={1}>
@@ -106,11 +122,13 @@ export default function Alerts() {
                           >
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
                               <Typography variant="body2" sx={{ fontWeight: 700 }}>{it.name}</Typography>
-                              <ChipNewText>{daysLabel(it.days)}</ChipNewText>
+                              {s.key !== 'missing_docs' && <ChipNewText>{daysLabel(it.days)}</ChipNewText>}
                             </Stack>
                             <Typography variant="caption" color="text.secondary">
-                              {it.file_code ? `${it.file_code} · ` : ''}
-                              {new Date(it.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              {s.key === 'missing_docs'
+                                ? `${groupTitle(it)} · ${it.doc}`
+                                : it.file_code ? `${it.file_code} · ` : ''}
+                              {s.key !== 'missing_docs' && new Date(it.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                               {it.detail ? ` · ${it.detail}` : ''}
                             </Typography>
                           </Box>

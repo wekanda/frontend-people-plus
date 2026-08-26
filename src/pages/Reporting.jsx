@@ -55,41 +55,94 @@ export default function Reporting() {
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {/* HR Metrics Cards */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <Card sx={{ borderRadius: 3, border: '1px solid #d1d5db', height: '100%' }}>
             <CardContent>
-              <Typography variant="subtitle2" sx={{ color: '#6b7280', mb: 1 }}>Total Employees</Typography>
+              <Typography variant="subtitle2" sx={{ color: '#6b7280', mb: 1 }}>Total Staff</Typography>
               <Typography variant="h4" sx={{ fontWeight: 700, color: '#111827' }}>{hr.total_employees}</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Active: {hr.active_employees}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>All employees on record</Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <Card sx={{ borderRadius: 3, border: '1px solid #d1d5db', height: '100%' }}>
             <CardContent>
-              <Typography variant="subtitle2" sx={{ color: '#6b7280', mb: 1 }}>Turnover Rate</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 700, color: '#111827' }}>{hr.turnover_rate_percent}%</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Left: {hr.employees_left}</Typography>
+              <Typography variant="subtitle2" sx={{ color: '#6b7280', mb: 1 }}>Active Staff</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: '#16a34a' }}>{hr.active_employees}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Currently active</Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <Card sx={{ borderRadius: 3, border: '1px solid #d1d5db', height: '100%' }}>
             <CardContent>
-              <Typography variant="subtitle2" sx={{ color: '#6b7280', mb: 1 }}>Avg Tenure</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 700, color: '#111827' }}>{Math.floor(hr.average_tenure_days / 365)} yrs</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>{hr.average_tenure_days} days</Typography>
+              <Typography variant="subtitle2" sx={{ color: '#6b7280', mb: 1 }}>On Recess</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: '#f59e0b' }}>{hr.on_recess_count}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Staff on recess</Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <Card sx={{ borderRadius: 3, border: '1px solid #d1d5db', height: '100%' }}>
             <CardContent>
-              <Typography variant="subtitle2" sx={{ color: '#6b7280', mb: 1 }}>Pending Approvals</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 700, color: '#111827' }}>{hr.pending_leaves}</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Leave requests</Typography>
+              <Typography variant="subtitle2" sx={{ color: '#6b7280', mb: 1 }}>Exited / Turnover</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: '#e53e3e' }}>{hr.turnover_rate_percent}%</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Exited: {hr.exited_count ?? hr.employees_left}</Typography>
             </CardContent>
           </Card>
+        </Grid>
+      </Grid>
+
+      {/* Gender breakdown + Project performance visuals */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #d1d5db' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Gender Breakdown</Typography>
+            <Box sx={{ mb: 2 }}>
+              {Object.entries(hr.gender_breakdown || {}).map(([gender, count]) => (
+                <Box key={gender} sx={{ display: 'flex', justifyContent: 'space-between', pb: 1, borderBottom: '1px solid #e5e7eb' }}>
+                  <Typography variant="body2">{gender}</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 700 }}>{count}</Typography>
+                </Box>
+              ))}
+              {Object.keys(hr.gender_breakdown || {}).length === 0 && (
+                <Typography variant="body2" color="text.secondary">No gender data recorded yet.</Typography>
+              )}
+            </Box>
+            {Object.keys(hr.gender_breakdown || {}).length > 0 && (
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie data={Object.entries(hr.gender_breakdown).map(([name, value]) => ({ name, value }))} cx="50%" cy="50%" labelLine={false} label={({ name, value }) => `${name}: ${value}`} outerRadius={85} dataKey="value">
+                    {Object.keys(hr.gender_breakdown).map((entry, index) => (
+                      <Cell key={`gb-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #d1d5db' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Project Performance</Typography>
+            {Object.keys(hr.project_performance || {}).length > 0 ? (
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={Object.entries(hr.project_performance).map(([name, p]) => ({ name, staff: p.staff, active: p.active, recess: p.recess, exited: p.exited }))}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="active" fill="#16a34a" />
+                  <Bar dataKey="recess" fill="#f59e0b" />
+                  <Bar dataKey="exited" fill="#e53e3e" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <Typography variant="body2" color="text.secondary">No project data recorded yet.</Typography>
+            )}
+          </Paper>
         </Grid>
       </Grid>
 

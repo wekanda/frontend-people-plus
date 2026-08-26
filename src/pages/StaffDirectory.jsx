@@ -34,11 +34,22 @@ export default function StaffDirectory() {
   });
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [analysis, setAnalysis] = useState(null);
   const canManageEmployees = user?.role === 'hr_admin';
 
   useEffect(() => {
     fetchEmployees();
   }, [status]);
+
+  useEffect(() => {
+    const loadAnalysis = async () => {
+      try {
+        const res = await api.get('/reporting/hr_metrics', { headers: { Authorization: `Bearer ${token}` } });
+        setAnalysis(res.data);
+      } catch (e) { /* optional */ }
+    };
+    if (user?.role === 'hr_admin' || user?.role === 'project_manager') loadAnalysis();
+  }, [token]);
 
   const fetchEmployees = async () => {
     try {
@@ -136,6 +147,44 @@ export default function StaffDirectory() {
         <Alert severity="success" sx={{ mb: 3 }} onClose={() => setMessage('')}>
           {message}
         </Alert>
+      )}
+
+      {/* Staff Analysis cards */}
+      {analysis && (user?.role === 'hr_admin' || user?.role === 'project_manager') && (
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={6} sm={3}>
+            <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+              <CardContent sx={{ textAlign: 'center' }}>
+                <Typography variant="h4" sx={{ fontWeight: 800 }}>{analysis.total_employees}</Typography>
+                <Typography variant="caption" color="text.secondary">Total Staff</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+              <CardContent sx={{ textAlign: 'center' }}>
+                <Typography variant="h4" sx={{ fontWeight: 800, color: '#16a34a' }}>{analysis.active_employees}</Typography>
+                <Typography variant="caption" color="text.secondary">Active Staff</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+              <CardContent sx={{ textAlign: 'center' }}>
+                <Typography variant="h4" sx={{ fontWeight: 800, color: '#f59e0b' }}>{analysis.on_recess_count || 0}</Typography>
+                <Typography variant="caption" color="text.secondary">Staff on Recess</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+              <CardContent sx={{ textAlign: 'center' }}>
+                <Typography variant="h4" sx={{ fontWeight: 800, color: '#e53e3e' }}>{analysis.exited_count || 0}</Typography>
+                <Typography variant="caption" color="text.secondary">Exited Staff</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
       )}
 
       {/* Search and Filter */}
