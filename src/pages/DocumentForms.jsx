@@ -188,6 +188,25 @@ const handlePrint = () => {
     }
   };
 
+  const handleDeleteDraft = async (id) => {
+    if (!window.confirm('Delete this saved draft?')) return;
+    try {
+      await api.delete(`/api/form-documents/saved/${id}`);
+      setNotice({ ok: true, text: 'Draft deleted.' });
+      await loadSavedDrafts();
+    } catch (err) {
+      setNotice({ ok: false, text: err.response?.data?.detail || 'Delete failed' });
+    }
+  };
+
+  // "Next Page" navigation between forms in the current category (avoids crowding).
+  const goNav = (dir) => {
+    if (!filteredForms.length) return;
+    const idx = filteredForms.findIndex((f) => f.key === activeKey);
+    const next = filteredForms[(idx + dir + filteredForms.length) % filteredForms.length];
+    if (next) selectForm(next.key);
+  };
+
   const loadSavedDrafts = async () => {
     try {
       const res = await api.get('/api/form-documents/saved');
@@ -197,6 +216,11 @@ const handlePrint = () => {
 
   const handleLoadSaved = async (e) => {
     const id = e.target.value;
+    if (!id) return;
+    await handleLoadSavedById(id);
+  };
+
+  const handleLoadSavedById = async (id) => {
     if (!id) return;
     try {
       const res = await api.get('/api/form-documents/saved');
@@ -364,6 +388,31 @@ if (loadingList) {
         </Alert>
       )}
 
+      {/* Contractual Document Management Workflow */}
+      <Paper sx={{ p: 2, mb: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: '#f8fafc' }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>📂 Contractual Document Management Flow</Typography>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+          {[
+            ['1', 'Template Upload', 'Managers select & upload HRM contractual templates'],
+            ['2', 'Data Population', 'Employee/project info fills the structured fields'],
+            ['3', 'Draft Save', 'Partially completed docs saved for later'],
+            ['4', 'Document Preview', 'A4 validation before finalization'],
+            ['5', 'Final Save', 'Stored securely in the document repository'],
+            ['6', 'Generate', 'Compile into Word/PDF'],
+            ['7', 'Print Dispatch', 'Send to the printer queue'],
+            ['8', 'Audit & Versions', 'Logs of edits, approvals & versions'],
+          ].map(([n, t, d]) => (
+            <Box key={n} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: '#eef2ff', borderRadius: 2, px: 1.25, py: 0.75 }}>
+              <Typography variant="caption" sx={{ fontWeight: 800, color: 'primary.main' }}>{n}</Typography>
+              <Box>
+                <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', lineHeight: 1.1 }}>{t}</Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.62rem', lineHeight: 1.1 }}>{d}</Typography>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      </Paper>
+
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '280px 1fr 1.4fr' }, gap: 2, alignItems: 'start' }}>
         {/* ---- Document library ---- */}
         <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
@@ -449,39 +498,36 @@ if (loadingList) {
           {savedDrafts.length > 0 && (
             <>
               <Divider sx={{ my: 1 }} />
-              <TextField
-                select
-                size="small"
-                fullWidth
-                label="Saved drafts"
-                value=""
-                onChange={handleLoadSaved}
-                sx={{ mb: 1 }}
-              >
-                <MenuItem value="">— Load a saved draft —</MenuItem>
+              <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', mb: 0.5 }}>Saved drafts</Typography>
+              <Stack spacing={0.75}>
                 {savedDrafts.map((d) => (
-                  <MenuItem key={d.id} value={String(d.id)}>
-                    {d.form_name} ({new Date(d.saved_at).toLocaleDateString()})
-                  </MenuItem>
+                  <Stack key={d.id} direction="row" alignItems="center" spacing={0.5}>
+                    <Button size="small" variant="outlined" fullWidth onClick={() => handleLoadSavedById(d.id)} sx={{ textTransform: 'none', justifyContent: 'flex-start' }}>
+                      {d.form_name} ({new Date(d.saved_at).toLocaleDateString()})
+                    </Button>
+                    <IconButton size="small" color="error" onClick={() => handleDeleteDraft(d.id)} title="Delete draft">
+                      <RefreshCcw size={14} />
+                    </IconButton>
+                  </Stack>
                 ))}
-              </TextField>
+              </Stack>
             </>
           )}
         </Paper>
 {/* ---- Fillable form ---- */}
         <Paper sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{activeForm.name}</Typography>
-            <Stack direction="row" spacing={0.5}>
+            <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap' }}>
               {!canGenerate && (
                 <Chip size="small" color="warning" label="🔒 Read-only for HR Admin only" />
               )}
               <Button size="small" variant="outlined" onClick={handleSaveDraft} disabled={busy} sx={{ textTransform: 'none' }}>
-                Save draft
+                💾 Save
               </Button>
-              <Tooltip title="Clear all fields">
-                <IconButton size="small" onClick={resetForm}><RefreshCcw size={15} /></IconButton>
-              </Tooltip>
+              <Button size="small" variant="outlined" color="error" onClick={resetForm} disabled={busy} sx={{ textTransform: 'none' }}>
+                🗑️ Delete
+              </Button>
             </Stack>
           </Stack>
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
@@ -490,6 +536,20 @@ if (loadingList) {
           <Divider sx={{ mb: 2 }} />
           <Stack spacing={1.5}>
             {activeForm.fields.map((f) => renderField(f))}
+          </Stack>
+
+          {/* Next Page navigation to avoid crowding the interface */}
+          <Divider sx={{ my: 2 }} />
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexWrap: 'wrap', gap: 1 }}>
+            <Button size="small" variant="outlined" onClick={() => goNav(-1)} sx={{ textTransform: 'none' }} disabled={!filteredForms.length}>
+              ← Previous document
+            </Button>
+            <Typography variant="caption" color="text.secondary">
+              Step {filteredForms.findIndex((f) => f.key === activeKey) + 1} of {filteredForms.length} in this category
+            </Typography>
+            <Button size="small" variant="contained" onClick={() => goNav(1)} sx={{ textTransform: 'none' }} disabled={!filteredForms.length}>
+              Next document →
+            </Button>
           </Stack>
         </Paper>
 
@@ -504,7 +564,7 @@ if (loadingList) {
                 Print
               </Button>
               <Button size="small" variant="outlined" startIcon={<Download size={14} />} onClick={handleDownload} disabled={busy} sx={{ textTransform: 'none', color: '#fff', borderColor: 'rgba(255,255,255,0.5)' }}>
-                .doc
+                ⚙️ Generate .doc
               </Button>
               <Button size="small" variant="text" startIcon={<ExternalLink size={14} />} onClick={handleOpenExternal} sx={{ textTransform: 'none', color: '#fff' }}>
                 Open
