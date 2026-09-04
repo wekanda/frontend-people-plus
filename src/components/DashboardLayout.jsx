@@ -6,8 +6,10 @@ import NotificationBell from './NotificationBell';
 
 /**
  * Navigation is grouped into logical sections so related documents, forms and
- * tools live under one heading (Payroll & Benefits, Procurement & Stores,
- * Documentation, HR Tools, Alerts, Pipeline, Internships & Volunteers...).
+ * tools live under one heading. The Dashboard section carries the approved
+ * Dashboard sub-groups (Smart Alerts, Analytics, Performance Analysis, Pipeline,
+ * Reports). Removed from Dashboard per product decision: Generate docs,
+ * Employees, Payroll, Excel import, Staff profile.
  */
 const NAV_SECTIONS = [
   {
@@ -16,14 +18,18 @@ const NAV_SECTIONS = [
       { label: '📊 Dashboard', path: '/', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
       { label: '🔔 Smart Alerts', path: '/alerts', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
       { label: '📊 Analytics', path: '/reporting', roles: ['hr_admin', 'project_manager'] },
+      { label: '⭐ Performance Analysis', path: '/reporting?tab=performance', roles: ['hr_admin', 'project_manager'] },
+      { label: '📈 Pipeline', path: '/pipeline', roles: ['hr_admin', 'project_manager'] },
+      { label: '📋 Reports', path: '/reports', roles: ['hr_admin', 'project_manager', 'finance', 'staff'] },
     ],
   },
   {
-    heading: 'Finance & Payroll',
+    heading: 'Finance',
     items: [
-      { label: '🏦 Finance', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
+      { label: '🏦 Finance — Payroll & Benefits', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
       { label: '💰 Payroll', path: '/payroll', roles: ['hr_admin', 'finance'] },
       { label: '🧾 Payslips', path: '/payslips', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
+      { label: '🩺 Medical Insurance', path: '/medical-insurance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
       { label: '💳 Payslips, Medical & Benefits', path: '/forms?category=Payroll%20%26%20Benefits', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
     ],
   },
@@ -92,6 +98,12 @@ const NAV_SECTIONS = [
     heading: 'Compliance',
     items: [
       { label: '⚖️ Compliance & Policies', path: '/compliance', roles: ['hr_admin', 'project_manager'] },
+    ],
+  },
+  {
+    heading: 'My Digital Identity',
+    items: [
+      { label: '✍️ My Profile (Signature & Photos)', path: '/my-profile', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
     ],
   },
 ];

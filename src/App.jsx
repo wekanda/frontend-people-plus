@@ -39,6 +39,9 @@ import DocumentForms from './pages/DocumentForms';
 import PersonnelFile from './pages/PersonnelFile';
 import PayrollManagement from './pages/PayrollManagement';
 import ExcelImport from './pages/ExcelImport';
+import Reports from './pages/Reports';
+import MedicalInsurance from './pages/MedicalInsurance';
+import MyProfile from './pages/MyProfile';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -107,6 +110,9 @@ function AppContent() {
               <Route path="personnel-file" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><PersonnelFile /></ProtectedRoute>} />
               <Route path="payroll" element={<ProtectedRoute allowedRoles={['hr_admin', 'finance']}><PayrollManagement /></ProtectedRoute>} />
               <Route path="excel-import" element={<ProtectedRoute allowedRoles={['hr_admin']}><ExcelImport /></ProtectedRoute>} />
+              <Route path="reports" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'staff']}><Reports /></ProtectedRoute>} />
+              <Route path="medical-insurance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay']}><MedicalInsurance /></ProtectedRoute>} />
+              <Route path="my-profile" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><MyProfile /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<Navigate to={user ? '/' : '/login'} replace />} />
           </Routes>

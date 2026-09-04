@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
-import { Container, Typography, Box, Paper, Stack, Button, Grid, CircularProgress, Alert, Divider } from '@mui/material';
+import { Container, Typography, Box, Paper, Stack, Button, Grid, CircularProgress, Alert, Divider, Chip } from '@mui/material';
 import { Download, FileSpreadsheet, Wallet } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 
@@ -60,6 +60,65 @@ export default function Finance() {
           <Box sx={{ textAlign: 'center', py: 3 }}><CircularProgress size={24} /></Box>
         )}
       </Paper>
+
+      {/* Workflows: Payroll master-sheet & pay slips */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>🧾 Payroll Master-Sheet</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Populate with statutory deductions, then Generate → Submit → Approve.
+            </Typography>
+            <Stack spacing={1}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, borderRadius: 2, bgcolor: '#f8fafc' }}>
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 700 }}>Statutory deductions</Typography>
+                  <Typography variant="caption" color="text.secondary">PAYE · NSSF · LST</Typography>
+                </Box>
+                <Chip size="small" label="PAYE / NSSF / LST" color="primary" variant="outlined" />
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, borderRadius: 2, bgcolor: '#f8fafc' }}>
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 700 }}>Workflow</Typography>
+                  <Typography variant="caption" color="text.secondary">Populate → Generate → Submit → Approve</Typography>
+                </Box>
+                <Stack direction="row" spacing={1}>
+                  <Button size="small" variant="outlined" onClick={() => navigate('/payroll')} sx={{ textTransform: 'none' }}>Open Payroll</Button>
+                  <Button size="small" variant="outlined" onClick={() => downloadTool('PAYROLL MASTERSHEET TOOL.xlsx')} sx={{ textTransform: 'none' }}>Download Tool</Button>
+                </Stack>
+              </Box>
+            </Stack>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>🧾 Pay Slips</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Populate employee pay data, then Generate → Submit → Approve.
+            </Typography>
+            <Stack spacing={1}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, borderRadius: 2, bgcolor: '#f8fafc' }}>
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 700 }}>Pay slip workflow</Typography>
+                  <Typography variant="caption" color="text.secondary">Populate → Generate → Submit → Approve</Typography>
+                </Box>
+                <Stack direction="row" spacing={1}>
+                  <Button size="small" variant="outlined" onClick={() => navigate('/payslips')} sx={{ textTransform: 'none' }}>Pay slips</Button>
+                  <Button size="small" variant="outlined" onClick={() => downloadTool('PAYSLIP TOOL.xlsx')} sx={{ textTransform: 'none' }}>Download Tool</Button>
+                </Stack>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, borderRadius: 2, bgcolor: '#f8fafc' }}>
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 700 }}>Medical insurance</Typography>
+                  <Typography variant="caption" color="text.secondary">Populate beneficiaries → Generate → Submit → Approve</Typography>
+                </Box>
+                <Button size="small" variant="outlined" onClick={() => navigate('/medical-insurance')} sx={{ textTransform: 'none' }}>Manage</Button>
+              </Box>
+            </Stack>
+          </Paper>
+        </Grid>
+      </Grid>
+
       <Grid container spacing={3}>
 <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
