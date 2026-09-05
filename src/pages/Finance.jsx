@@ -42,7 +42,7 @@ export default function Finance() {
   };
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-      <PageHeader title="🏦 Finance — Payroll & Benefits" subtitle="Payroll controls, pay slips, medical insurance and staff allowances in one place." />
+      <PageHeader title="🏦 Financial Management" subtitle="Payroll master-sheet, pay slips, medical insurance and staff allowances in one place." />
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', mb: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}>

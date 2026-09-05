@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../api';
 import {
   Container, TextField, Button, Card, CardContent, Typography, Box,
@@ -15,12 +15,15 @@ const statusOptions = ['All', 'Active', 'Exited', 'On Recess'];
 
 export default function StaffDirectory() {
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
   const { token, user } = useAuth();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('All');
-  const [openDialog, setOpenDialog] = useState(false);
+  // Support deep links: ?filter=Active (or On%20Recess / Exited) and ?add=1
+  const initialFilter = params.get('filter');
+  const [status, setStatus] = useState(initialFilter && ['Active', 'On Recess', 'Exited'].includes(initialFilter) ? initialFilter : 'All');
+  const [openDialog, setOpenDialog] = useState(params.get('add') === '1');
   const [formData, setFormData] = useState({
     file_code: '',
     full_name: '',
@@ -206,7 +209,13 @@ export default function StaffDirectory() {
             {statusOptions.map(s => (
               <Button
                 key={s}
-                onClick={() => setStatus(s)}
+                onClick={() => {
+                  setStatus(s);
+                  const next = new URLSearchParams(params);
+                  if (s === 'All') next.delete('filter');
+                  else next.set('filter', s);
+                  setParams(next, { replace: true });
+                }}
                 variant={status === s ? 'contained' : 'outlined'}
                 sx={{
                   textTransform: 'none',

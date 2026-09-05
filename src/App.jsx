@@ -42,6 +42,8 @@ import ExcelImport from './pages/ExcelImport';
 import Reports from './pages/Reports';
 import MedicalInsurance from './pages/MedicalInsurance';
 import MyProfile from './pages/MyProfile';
+import DocumentWorkflow from './pages/DocumentWorkflow';
+import Integrations from './pages/Integrations';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -113,6 +115,8 @@ function AppContent() {
               <Route path="reports" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'staff']}><Reports /></ProtectedRoute>} />
               <Route path="medical-insurance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay']}><MedicalInsurance /></ProtectedRoute>} />
               <Route path="my-profile" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><MyProfile /></ProtectedRoute>} />
+              <Route path="document-workflow" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><DocumentWorkflow /></ProtectedRoute>} />
+              <Route path="integrations" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Integrations /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<Navigate to={user ? '/' : '/login'} replace />} />
           </Routes>

@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -41,6 +42,8 @@ import api from '../api';
 import PageHeader from '../components/PageHeader';
 
 export default function PersonnelFile() {
+  const [params] = useSearchParams();
+  const activeCategory = params.get('category') || '';
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [employees, setEmployees] = useState([]);
   const [personnelFile, setPersonnelFile] = useState(null);
@@ -269,10 +272,23 @@ export default function PersonnelFile() {
 
           {/* Required Documents Checklist */}
           <Card sx={{ mt: 3 }}>
-            <CardHeader title="Required Documents Checklist" />
+            <CardHeader
+              title={`Required Documents Checklist${activeCategory ? ` — ${activeCategory}` : ''}`}
+              subheader={activeCategory ? `Filtered to the ${activeCategory} documents group` : 'All personnel-file document groups'}
+            />
             <CardContent>
               <List>
-                {requiredDocuments.map((doc) => {
+                {requiredDocuments
+                  .filter((doc) => {
+                    if (!activeCategory) return true;
+                    const cat = (doc.category || '').toLowerCase();
+                    if (activeCategory === 'Recruitment') return cat.includes('recruit');
+                    if (activeCategory === 'Bio data') return cat.includes('bio') || cat.includes('data') || cat.includes('id');
+                    if (activeCategory === 'Performance') return cat.includes('perf') || cat.includes('appraisal');
+                    if (activeCategory === 'Exit') return cat.includes('exit') || cat.includes('contract') || cat.includes('notice');
+                    return cat.includes(activeCategory.toLowerCase());
+                  })
+                  .map((doc) => {
                   const isUploaded = documents.some(
                     (d) => d.document_type_id === doc.id && d.approval_status === 'approved'
                   );

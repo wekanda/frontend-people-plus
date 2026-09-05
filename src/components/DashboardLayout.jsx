@@ -24,9 +24,9 @@ const NAV_SECTIONS = [
     ],
   },
   {
-    heading: 'Finance',
+    heading: 'Financial Management',
     items: [
-      { label: '🏦 Finance — Payroll & Benefits', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
+      { label: '🏦 Financial Management', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
       { label: '💰 Payroll', path: '/payroll', roles: ['hr_admin', 'finance'] },
       { label: '🧾 Payslips', path: '/payslips', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
       { label: '🩺 Medical Insurance', path: '/medical-insurance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
@@ -53,6 +53,10 @@ const NAV_SECTIONS = [
     heading: 'Staff Directory',
     items: [
       { label: '👥 Staff Directory', path: '/staff', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
+      { label: '🟢 Active Staff', path: '/staff?filter=Active', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
+      { label: '🌤️ Staff on Recess', path: '/staff?filter=On%20Recess', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
+      { label: '🚪 Exited Staff', path: '/staff?filter=Exited', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
+      { label: '➕ Add Staff', path: '/staff?add=1', roles: ['hr_admin'] },
       { label: '🎓 Internships & Volunteers', path: '/internships', roles: ['hr_admin', 'project_manager'] },
     ],
   },
@@ -60,6 +64,10 @@ const NAV_SECTIONS = [
     heading: 'Personal Files',
     items: [
       { label: '📁 Personnel File', path: '/personnel-file', roles: ['hr_admin', 'project_manager'] },
+      { label: '🧲 Recruitment Documents', path: '/personnel-file?category=Recruitment', roles: ['hr_admin', 'project_manager'] },
+      { label: '🪪 Bio Data Information', path: '/personnel-file?category=Bio%20data', roles: ['hr_admin', 'project_manager'] },
+      { label: '⭐ Performance Mgmt Documents', path: '/personnel-file?category=Performance', roles: ['hr_admin', 'project_manager'] },
+      { label: '🚪 Staff Exit Documents', path: '/personnel-file?category=Exit', roles: ['hr_admin', 'project_manager'] },
       { label: '👤 Employee Records Form', path: '/forms?category=Employee%20Records', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
     ],
   },
@@ -71,6 +79,7 @@ const NAV_SECTIONS = [
       { label: '📜 Contractual Templates', path: '/forms?category=Contracts%20%26%20Letters', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
       { label: '🧾 Staff Form Templates', path: '/forms?category=Employee%20Records', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
       { label: '📝 Contract Generation', path: '/contracts', roles: ['hr_admin', 'project_manager'] },
+      { label: '🔁 Document Generation Workflow', path: '/document-workflow', roles: ['hr_admin', 'project_manager'] },
       { label: '📋 Document Management', path: '/documents', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
     ],
   },
@@ -104,6 +113,12 @@ const NAV_SECTIONS = [
     heading: 'My Digital Identity',
     items: [
       { label: '✍️ My Profile (Signature & Photos)', path: '/my-profile', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+    ],
+  },
+  {
+    heading: 'Integrations & Security',
+    items: [
+      { label: '🔗 Outlook / Teams / WhatsApp', path: '/integrations', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
     ],
   },
 ];
