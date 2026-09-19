@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import CakeIcon from '@mui/icons-material/Cake';
-import { Container, Grid, Paper, Typography, Box, CircularProgress, Button, Stack, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Divider, Chip, TextField } from '@mui/material';
+import { ChevronDown } from 'lucide-react';
+import { Container, Grid, Paper, Typography, Box, CircularProgress, Button, Stack, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Divider, Chip, TextField, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -180,8 +181,8 @@ export default function Dashboard() {
             { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, borderColor: '#fde68a' },
           ];
 
-  const primaryActionLabel = isStaff ? 'View your documents' : 'Upload Excel Data';
-  const primaryActionHandler = () => navigate(isStaff ? '/documents' : '/upload');
+  const primaryActionLabel = isStaff ? 'View your documents' : isFinance ? 'Open Financial Management' : 'Open HR Tools & Downloads';
+  const primaryActionHandler = () => navigate(isStaff ? '/documents' : isFinance ? '/finance' : '/hr-tools');
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -203,9 +204,9 @@ export default function Dashboard() {
       {(() => {
         const actions =
           role === 'hr_admin' || role === 'project_manager'
-            ? [['🔔 Smart Alerts', '/alerts'], ['📄 Forms Library', '/forms'], ['🏖️ Leave', '/leave'], ['⏱️ Timesheets', '/timesheet']]
+            ? [['🔔 Smart Alerts', '/alerts'], ['🧰 HR Tools', '/hr-tools'], ['🏖️ Leave', '/leave'], ['⏱️ Timesheets', '/timesheet']]
             : isFinance
-              ? [['🔔 Smart Alerts', '/alerts'], ['🧾 Payslips', '/payslips'], ['🏦 Finance', '/finance'], ['📄 Forms Library', '/forms']]
+              ? [['🔔 Smart Alerts', '/alerts'], ['🧾 Payslips', '/payslips'], ['🏦 Finance', '/finance'], ['🧰 HR Tools', '/hr-tools']]
               : [['🔔 Smart Alerts', '/alerts'], ['📄 My Documents', '/documents'], ['🏖️ Apply Leave', '/leave'], ['⏱️ My Timesheet', '/timesheet']];
         return (
           <Stack direction="row" spacing={1} sx={{ mb: 3, flexWrap: 'wrap' }}>
@@ -410,6 +411,11 @@ export default function Dashboard() {
 
       <Stack spacing={4}>
         {/* Smart Alerts */}
+        <Accordion square>
+          <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary', '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } }}>
+            Smart Alerts
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 1 }}>
         <Box>
           <SectionTitle icon="🔔" title="Smart Alerts" subtitle="Milestones and approvals that need attention." />
           <Grid container spacing={2}>
@@ -436,8 +442,15 @@ export default function Dashboard() {
             ))}
           </Grid>
         </Box>
+          </AccordionDetails>
+        </Accordion>
 
         {/* Analytics */}
+        <Accordion square defaultExpanded>
+          <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary', '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } }}>
+            Analytics
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 1 }}>
         <Box>
           <SectionTitle icon="📊" title="Analytics" subtitle="Total staff, employment types, recess, exits, gender and organizational spread." />
           <Grid container spacing={2}>
@@ -490,7 +503,14 @@ export default function Dashboard() {
             </Box>
           </Paper>
         </Box>
+          </AccordionDetails>
+        </Accordion>
 {/* Performance Analysis */}
+        <Accordion square>
+          <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary', '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } }}>
+            Performance Analysis
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 1 }}>
         <Box>
           <SectionTitle icon="⭐" title="Performance Analysis" subtitle="Ratings across the organization, units, staff and projects." />
           <Grid container spacing={2}>
@@ -543,7 +563,14 @@ export default function Dashboard() {
             </Grid>
           </Grid>
         </Box>
+          </AccordionDetails>
+        </Accordion>
 {/* Pipeline */}
+        <Accordion square>
+          <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary', '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } }}>
+            Pipeline
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 1 }}>
         <Box>
           <SectionTitle icon="📈" title="Pipeline" subtitle="Vacancies, job-description building blocks, applications, internships and volunteers." />
           <Grid container spacing={2}>
@@ -567,8 +594,15 @@ export default function Dashboard() {
             </Box>
           </Paper>
         </Box>
+          </AccordionDetails>
+        </Accordion>
 
         {/* Reports */}
+        <Accordion square>
+          <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary', '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } }}>
+            Reports
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 1 }}>
         <Box>
           <SectionTitle icon="📋" title="Reports" subtitle="Standard report types and the schedule that keeps reporting on track." />
           <Grid container spacing={2}>
@@ -597,6 +631,8 @@ export default function Dashboard() {
             </Grid>
           </Grid>
         </Box>
+          </AccordionDetails>
+        </Accordion>
       </Stack>
     </Container>
   );

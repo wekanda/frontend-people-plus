@@ -4,7 +4,7 @@
  * upload an Excel file to auto-populate every document automatically.
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Container, Paper, Box, Typography, TextField, Button, MenuItem, Chip,
   CircularProgress, Alert, Stack, Divider, IconButton, Tooltip,
@@ -50,6 +50,8 @@ export default function DocumentForms() {
   const fileInputRef = useRef(null);
   const [employees, setEmployees] = useState([]);
   const [empKey, setEmpKey] = useState('');
+  const [company, setCompany] = useState(null);
+  const navigate = useNavigate();
   // Category filter from the sidebar deep-links (e.g. /forms?category=Payroll & Benefits)
   const activeCategory = params.get('category') || 'All';
   const setActiveCategory = (cat) => {
@@ -69,6 +71,12 @@ export default function DocumentForms() {
     api.get('/api/employees')
       .then((res) => setEmployees(Array.isArray(res.data) ? res.data : []))
       .catch((err) => console.error('Failed to load employees', err));
+  }, []);
+
+  useEffect(() => {
+    api.get('/api/hr-resources/company')
+      .then((res) => setCompany(res.data || null))
+      .catch(() => setCompany(null));
   }, []);
 
   useEffect(() => {
@@ -370,7 +378,7 @@ if (loadingList) {
   if (!activeForm) {
     return (
       <Container maxWidth="lg">
-        <PageHeader title="Forms Library" subtitle="No documents available." />
+        <PageHeader title="Document Forms & Templates" subtitle="No documents available." />
       </Container>
     );
   }
@@ -378,9 +386,23 @@ if (loadingList) {
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
       <PageHeader
-        title="📄  Forms Library"
-        subtitle="Fill the form on the left and watch the A4 document update live — print it exactly as TPO Uganda's official documents, or download the .doc. Upload an Excel file to auto-complete every document at once."
+        title="📄  Document Forms & Templates"
+        subtitle="Fill the form on the left and watch the A4 document update live — print it exactly as your organization’s official documents, or download the .doc. Upload an Excel file to auto-complete every document at once."
       />
+
+      {company && !company.header_url && !company.logo_url && !company.company_name && (
+        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
+          <Box display="flex" justifyContent="space-between" alignItems="center" gap={1} sx={{ flexWrap: 'wrap' }}>
+            <Typography variant="body2">
+              🏢 Your organization hasn't set its name, logo or letterhead yet. They appear at the top of every document you generate here.
+            </Typography>
+            <Button size="small" variant="outlined" onClick={() => navigate('/hr-tools?tab=company')} sx={{ textTransform: 'none' }}>
+              Set Organization Branding
+            </Button>
+          </Box>
+        </Alert>
+      )}
+
 
       {notice && (
         <Alert severity={notice.ok ? 'success' : 'error'} sx={{ mb: 2, borderRadius: 2 }} onClose={() => setNotice(null)}>

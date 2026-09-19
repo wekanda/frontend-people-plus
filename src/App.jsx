@@ -10,7 +10,6 @@ import StaffDirectory from './pages/StaffDirectory';
 import LeaveManagement from './pages/LeaveManagement';
 import Timesheet from './pages/Timesheet';
 import PerformanceAppraisal from './pages/PerformanceAppraisal';
-import Upload from './pages/Upload';
 import Notifications from './pages/Notifications';
 import Login from './pages/Login';
 import DashboardLayout from './components/DashboardLayout';
@@ -87,7 +86,7 @@ function AppContent() {
               <Route path="applicants" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Applicants /></ProtectedRoute>} />
               <Route path="applicant/:id" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><ApplicantDetail /></ProtectedRoute>} />
               <Route path="pipeline" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Pipeline /></ProtectedRoute>} />
-              <Route path="hr-tools" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><HRTools /></ProtectedRoute>} />
+              <Route path="hr-tools" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay']}><HRTools /></ProtectedRoute>} />
               <Route path="talent-pool" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><TalentPool /></ProtectedRoute>} />
               <Route path="referrals" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Referrals /></ProtectedRoute>} />
               <Route path="assessments" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Assessments /></ProtectedRoute>} />
@@ -108,7 +107,6 @@ function AppContent() {
               <Route path="appraisals" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><PerformanceAppraisal /></ProtectedRoute>} />
               <Route path="alerts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Alerts /></ProtectedRoute>} />
               <Route path="notifications" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Notifications /></ProtectedRoute>} />
-              <Route path="upload" element={<ProtectedRoute allowedRoles={['hr_admin']}><Upload /></ProtectedRoute>} />
               <Route path="personnel-file" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><PersonnelFile /></ProtectedRoute>} />
               <Route path="payroll" element={<ProtectedRoute allowedRoles={['hr_admin', 'finance']}><PayrollManagement /></ProtectedRoute>} />
               <Route path="excel-import" element={<ProtectedRoute allowedRoles={['hr_admin']}><ExcelImport /></ProtectedRoute>} />
