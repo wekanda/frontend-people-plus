@@ -63,6 +63,13 @@ const NAV_SECTIONS = [
     ],
   },
   {
+    heading: 'Subscription & Billing',
+    icon: '💳',
+    items: [
+      { label: 'Plan & Billing (quarterly / yearly)', path: '/subscription', roles: ['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant'] },
+    ],
+  },
+  {
     heading: 'Time & Leave',
     icon: '⏱️',
     items: [
@@ -103,7 +110,6 @@ const NAV_SECTIONS = [
     icon: '🏢',
     items: [
       { label: 'Organization Branding (logo & letterhead)', path: '/hr-tools?tab=company', roles: ALL },
-      { label: 'Subscription & Billing', path: '/subscription', roles: ['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant'] },
       { label: 'Compliance & Policies', path: '/compliance', roles: EXEC },
       { label: 'My Profile & Signature', path: '/my-profile', roles: TOOLS },
       { label: 'Integrations', path: '/integrations', roles: ALL },

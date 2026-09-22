@@ -58,6 +58,7 @@ export default function Dashboard() {
   const [error, setError] = useState('');
 
   const role = user?.role;
+  const [sub, setSub] = useState(null);
   const isHRorManager = role === 'hr_admin' || role === 'project_manager' || role === 'it_officer' || role === 'ceo' || role === 'ceo_assistant';
   const isFinance = role === 'finance' || role === 'pay';
   const isStaff = role === 'staff';
@@ -89,7 +90,11 @@ export default function Dashboard() {
     };
 
     if (token) {
-      Promise.all([fetchDashboard(), fetchNotifications()]).finally(() => setLoading(false));
+      Promise.all([
+        fetchDashboard(),
+        fetchNotifications(),
+        api.get('/api/subscription').then((r) => setSub(r.data || null)).catch(() => setSub(null)),
+      ]).finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
@@ -200,6 +205,41 @@ export default function Dashboard() {
           { label: 'Open staff directory', onClick: () => navigate('/staff') },
         ]}
       />
+
+      {(role === 'ceo' || role === 'ceo_assistant' || role === 'it_officer') && (
+        <Paper sx={{ p: 1.5, mb: 3, borderRadius: 3, bgcolor: '#eef2ff', border: '1px solid #c7d2fe', display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+          <Box component="span" sx={{ fontSize: 22 }}>{role === 'it_officer' ? '🛠️' : '👔'}</Box>
+          <Box flex={1}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#312e81' }}>
+              {role === 'ceo' ? 'CEO — Executive View' : role === 'ceo_assistant' ? 'CEO Assistant — Executive Access' : 'IT Officer — System Administration'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {role === 'it_officer'
+                ? 'You manage the whole app: employees, documents, HR tools, organization branding and subscriptions.'
+                : 'High-level view of how the system is running — reports, analytics, alerts, staff and the organization plan.'}
+            </Typography>
+          </Box>
+        </Paper>
+      )}
+
+      {['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant'].includes(role) && (
+        <Paper sx={{ p: 1.5, mb: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap', bgcolor: '#f8fafc' }}>
+          <Box component="span" sx={{ fontSize: 22 }}>💳</Box>
+          <Box flex={1}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+              Organization plan: {(sub?.plan || 'yearly').charAt(0).toUpperCase() + (sub?.plan || 'yearly').slice(1)} · {sub?.status || 'inactive'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {(sub?.status === 'active' || sub?.status === 'trial')
+                ? `Subscription runs ${sub?.start_date || 'soon'} → ${sub?.end_date || '…'}. Payments will be activated at full launch.`
+                : 'Payments & subscriptions activate once the app is fully built — set your quarterly/yearly plan now.'}
+            </Typography>
+          </Box>
+          <Button size="small" variant="outlined" onClick={() => navigate('/subscription')} sx={{ textTransform: 'none' }}>
+            Plan &amp; Billing
+          </Button>
+        </Paper>
+      )}
 
       {(() => {
         const actions =
