@@ -5,7 +5,12 @@ import { Menu, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import NotificationBell from './NotificationBell';
 
-const ALL = ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'];
+const ALL = ['hr_admin', 'project_manager', 'staff', 'finance', 'pay', 'it_officer', 'ceo', 'ceo_assistant'];
+
+const MG = ['hr_admin', 'project_manager', 'it_officer'];
+const EXEC = ['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant'];
+const STAFF = ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'];
+const TOOLS = ['hr_admin', 'project_manager', 'staff', 'finance', 'it_officer', 'ceo', 'ceo_assistant'];
 
 /**
  * Navigation is organised into the standard HRIS modules (Dashboard, Staff,
@@ -19,9 +24,9 @@ const NAV_SECTIONS = [
     icon: '📊',
     items: [
       { label: 'Dashboard', path: '/', roles: ALL },
-      { label: 'Smart Alerts', path: '/alerts', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
-      { label: 'Analytics', path: '/reporting', roles: ['hr_admin', 'project_manager'] },
-      { label: 'Pipeline', path: '/pipeline', roles: ['hr_admin', 'project_manager'] },
+      { label: 'Smart Alerts', path: '/alerts', roles: TOOLS },
+      { label: 'Analytics', path: '/reporting', roles: EXEC },
+      { label: 'Pipeline', path: '/pipeline', roles: EXEC },
     ],
   },
   {
@@ -29,68 +34,68 @@ const NAV_SECTIONS = [
     icon: '👥',
     items: [
       { label: 'Staff Directory', path: '/staff', roles: ALL },
-      { label: 'Personnel Files', path: '/personnel-file', roles: ['hr_admin', 'project_manager'] },
-      { label: 'Internships & Volunteers', path: '/internships', roles: ['hr_admin', 'project_manager'] },
+      { label: 'Personnel Files', path: '/personnel-file', roles: EXEC },
+      { label: 'Internships & Volunteers', path: '/internships', roles: EXEC },
     ],
   },
   {
     heading: 'Recruitment Management',
     icon: '🎯',
     items: [
-      { label: 'Recruitment', path: '/recruitment', roles: ['hr_admin', 'project_manager'] },
-      { label: 'Job Postings', path: '/recruitment-admin', roles: ['hr_admin', 'project_manager'] },
-      { label: 'Applicants', path: '/applicants', roles: ['hr_admin', 'project_manager'] },
-      { label: 'Interviews', path: '/interviews', roles: ['hr_admin', 'project_manager'] },
-      { label: 'Offers', path: '/offers', roles: ['hr_admin', 'project_manager'] },
-      { label: 'Background Checks', path: '/background-checks', roles: ['hr_admin', 'project_manager'] },
-      { label: 'Onboarding', path: '/onboarding', roles: ['hr_admin', 'project_manager'] },
+      { label: 'Recruitment', path: '/recruitment', roles: EXEC },
+      { label: 'Job Postings', path: '/recruitment-admin', roles: EXEC },
+      { label: 'Applicants', path: '/applicants', roles: EXEC },
+      { label: 'Interviews', path: '/interviews', roles: EXEC },
+      { label: 'Offers', path: '/offers', roles: EXEC },
+      { label: 'Background Checks', path: '/background-checks', roles: EXEC },
+      { label: 'Onboarding', path: '/onboarding', roles: EXEC },
     ],
   },
   {
     heading: 'Financial Management',
     icon: '💼',
     items: [
-      { label: 'Financial Management', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
-      { label: 'Payroll', path: '/payroll', roles: ['hr_admin', 'finance'] },
+      { label: 'Financial Management', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer'] },
+      { label: 'Payroll', path: '/payroll', roles: ['hr_admin', 'finance', 'it_officer'] },
       { label: 'Payslips', path: '/payslips', roles: ALL },
       { label: '🧾 Payslip Tool (inbuilt Excel)', path: '/hr-tools?tab=excel', roles: ALL },
-      { label: 'Medical Insurance', path: '/medical-insurance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
+      { label: 'Medical Insurance', path: '/medical-insurance', roles: ['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer'] },
     ],
   },
   {
     heading: 'Time & Leave',
     icon: '⏱️',
     items: [
-      { label: 'Leave Management', path: '/leave', roles: ['hr_admin', 'project_manager', 'staff'] },
-      { label: 'Timesheets', path: '/timesheet', roles: ['hr_admin', 'project_manager', 'staff'] },
+      { label: 'Leave Management', path: '/leave', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
+      { label: 'Timesheets', path: '/timesheet', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
     ],
   },
   {
     heading: 'Performance',
     icon: '⭐',
     items: [
-      { label: 'Performance Appraisals', path: '/appraisals', roles: ['hr_admin', 'project_manager', 'staff'] },
-      { label: 'Performance Analysis', path: '/reporting?tab=performance', roles: ['hr_admin', 'project_manager'] },
+      { label: 'Performance Appraisals', path: '/appraisals', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
+      { label: 'Performance Analysis', path: '/reporting?tab=performance', roles: EXEC },
     ],
   },
   {
     heading: 'Reports',
     icon: '📋',
     items: [
-      { label: 'Reports', path: '/reports', roles: ['hr_admin', 'project_manager', 'finance', 'staff'] },
-      { label: 'Analytics & Trends', path: '/reporting', roles: ['hr_admin', 'project_manager'] },
+      { label: 'Reports', path: '/reports', roles: ['hr_admin', 'project_manager', 'finance', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
+      { label: 'Analytics & Trends', path: '/reporting', roles: EXEC },
     ],
   },
   {
     heading: 'HR Tools & Documents',
     icon: '🧰',
     items: [
-      { label: 'HR Tools & Built-in Excel Tools', path: '/hr-tools', roles: ['hr_admin', 'project_manager'] },
-      { label: 'Document Forms & Templates', path: '/forms', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
-      { label: 'Contract Generation', path: '/contracts', roles: ['hr_admin', 'project_manager'] },
-      { label: 'Document Management', path: '/documents', roles: ['hr_admin', 'project_manager', 'staff'] },
-      { label: 'Document Workflow', path: '/document-workflow', roles: ['hr_admin', 'project_manager'] },
-      { label: 'Excel / Employee Import', path: '/excel-import', roles: ['hr_admin'] },
+      { label: 'HR Tools & Built-in Excel Tools', path: '/hr-tools', roles: EXEC },
+      { label: 'Document Forms & Templates', path: '/forms', roles: TOOLS },
+      { label: 'Contract Generation', path: '/contracts', roles: EXEC },
+      { label: 'Document Management', path: '/documents', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
+      { label: 'Document Workflow', path: '/document-workflow', roles: EXEC },
+      { label: 'Excel / Employee Import', path: '/excel-import', roles: ['hr_admin', 'it_officer'] },
     ],
   },
   {
@@ -98,8 +103,9 @@ const NAV_SECTIONS = [
     icon: '🏢',
     items: [
       { label: 'Organization Branding (logo & letterhead)', path: '/hr-tools?tab=company', roles: ALL },
-      { label: 'Compliance & Policies', path: '/compliance', roles: ['hr_admin', 'project_manager'] },
-      { label: 'My Profile & Signature', path: '/my-profile', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+      { label: 'Subscription & Billing', path: '/subscription', roles: ['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant'] },
+      { label: 'Compliance & Policies', path: '/compliance', roles: EXEC },
+      { label: 'My Profile & Signature', path: '/my-profile', roles: TOOLS },
       { label: 'Integrations', path: '/integrations', roles: ALL },
     ],
   },

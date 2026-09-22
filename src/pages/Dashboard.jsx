@@ -58,7 +58,7 @@ export default function Dashboard() {
   const [error, setError] = useState('');
 
   const role = user?.role;
-  const isHRorManager = role === 'hr_admin' || role === 'project_manager';
+  const isHRorManager = role === 'hr_admin' || role === 'project_manager' || role === 'it_officer' || role === 'ceo' || role === 'ceo_assistant';
   const isFinance = role === 'finance' || role === 'pay';
   const isStaff = role === 'staff';
 
@@ -181,8 +181,8 @@ export default function Dashboard() {
             { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, borderColor: '#fde68a' },
           ];
 
-  const primaryActionLabel = isStaff ? 'View your documents' : isFinance ? 'Open Financial Management' : 'Open HR Tools & Downloads';
-  const primaryActionHandler = () => navigate(isStaff ? '/documents' : isFinance ? '/finance' : '/hr-tools');
+  const primaryActionLabel = isStaff ? 'View your documents' : role === 'ceo' || role === 'ceo_assistant' ? 'View Executive Reports' : isFinance ? 'Open Financial Management' : 'Open HR Tools & Downloads';
+  const primaryActionHandler = () => navigate(isStaff ? '/documents' : role === 'ceo' || role === 'ceo_assistant' ? '/reports' : isFinance ? '/finance' : '/hr-tools');
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -203,11 +203,13 @@ export default function Dashboard() {
 
       {(() => {
         const actions =
-          role === 'hr_admin' || role === 'project_manager'
-            ? [['🔔 Smart Alerts', '/alerts'], ['🧰 HR Tools', '/hr-tools'], ['🏖️ Leave', '/leave'], ['⏱️ Timesheets', '/timesheet']]
-            : isFinance
-              ? [['🔔 Smart Alerts', '/alerts'], ['🧾 Payslips', '/payslips'], ['🏦 Finance', '/finance'], ['🧰 HR Tools', '/hr-tools']]
-              : [['🔔 Smart Alerts', '/alerts'], ['📄 My Documents', '/documents'], ['🏖️ Apply Leave', '/leave'], ['⏱️ My Timesheet', '/timesheet']];
+          role === 'ceo' || role === 'ceo_assistant'
+            ? [['📋 Reports', '/reports'], ['🔔 Smart Alerts', '/alerts'], ['👥 Staff', '/staff'], ['🌐 Subscription', '/subscription']]
+            : role === 'hr_admin' || role === 'project_manager' || role === 'it_officer'
+              ? [['🔔 Smart Alerts', '/alerts'], ['🧰 HR Tools', '/hr-tools'], ['🏖️ Leave', '/leave'], ['⏱️ Timesheets', '/timesheet'], ['🌐 Subscription', '/subscription']]
+              : isFinance
+                ? [['🔔 Smart Alerts', '/alerts'], ['🧾 Payslips', '/payslips'], ['🏦 Finance', '/finance'], ['🧰 HR Tools', '/hr-tools']]
+                : [['🔔 Smart Alerts', '/alerts'], ['📄 My Documents', '/documents'], ['🏖️ Apply Leave', '/leave'], ['⏱️ My Timesheet', '/timesheet']];
         return (
           <Stack direction="row" spacing={1} sx={{ mb: 3, flexWrap: 'wrap' }}>
             {actions.map(([label, path]) => (

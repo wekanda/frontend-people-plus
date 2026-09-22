@@ -40,6 +40,7 @@ import PayrollManagement from './pages/PayrollManagement';
 import ExcelImport from './pages/ExcelImport';
 import Reports from './pages/Reports';
 import MedicalInsurance from './pages/MedicalInsurance';
+import Subscriptions from './pages/Subscriptions';
 import MyProfile from './pages/MyProfile';
 import DocumentWorkflow from './pages/DocumentWorkflow';
 import Integrations from './pages/Integrations';
@@ -73,48 +74,49 @@ function AppContent() {
             <Route
               path="/"
               element={
-                <ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay']}>
+                <ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay', 'it_officer', 'ceo', 'ceo_assistant']}>
                   <DashboardLayout />
                 </ProtectedRoute>
               }
             >
               <Route index element={<Dashboard />} />
               {/* Removed duplicate 'My Dashboard' route; single Dashboard at '/' */}
-              <Route path="staff" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><StaffDirectory /></ProtectedRoute>} />
-              <Route path="recruitment" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Recruitment /></ProtectedRoute>} />
-              <Route path="recruitment-admin" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><JobAdmin /></ProtectedRoute>} />
-              <Route path="applicants" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Applicants /></ProtectedRoute>} />
-              <Route path="applicant/:id" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><ApplicantDetail /></ProtectedRoute>} />
-              <Route path="pipeline" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Pipeline /></ProtectedRoute>} />
-              <Route path="hr-tools" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay']}><HRTools /></ProtectedRoute>} />
-              <Route path="talent-pool" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><TalentPool /></ProtectedRoute>} />
-              <Route path="referrals" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Referrals /></ProtectedRoute>} />
-              <Route path="assessments" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Assessments /></ProtectedRoute>} />
-              <Route path="offers" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><OfferManagement /></ProtectedRoute>} />
-              <Route path="background-checks" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><BackgroundChecks /></ProtectedRoute>} />
-              <Route path="compliance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Compliance /></ProtectedRoute>} />
-              <Route path="reporting" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Reporting /></ProtectedRoute>} />
-              <Route path="onboarding" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Onboarding /></ProtectedRoute>} />
-              <Route path="contracts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><ContractGeneration /></ProtectedRoute>} />
-              <Route path="documents" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><DocumentManagement /></ProtectedRoute>} />
-              <Route path="forms" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><DocumentForms /></ProtectedRoute>} />
-              <Route path="interviews" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><InterviewScheduling /></ProtectedRoute>} />
-              <Route path="internships" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Internship /></ProtectedRoute>} />
-              <Route path="finance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay']}><Finance /></ProtectedRoute>} />
-              <Route path="payslips" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay']}><Payslip /></ProtectedRoute>} />
-              <Route path="leave" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><LeaveManagement /></ProtectedRoute>} />
-              <Route path="timesheet" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><Timesheet /></ProtectedRoute>} />
-              <Route path="appraisals" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><PerformanceAppraisal /></ProtectedRoute>} />
-              <Route path="alerts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Alerts /></ProtectedRoute>} />
-              <Route path="notifications" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Notifications /></ProtectedRoute>} />
-              <Route path="personnel-file" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><PersonnelFile /></ProtectedRoute>} />
-              <Route path="payroll" element={<ProtectedRoute allowedRoles={['hr_admin', 'finance']}><PayrollManagement /></ProtectedRoute>} />
-              <Route path="excel-import" element={<ProtectedRoute allowedRoles={['hr_admin']}><ExcelImport /></ProtectedRoute>} />
-              <Route path="reports" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'staff']}><Reports /></ProtectedRoute>} />
-              <Route path="medical-insurance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay']}><MedicalInsurance /></ProtectedRoute>} />
-              <Route path="my-profile" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><MyProfile /></ProtectedRoute>} />
-              <Route path="document-workflow" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><DocumentWorkflow /></ProtectedRoute>} />
-              <Route path="integrations" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Integrations /></ProtectedRoute>} />
+              <Route path="staff" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><StaffDirectory /></ProtectedRoute>} />
+              <Route path="recruitment" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Recruitment /></ProtectedRoute>} />
+              <Route path="recruitment-admin" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><JobAdmin /></ProtectedRoute>} />
+              <Route path="applicants" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Applicants /></ProtectedRoute>} />
+              <Route path="applicant/:id" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><ApplicantDetail /></ProtectedRoute>} />
+              <Route path="pipeline" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Pipeline /></ProtectedRoute>} />
+              <Route path="hr-tools" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay', 'it_officer', 'ceo', 'ceo_assistant']}><HRTools /></ProtectedRoute>} />
+              <Route path="talent-pool" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><TalentPool /></ProtectedRoute>} />
+              <Route path="referrals" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Referrals /></ProtectedRoute>} />
+              <Route path="assessments" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Assessments /></ProtectedRoute>} />
+              <Route path="offers" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><OfferManagement /></ProtectedRoute>} />
+              <Route path="background-checks" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><BackgroundChecks /></ProtectedRoute>} />
+              <Route path="compliance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Compliance /></ProtectedRoute>} />
+              <Route path="reporting" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Reporting /></ProtectedRoute>} />
+              <Route path="onboarding" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Onboarding /></ProtectedRoute>} />
+              <Route path="contracts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><ContractGeneration /></ProtectedRoute>} />
+              <Route path="documents" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant']}><DocumentManagement /></ProtectedRoute>} />
+              <Route path="forms" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><DocumentForms /></ProtectedRoute>} />
+              <Route path="interviews" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><InterviewScheduling /></ProtectedRoute>} />
+              <Route path="internships" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Internship /></ProtectedRoute>} />
+              <Route path="finance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer']}><Finance /></ProtectedRoute>} />
+              <Route path="payslips" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay', 'it_officer', 'ceo', 'ceo_assistant']}><Payslip /></ProtectedRoute>} />
+              <Route path="leave" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant']}><LeaveManagement /></ProtectedRoute>} />
+              <Route path="timesheet" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant']}><Timesheet /></ProtectedRoute>} />
+              <Route path="appraisals" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant']}><PerformanceAppraisal /></ProtectedRoute>} />
+              <Route path="alerts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><Alerts /></ProtectedRoute>} />
+              <Route path="notifications" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><Notifications /></ProtectedRoute>} />
+              <Route path="personnel-file" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><PersonnelFile /></ProtectedRoute>} />
+              <Route path="payroll" element={<ProtectedRoute allowedRoles={['hr_admin', 'finance', 'it_officer']}><PayrollManagement /></ProtectedRoute>} />
+              <Route path="excel-import" element={<ProtectedRoute allowedRoles={['hr_admin', 'it_officer']}><ExcelImport /></ProtectedRoute>} />
+              <Route path="reports" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'staff', 'it_officer', 'ceo', 'ceo_assistant']}><Reports /></ProtectedRoute>} />
+              <Route path="subscription" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><Subscriptions /></ProtectedRoute>} />
+              <Route path="medical-insurance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer']}><MedicalInsurance /></ProtectedRoute>} />
+              <Route path="my-profile" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><MyProfile /></ProtectedRoute>} />
+              <Route path="document-workflow" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><DocumentWorkflow /></ProtectedRoute>} />
+              <Route path="integrations" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><Integrations /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<Navigate to={user ? '/' : '/login'} replace />} />
           </Routes>
