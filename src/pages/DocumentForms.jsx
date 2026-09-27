@@ -32,6 +32,62 @@ const CATEGORY_ICON = {
   'Communications': '📣',
 };
 
+function RichTextEditor({ value, onChange }) {
+  const ref = useRef(null);
+  const last = useRef(value || '');
+
+  const emit = () => {
+    if (!ref.current) return;
+    last.current = ref.current.innerHTML;
+    onChange(ref.current.innerHTML);
+  };
+
+  const exec = (cmd) => {
+    if (!ref.current) return;
+    ref.current.focus();
+    document.execCommand(cmd, false, null);
+    emit();
+  };
+
+  // Keep editor in sync when the value changes externally (e.g. Excel autofill).
+  useEffect(() => {
+    if (ref.current && last.current !== (value || '')) {
+      ref.current.innerHTML = value || '';
+      last.current = value || '';
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  return (
+    <Box>
+      <Stack direction="row" spacing={0.5} sx={{ mb: 0.5, flexWrap: 'wrap' }}>
+        {[
+          { cmd: 'bold', label: 'B', title: 'Bold', style: { fontWeight: 700 } },
+          { cmd: 'italic', label: 'I', title: 'Italic', style: { fontStyle: 'italic' } },
+          { cmd: 'underline', label: 'U', title: 'Underline', style: { textDecoration: 'underline' } },
+          { cmd: 'insertUnorderedList', label: '• List', title: 'Bullet list' },
+          { cmd: 'insertOrderedList', label: '1. List', title: 'Numbered list' },
+          { cmd: 'removeFormat', label: 'Clear', title: 'Remove formatting' },
+        ].map((b) => (
+          <IconButton key={b.cmd} size="small" title={b.title} onMouseDown={(e) => { e.preventDefault(); exec(b.cmd); }}
+            sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, fontSize: 13, textTransform: 'none', ...b.style }}>
+            {b.label}
+          </IconButton>
+        ))}
+      </Stack>
+      <Box
+        ref={ref}
+        contentEditable
+        suppressContentEditableWarning
+        onInput={emit}
+        onBlur={emit}
+        dangerouslySetInnerHTML={{ __html: value || '' }}
+        sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5, p: 1, minHeight: 90, fontSize: '0.95rem', outline: 'none', '&:focus': { borderColor: 'primary.main', borderWidth: 2 } }}
+      />
+    </Box>
+  );
+}
+
 export default function DocumentForms() {
   const { user } = useAuth();
   const role = user?.role;
@@ -356,7 +412,7 @@ const handlePrint = () => {
       onChange: (ev) => setField(f.name, ev.target.value),
     };
     if (f.type === 'longtext' || f.type === 'textarea') {
-      return <TextField {...common} multiline minRows={2} />;
+      return <RichTextEditor value={values[f.name] || ''} onChange={(html) => setField(f.name, html)} />;
     }
     if (f.type === 'select') {
       return (

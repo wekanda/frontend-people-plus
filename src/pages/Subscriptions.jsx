@@ -93,7 +93,7 @@ export default function Subscriptions() {
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <PageHeader
         title="Subscription & Billing"
-        subtitle="Your organization's plan with People Plus — quarterly or yearly."
+        subtitle="Your organization's plan with PEOPLE PULSE — quarterly or yearly."
       />
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -152,6 +152,14 @@ export default function Subscriptions() {
             </Stack>
             {sub?.notes && (
               <Alert severity="warning" sx={{ mt: 2 }}><Typography variant="caption">{sub.notes}</Typography></Alert>
+            )}
+            {sub?.prices && (
+              <Alert severity="info" sx={{ mt: 1 }}>
+                <Typography variant="caption">
+                  📊 Quarterly billing: <strong>UGX {Number(sub.prices.quarterly).toLocaleString()}</strong>
+                  {' '}· Yearly billing: <strong>UGX {Number(sub.prices.yearly).toLocaleString()}</strong> (per year)
+                </Typography>
+              </Alert>
             )}
           </Paper>
         </Grid>

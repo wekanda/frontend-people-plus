@@ -59,7 +59,7 @@ export default function Reports() {
                   <Box>
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>{r.name}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Standard People Plus report template
+                      Standard PEOPLE PULSE report template
                     </Typography>
                   </Box>
                 </Box>

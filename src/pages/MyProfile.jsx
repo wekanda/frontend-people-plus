@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
 import {
-  Container, Paper, Typography, Box, Grid, Button, Stack, CircularProgress, Alert, Divider,
+  Container, Paper, Typography, Box, Grid, Button, Stack, CircularProgress, Alert, Divider, TextField,
 } from '@mui/material';
 import { Upload, BadgeCheck } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
@@ -26,6 +26,19 @@ export default function MyProfile() {
   const [error, setError] = useState('');
 
   const isAdmin = user?.role === 'hr_admin';
+  const [emailForm, setEmailForm] = useState({ email: user?.email || '', full_name: user?.full_name || '' });
+  const [profileMsg, setProfileMsg] = useState('');
+
+  const saveProfileDetails = async () => {
+    setError('');
+    setProfileMsg('');
+    try {
+      const res = await api.put('/auth/me', emailForm);
+      setProfileMsg('Profile updated. Use your new email the next time you log in.');
+    } catch (err) {
+      setError(err?.response?.data?.detail || 'Could not update your profile.');
+    }
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -110,6 +123,23 @@ export default function MyProfile() {
           </Stack>
         </Paper>
       )}
+
+      <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', mb: 3 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>📧 Company Email & Name</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Use your real company email so colleagues, the CEO and the IT Officer can reach you across the system.
+        </Typography>
+        {profileMsg && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setProfileMsg('')}>{profileMsg}</Alert>}
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ alignItems: { sm: 'center' } }}>
+          <TextField size="small" label="Full name" fullWidth value={emailForm.full_name}
+            onChange={(e) => setEmailForm({ ...emailForm, full_name: e.target.value })} />
+          <TextField size="small" label="Work email" type="email" fullWidth value={emailForm.email}
+            onChange={(e) => setEmailForm({ ...emailForm, email: e.target.value })} />
+          <Button variant="contained" onClick={saveProfileDetails} sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}>
+            Save details
+          </Button>
+        </Stack>
+      </Paper>
 
       <Grid container spacing={3}>
 {/* Digital signature */}

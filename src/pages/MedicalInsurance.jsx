@@ -86,6 +86,20 @@ export default function MedicalInsurance() {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <PageHeader title="🩺 Medical Insurance" subtitle="Populate beneficiaries, generate cover records, submit and approve." />
 
+      <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', mb: 2, bgcolor: '#f8fafc' }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>🏥 Top Medical Insurance Companies in Uganda</Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+          {['Jubilee Health Insurance', 'UAP Old Mutual', 'AIG Uganda', 'ICEA LION', 'Sanlam Life Uganda',
+            'Goldstar Insurance', 'Britam Uganda', 'Prudential Uganda', 'APA Insurance', 'CIC General Insurance',
+            'Radiant Insurance', 'MUA Uganda', 'Housing Finance Bank (Medical Plan)', 'Pioneer Assurance'].map((c) => (
+            <Chip key={c} size="small" label={c} variant="outlined" />
+          ))}
+        </Box>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+          Select a provider when generating beneficiary cover records, or add your company's preferred provider during policy setup.
+        </Typography>
+      </Paper>
+
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
 
       {/* Workflow overview */}

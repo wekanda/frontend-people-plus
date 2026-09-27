@@ -4,6 +4,7 @@ import { Box, Typography, Avatar, Button, Divider, Stack, List, ListItemButton, 
 import { Menu, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import NotificationBell from './NotificationBell';
+import ToastAlerts from './ToastAlerts';
 
 const ALL = ['hr_admin', 'project_manager', 'staff', 'finance', 'pay', 'it_officer', 'ceo', 'ceo_assistant'];
 
@@ -74,7 +75,16 @@ const NAV_SECTIONS = [
     icon: '⏱️',
     items: [
       { label: 'Leave Management', path: '/leave', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
+      { label: 'Leave Application & Tracker (inbuilt)', path: '/forms?category=Leave%20%26%20Attendance', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
       { label: 'Timesheets', path: '/timesheet', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
+    ],
+  },
+  {
+    heading: 'Calendar & Scheduling',
+    icon: '📅',
+    items: [
+      { label: 'Organization Calendar', path: '/calendar', roles: ALL },
+      { label: 'Schedule Interviews / Meetings / Trainings', path: '/calendar?new=1', roles: ALL },
     ],
   },
   {
@@ -96,9 +106,10 @@ const NAV_SECTIONS = [
   {
     heading: 'HR Tools & Documents',
     icon: '🧰',
+    staffHeading: 'Staff Tools & Documents',
     items: [
-      { label: 'HR Tools & Built-in Excel Tools', path: '/hr-tools', roles: EXEC },
-      { label: 'Document Forms & Templates', path: '/forms', roles: TOOLS },
+      { label: 'HR Tools & Built-in Excel Tools', path: '/hr-tools', roles: EXEC, staffLabel: 'Staff Tools & Downloads' },
+      { label: 'Document Forms & Templates', path: '/forms', roles: TOOLS, staffLabel: 'My Documents & Templates' },
       { label: 'Contract Generation', path: '/contracts', roles: EXEC },
       { label: 'Document Management', path: '/documents', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
       { label: 'Document Workflow', path: '/document-workflow', roles: EXEC },
@@ -112,6 +123,7 @@ const NAV_SECTIONS = [
       { label: 'Organization Branding (logo & letterhead)', path: '/hr-tools?tab=company', roles: ALL },
       { label: 'Compliance & Policies', path: '/compliance', roles: EXEC },
       { label: 'My Profile & Signature', path: '/my-profile', roles: TOOLS },
+      { label: '📘 System Manual', path: '/manual', roles: ALL },
       { label: 'Integrations', path: '/integrations', roles: ALL },
     ],
   },
@@ -121,6 +133,8 @@ function NavAccordion({ section, open, onToggle, role, onNavigate }) {
   const items = section.items.filter((item) => !item.roles || item.roles.includes(role));
   if (!items.length) return null;
   const expanded = open === section.heading;
+  const isStaff = role === 'staff';
+  const headingLabel = isStaff && section.staffHeading ? section.staffHeading : section.heading;
   return (
     <Accordion
       expanded={expanded}
@@ -141,7 +155,7 @@ function NavAccordion({ section, open, onToggle, role, onNavigate }) {
         }}
       >
         <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.9rem', color: 'inherit' }}>
-          {section.icon} {section.heading}
+          {section.icon} {headingLabel}
         </Typography>
       </AccordionSummary>
       <AccordionDetails sx={{ p: 0 }}>
@@ -170,7 +184,10 @@ function NavAccordion({ section, open, onToggle, role, onNavigate }) {
                 '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.08)' },
               }}
             >
-              <ListItemText primary={item.label} primaryTypographyProps={{ fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit' }} />
+              <ListItemText
+                primary={isStaff && item.staffLabel ? item.staffLabel : item.label}
+                primaryTypographyProps={{ fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit' }}
+              />
             </ListItemButton>
           ))}
         </List>
@@ -203,13 +220,17 @@ function SidebarContent({ onNavigate }) {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, minHeight: '100%' }}>
       {/* Logo Section */}
-      <Box sx={{ p: 1.5, borderRadius: 1, bgcolor: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255,255,255,0.15)' }}>
-        <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.25, fontSize: '1.05rem', color: 'inherit' }}>
-          People Plus
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.78rem' }}>
-          HR workflow & approvals
-        </Typography>
+      <Box sx={{ p: 1.5, borderRadius: 1, bgcolor: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <Box component="img" src="/favicon-and-logo.jpeg" alt="PEOPLE PULSE logo"
+          sx={{ width: 44, height: 44, borderRadius: '10px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.35)' }} />
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.25, fontSize: '1rem', color: 'inherit', lineHeight: 1.1 }}>
+            PEOPLE PULSE
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.72rem' }}>
+            HR workflow & approvals
+          </Typography>
+        </Box>
       </Box>
 
       {/* User Info */}
@@ -315,6 +336,7 @@ export default function DashboardLayout() {
 
         {/* Page Content */}
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, overflow: 'auto', minHeight: 0 }}>
+          <ToastAlerts />
           <Outlet />
         </Box>
       </Box>

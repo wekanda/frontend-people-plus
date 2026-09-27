@@ -41,6 +41,8 @@ import ExcelImport from './pages/ExcelImport';
 import Reports from './pages/Reports';
 import MedicalInsurance from './pages/MedicalInsurance';
 import Subscriptions from './pages/Subscriptions';
+import CalendarPage from './pages/Calendar';
+import Manual from './pages/Manual';
 import MyProfile from './pages/MyProfile';
 import DocumentWorkflow from './pages/DocumentWorkflow';
 import Integrations from './pages/Integrations';
@@ -113,6 +115,8 @@ function AppContent() {
               <Route path="excel-import" element={<ProtectedRoute allowedRoles={['hr_admin', 'it_officer']}><ExcelImport /></ProtectedRoute>} />
               <Route path="reports" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'staff', 'it_officer', 'ceo', 'ceo_assistant']}><Reports /></ProtectedRoute>} />
               <Route path="subscription" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><Subscriptions /></ProtectedRoute>} />
+              <Route path="calendar" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay', 'it_officer', 'ceo', 'ceo_assistant']}><CalendarPage /></ProtectedRoute>} />
+              <Route path="manual" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay', 'it_officer', 'ceo', 'ceo_assistant']}><Manual /></ProtectedRoute>} />
               <Route path="medical-insurance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer']}><MedicalInsurance /></ProtectedRoute>} />
               <Route path="my-profile" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><MyProfile /></ProtectedRoute>} />
               <Route path="document-workflow" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><DocumentWorkflow /></ProtectedRoute>} />

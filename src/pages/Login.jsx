@@ -64,12 +64,16 @@ export default function Login() {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default', p: 2 }}>
       <Paper sx={{ width: '100%', maxWidth: 480, p: 4, borderRadius: 3, boxShadow: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-          {isRegistering ? 'Create your account' : 'People Pluse Login'}
+        <Box sx={{ textAlign: 'center', mb: 2 }}>
+          <Box component="img" src="/favicon-and-logo.jpeg" alt="PEOPLE PULSE logo"
+            sx={{ width: 96, height: 96, borderRadius: '18px', objectFit: 'cover', boxShadow: 2 }} />
+        </Box>
+        <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, textAlign: 'center' }}>
+          {isRegistering ? 'Create your account' : 'PEOPLE PULSE Login'}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3, textAlign: 'center' }}>
           {isRegistering
-            ? 'Register a new account and start using People Pluse immediately.'
+            ? 'Register a new account and start using PEOPLE PULSE immediately.'
             : 'Enter your credentials to continue.'}
         </Typography>
 
