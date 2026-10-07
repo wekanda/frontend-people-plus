@@ -377,7 +377,12 @@ export default function DashboardLayout() {
         anchor="left"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        sx={{ width: 280, bgcolor: 'sidebar.main', color: '#FFFFFF', display: { md: 'none' }, overflowY: 'auto' }}
+        sx={{
+          width: 280,
+          display: { md: 'none' },
+          overflowY: 'auto',
+          '& .MuiDrawer-paper': { bgcolor: 'sidebar.main', color: '#FFFFFF', width: 280 },
+        }}
       >
         <SidebarContent onNavigate={() => setDrawerOpen(false)} />
       </Drawer>
