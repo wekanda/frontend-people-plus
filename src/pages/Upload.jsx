@@ -255,7 +255,7 @@ export default function Upload() {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <PageHeader
-        title="📤 Excel Import"
+        title="Excel Import"
         subtitle="Upload a spreadsheet and use the page menu for import controls."
         primaryAction={(
           <Button variant="contained" sx={{ background: 'primary.main' }} onClick={handleUpload} disabled={files.length === 0 || uploading}>

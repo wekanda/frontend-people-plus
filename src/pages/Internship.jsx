@@ -54,7 +54,7 @@ export default function Internship() {
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <PageHeader
-        title="🎓 Internships & Volunteers"
+        title="Internships & Volunteers"
         subtitle="Manage interns and volunteers separately — same pipeline, distinct tracks."
         primaryAction={<Button variant="contained" onClick={() => setAddOpen(true)} sx={{ textTransform: 'none' }}>+ Add {isIntern ? 'Intern' : 'Volunteer'}</Button>}
       />
@@ -63,20 +63,20 @@ export default function Internship() {
         <Grid item xs={6} sm={4} md={3}>
           <Paper sx={{ p: 2, borderRadius: 3, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
             <Typography variant="h4" sx={{ fontWeight: 800 }}>{summary.interns}</Typography>
-            <Typography variant="caption" color="text.secondary">🎓 Interns</Typography>
+            <Typography variant="caption" color="text.secondary"> Interns</Typography>
           </Paper>
         </Grid>
         <Grid item xs={6} sm={4} md={3}>
           <Paper sx={{ p: 2, borderRadius: 3, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
             <Typography variant="h4" sx={{ fontWeight: 800 }}>{summary.volunteers}</Typography>
-            <Typography variant="caption" color="text.secondary">🤝 Volunteers</Typography>
+            <Typography variant="caption" color="text.secondary"> Volunteers</Typography>
           </Paper>
         </Grid>
       </Grid>
 
       <Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 2 }}>
-        <Tab label={`🎓 Interns (${summary.interns})`} value="intern" />
-        <Tab label={`🤝 Volunteers (${summary.volunteers})`} value="volunteer" />
+        <Tab label={` Interns (${summary.interns})`} value="intern" />
+        <Tab label={` Volunteers (${summary.volunteers})`} value="volunteer" />
       </Tabs>
 {loading ? (
         <Box sx={{ textAlign: 'center', py: 8 }}><CircularProgress /></Box>
@@ -91,11 +91,11 @@ export default function Internship() {
               <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{i.candidate_name}</Typography>
-                  <Chip label={i.participant_type === 'volunteer' ? '🤝 Volunteer' : '🎓 Intern'} size="small" color={i.participant_type === 'volunteer' ? 'secondary' : 'primary'} />
+                  <Chip label={i.participant_type === 'volunteer' ? ' Volunteer' : ' Intern'} size="small" color={i.participant_type === 'volunteer' ? 'secondary' : 'primary'} />
                 </Stack>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>{i.email}</Typography>
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  {i.start_date ? `${i.start_date} → ${i.end_date || 'open'}` : 'Dates TBD'}
+                  {i.start_date ? `${i.start_date}  ${i.end_date || 'open'}` : 'Dates TBD'}
                 </Typography>
                 <Chip label={i.status} size="small" variant="outlined" />
               </Paper>

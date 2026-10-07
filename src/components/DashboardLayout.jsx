@@ -2,7 +2,55 @@ import React, { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Box, Typography, Avatar, Button, Divider, Stack, List, ListItemButton, ListItemText, IconButton, Drawer, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { Menu, ChevronDown } from 'lucide-react';
+import {
+  LayoutDashboard as DashboardIcon,
+  BellRing as NotificationsActiveIcon,
+  ChartColumn as AnalyticsIcon,
+  TrendingUp as TrendingUpIcon,
+  FileText as SummarizeIcon,
+  Users as PeopleIcon,
+  IdCard as BadgeIcon,
+  FolderOpen as FolderOpenIcon,
+  Backpack as BackpackIcon,
+  UserCheck as HowToRegIcon,
+  FileSearch as ManageSearchIcon,
+  FileText as DescriptionIcon,
+  User as PersonIcon,
+  CalendarCheck as EventAvailableIcon,
+  BadgeCheck as VerifiedIcon,
+  ClipboardCheck as FactCheckIcon,
+  Luggage as LuggageIcon,
+  CreditCard as PaymentsIcon,
+  PiggyBank as SavingsIcon,
+  Receipt as ReceiptLongIcon,
+  Receipt as ReceiptIcon,
+  HeartPulse as MedicalServicesIcon,
+  CreditCard as CreditCardIcon,
+  Gem as WorkspacePremiumIcon,
+  Clock as AccessTimeIcon,
+  TreePalm as HolidayVillageIcon,
+  Copy as FileCopyIcon,
+  CalendarDays as ScheduleIcon,
+  CalendarDays as CalendarMonthIcon,
+  Calendar as CalendarTodayIcon,
+  Users as EventSeatIcon,
+  Gauge as AssessmentIcon,
+  Star as StarIcon,
+  FileText as ArticleIcon,
+  BarChart3 as BarChartIcon,
+  Wrench as BuildIcon,
+  Upload as UploadIcon,
+  Settings as SettingsIcon,
+  KeyRound as VpnKeyIcon,
+  Shield as ShieldIcon,
+  BookOpen as MenuBookIcon,
+  Share as IosShareIcon,
+  LogOut as LogoutIcon,
+  Moon as DarkModeIcon,
+  Sun as LightModeIcon,
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useColorMode } from '../App';
 import NotificationBell from './NotificationBell';
 import ToastAlerts from './ToastAlerts';
 
@@ -13,26 +61,28 @@ const EXEC = ['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant
 const STAFF = ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'];
 const TOOLS = ['hr_admin', 'project_manager', 'staff', 'finance', 'it_officer', 'ceo', 'ceo_assistant'];
 
+function renderIcon(Icon, size = 17) {
+  return <Icon size={size} strokeWidth={2} style={{ color: 'inherit' }} />;
+}
+
 /**
- * Navigation is organised into the standard HRIS modules (Dashboard, Staff,
- * Recruitment, Financial, Time & Leave, Performance, Reports, HR Tools,
- * Organization & Settings). Every section is a collapsible dropdown so the
- * menu never feels congested on phones, tablets or laptops.
+ * Navigation is organised into the standard HRIS modules. Every section is a
+ * collapsible dropdown so the menu never feels congested on any screen size.
  */
 const NAV_SECTIONS = [
   {
     heading: 'Dashboard',
-    icon: '📊',
+    icon: DashboardIcon,
     items: [
-      { label: 'Dashboard', path: '/', roles: ALL },
       { label: 'Smart Alerts', path: '/alerts', roles: TOOLS },
       { label: 'Analytics', path: '/reporting', roles: EXEC },
       { label: 'Pipeline', path: '/pipeline', roles: EXEC },
+      { label: 'Reports', path: '/reports', roles: TOOLS },
     ],
   },
   {
     heading: 'Staff Management',
-    icon: '👥',
+    icon: PeopleIcon,
     items: [
       { label: 'Staff Directory', path: '/staff', roles: ALL },
       { label: 'Personnel Files', path: '/personnel-file', roles: EXEC },
@@ -40,8 +90,8 @@ const NAV_SECTIONS = [
     ],
   },
   {
-    heading: 'Recruitment Management',
-    icon: '🎯',
+    heading: 'Recruitment',
+    icon: HowToRegIcon,
     items: [
       { label: 'Recruitment', path: '/recruitment', roles: EXEC },
       { label: 'Job Postings', path: '/recruitment-admin', roles: EXEC },
@@ -53,35 +103,35 @@ const NAV_SECTIONS = [
     ],
   },
   {
-    heading: 'Financial Management',
-    icon: '💼',
+    heading: 'Finance & Payroll',
+    icon: PaymentsIcon,
     items: [
       { label: 'Financial Management', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer'] },
       { label: 'Payroll', path: '/payroll', roles: ['hr_admin', 'finance', 'it_officer'] },
       { label: 'Payslips', path: '/payslips', roles: ALL },
-      { label: '🧾 Payslip Tool (inbuilt Excel)', path: '/hr-tools?tab=excel', roles: ALL },
+      { label: 'Payslip Tool (Excel)', path: '/hr-tools?tab=excel', roles: ALL },
       { label: 'Medical Insurance', path: '/medical-insurance', roles: ['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer'] },
     ],
   },
   {
     heading: 'Subscription & Billing',
-    icon: '💳',
+    icon: CreditCardIcon,
     items: [
-      { label: 'Plan & Billing (quarterly / yearly)', path: '/subscription', roles: ['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant'] },
+      { label: 'Plan & Billing', path: '/subscription', roles: ['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant'] },
     ],
   },
   {
     heading: 'Time & Leave',
-    icon: '⏱️',
+    icon: AccessTimeIcon,
     items: [
       { label: 'Leave Management', path: '/leave', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
-      { label: 'Leave Application & Tracker (inbuilt)', path: '/forms?category=Leave%20%26%20Attendance', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
+      { label: 'Leave Application & Tracker', path: '/forms?category=Leave%20%26%20Attendance', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
       { label: 'Timesheets', path: '/timesheet', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
     ],
   },
   {
     heading: 'Calendar & Scheduling',
-    icon: '📅',
+    icon: CalendarMonthIcon,
     items: [
       { label: 'Organization Calendar', path: '/calendar', roles: ALL },
       { label: 'Schedule Interviews / Meetings / Trainings', path: '/calendar?new=1', roles: ALL },
@@ -89,7 +139,7 @@ const NAV_SECTIONS = [
   },
   {
     heading: 'Performance',
-    icon: '⭐',
+    icon: AssessmentIcon,
     items: [
       { label: 'Performance Appraisals', path: '/appraisals', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
       { label: 'Performance Analysis', path: '/reporting?tab=performance', roles: EXEC },
@@ -97,7 +147,7 @@ const NAV_SECTIONS = [
   },
   {
     heading: 'Reports',
-    icon: '📋',
+    icon: SummarizeIcon,
     items: [
       { label: 'Reports', path: '/reports', roles: ['hr_admin', 'project_manager', 'finance', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
       { label: 'Analytics & Trends', path: '/reporting', roles: EXEC },
@@ -105,12 +155,12 @@ const NAV_SECTIONS = [
   },
   {
     heading: 'HR Tools & Documents',
-    icon: '🧰',
+    icon: BuildIcon,
     staffHeading: 'Staff Tools & Documents',
     items: [
-      { label: 'HR Tools & Built-in Excel Tools', path: '/hr-tools', roles: EXEC, staffLabel: 'Staff Tools & Downloads' },
+      { label: 'HR Tools & Excel', path: '/hr-tools', roles: EXEC, staffLabel: 'Staff Tools & Downloads' },
       { label: 'Document Forms & Templates', path: '/forms', roles: TOOLS, staffLabel: 'My Documents & Templates' },
-      { label: 'Contract Generation', path: '/contracts', roles: EXEC },
+      { label: 'Contract Management', path: '/contracts', roles: EXEC },
       { label: 'Document Management', path: '/documents', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
       { label: 'Document Workflow', path: '/document-workflow', roles: EXEC },
       { label: 'Excel / Employee Import', path: '/excel-import', roles: ['hr_admin', 'it_officer'] },
@@ -118,16 +168,57 @@ const NAV_SECTIONS = [
   },
   {
     heading: 'Organization & Settings',
-    icon: '🏢',
+    icon: SettingsIcon,
     items: [
-      { label: 'Organization Branding (logo & letterhead)', path: '/hr-tools?tab=company', roles: ALL },
+      { label: 'Organization Branding', path: '/hr-tools?tab=company', roles: ALL },
       { label: 'Compliance & Policies', path: '/compliance', roles: EXEC },
       { label: 'My Profile & Signature', path: '/my-profile', roles: TOOLS },
-      { label: '📘 System Manual', path: '/manual', roles: ALL },
+      { label: 'System Manual', path: '/manual', roles: ALL },
       { label: 'Integrations', path: '/integrations', roles: ALL },
     ],
   },
 ];
+
+const ITEM_ICONS = {
+  'Smart Alerts': NotificationsActiveIcon,
+  'Analytics': AnalyticsIcon,
+  'Pipeline': TrendingUpIcon,
+  'Reports': SummarizeIcon,
+  'Staff Directory': BadgeIcon,
+  'Personnel Files': FolderOpenIcon,
+  'Internships & Volunteers': BackpackIcon,
+  'Recruitment': ManageSearchIcon,
+  'Job Postings': DescriptionIcon,
+  'Applicants': PersonIcon,
+  'Interviews': EventAvailableIcon,
+  'Offers': VerifiedIcon,
+  'Background Checks': FactCheckIcon,
+  'Onboarding': LuggageIcon,
+  'Financial Management': SavingsIcon,
+  'Payroll': ReceiptLongIcon,
+  'Payslips': ReceiptIcon,
+  'Medical Insurance': MedicalServicesIcon,
+  'Plan & Billing': WorkspacePremiumIcon,
+  'Leave Management': HolidayVillageIcon,
+  'Leave Application & Tracker': FileCopyIcon,
+  'Timesheets': ScheduleIcon,
+  'Organization Calendar': CalendarTodayIcon,
+  'Schedule Interviews / Meetings / Trainings': EventSeatIcon,
+  'Performance Appraisals': StarIcon,
+  'Performance Analysis': AnalyticsIcon,
+  'Analytics & Trends': BarChartIcon,
+  'HR Tools & Excel': BuildIcon,
+  'Document Forms & Templates': FileCopyIcon,
+  'Contract Management': DescriptionIcon,
+  'Document Management': FolderOpenIcon,
+  'Document Workflow': VerifiedIcon,
+  'Excel / Employee Import': UploadIcon,
+  'Organization Branding': VpnKeyIcon,
+  'Compliance & Policies': ShieldIcon,
+  'My Profile & Signature': PersonIcon,
+  'System Manual': MenuBookIcon,
+  'Integrations': IosShareIcon,
+};
 
 function NavAccordion({ section, open, onToggle, role, onNavigate }) {
   const items = section.items.filter((item) => !item.roles || item.roles.includes(role));
@@ -144,19 +235,22 @@ function NavAccordion({ section, open, onToggle, role, onNavigate }) {
       sx={{ bgcolor: 'transparent', boxShadow: 'none' }}
     >
       <AccordionSummary
-        expandIcon={<ChevronDown size={16} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />}
+        expandIcon={<ChevronDown size={16} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: '#FFFFFF' }} />}
         sx={{
           m: 0,
           px: 1.5,
           py: 1,
-          color: 'inherit',
+          color: '#FFFFFF',
           borderRadius: 1,
-          '&:hover': { bgcolor: 'rgba(255,255,255,0.07)' },
+          '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' },
         }}
       >
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.9rem', color: 'inherit' }}>
-          {section.icon} {headingLabel}
-        </Typography>
+        <Stack direction="row" spacing={1} alignItems="center">
+          {renderIcon(section.icon, 17)}
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#FFFFFF', lineHeight: '18px' }}>
+            {headingLabel}
+          </Typography>
+        </Stack>
       </AccordionSummary>
       <AccordionDetails sx={{ p: 0 }}>
         <List disablePadding sx={{ gap: 0.15, display: 'flex', flexDirection: 'column' }}>
@@ -168,7 +262,7 @@ function NavAccordion({ section, open, onToggle, role, onNavigate }) {
               end={item.path === '/'}
               onClick={onNavigate}
               sx={{
-                color: 'inherit',
+                color: '#FFFFFF',
                 borderRadius: 1,
                 mb: 0.15,
                 py: 0.8,
@@ -176,18 +270,22 @@ function NavAccordion({ section, open, onToggle, role, onNavigate }) {
                 fontSize: '0.88rem',
                 transition: 'all 0.15s ease',
                 '&.active': {
-                  bgcolor: 'rgba(255, 255, 255, 0.15)',
-                  borderLeft: '3px solid white',
+                  bgcolor: 'rgba(255,255,255,0.16)',
+                  borderLeft: '3px solid #FFFFFF',
                   fontWeight: 700,
                   paddingLeft: 'calc(1.5rem - 3px)',
                 },
-                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.08)' },
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.09)' },
               }}
             >
-              <ListItemText
-                primary={isStaff && item.staffLabel ? item.staffLabel : item.label}
-                primaryTypographyProps={{ fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit' }}
-              />
+              <Stack direction="row" spacing={1.25} alignItems="center" sx={{ width: '100%' }}>
+                {ITEM_ICONS[item.label] && renderIcon(ITEM_ICONS[item.label], 17)}
+                <ListItemText
+                  primary={isStaff && item.staffLabel ? item.staffLabel : item.label}
+                  sx={{ flex: 1 }}
+                  primaryTypographyProps={{ fontSize: '0.88rem', fontWeight: 500, color: '#FFFFFF', display: 'inline', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                />
+              </Stack>
             </ListItemButton>
           ))}
         </List>
@@ -218,30 +316,30 @@ function SidebarContent({ onNavigate }) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, minHeight: '100%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25, minHeight: '100%', pt: 0.5 }}>
       {/* Logo Section */}
-      <Box sx={{ p: 1.5, borderRadius: 1, bgcolor: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+      <Box component={NavLink} to="/" sx={{ p: 1.25, borderRadius: 1, bgcolor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', display: 'flex', alignItems: 'center', gap: 1.25, cursor: 'pointer' }}>
         <Box component="img" src="/favicon-and-logo.jpeg" alt="PEOPLE PULSE logo"
-          sx={{ width: 44, height: 44, borderRadius: '10px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.35)' }} />
+          sx={{ width: 40, height: 40, borderRadius: '10px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.35)' }} />
         <Box sx={{ minWidth: 0 }}>
-          <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.25, fontSize: '1rem', color: 'inherit', lineHeight: 1.1 }}>
+          <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.25, fontSize: '1rem', color: '#FFFFFF', lineHeight: 1.1 }}>
             PEOPLE PULSE
           </Typography>
-          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.72rem' }}>
-            HR workflow & approvals
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.72rem' }}>
+            Workforce & People Management
           </Typography>
         </Box>
       </Box>
 
       {/* User Info */}
-      <Box sx={{ p: 1.5, borderRadius: 1, bgcolor: 'rgba(255, 255, 255, 0.08)' }}>
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          <Avatar sx={{ bgcolor: 'secondary.main', width: 40, height: 40, fontSize: '0.85rem', fontWeight: 700 }}>{initials}</Avatar>
+      <Box sx={{ p: 1.25, borderRadius: 1, bgcolor: 'rgba(255,255,255,0.06)' }}>
+        <Stack direction="row" spacing={1.25} alignItems="center">
+          <Avatar sx={{ bgcolor: 'secondary.main', width: 38, height: 38, fontSize: '0.85rem', fontWeight: 700 }}>{initials}</Avatar>
           <Box sx={{ minWidth: 0 }}>
-            <Typography variant="body2" sx={{ fontWeight: 700, color: 'inherit', fontSize: '0.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, color: '#FFFFFF', fontSize: '0.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {user?.full_name || 'Guest User'}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.85)', display: 'block', fontSize: '0.75rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {user?.role || 'Employee'}
             </Typography>
           </Box>
@@ -259,8 +357,9 @@ function SidebarContent({ onNavigate }) {
 
       {/* Logout */}
       <Button onClick={logout} fullWidth variant="outlined" size="small"
-        sx={{ color: 'inherit', borderColor: 'rgba(255,255,255,0.3)', fontSize: '0.85rem', textTransform: 'none', fontWeight: 600 }}>
-        🚪 Logout
+        startIcon={<LogoutIcon size={17} />}
+        sx={{ color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', textTransform: 'none', fontWeight: 600 }}>
+        Logout
       </Button>
     </Box>
   );
@@ -268,6 +367,7 @@ function SidebarContent({ onNavigate }) {
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
+  const { mode, toggleColorMode } = useColorMode();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
@@ -277,7 +377,7 @@ export default function DashboardLayout() {
         anchor="left"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        sx={{ width: 300, bgcolor: 'primary.main', color: 'primary.contrastText', display: { md: 'none' }, overflowY: 'auto' }}
+        sx={{ width: 280, bgcolor: 'sidebar.main', color: '#FFFFFF', display: { md: 'none' }, overflowY: 'auto' }}
       >
         <SidebarContent onNavigate={() => setDrawerOpen(false)} />
       </Drawer>
@@ -286,26 +386,26 @@ export default function DashboardLayout() {
       <Box
         component="aside"
         sx={{
-          width: { xs: '100%', md: 290 },
-          bgcolor: 'primary.main',
-          color: 'primary.contrastText',
-          p: { xs: 2, md: 2 },
+          width: { xs: '100%', md: 268 },
+          bgcolor: 'sidebar.main',
+          color: '#FFFFFF',
+          p: { xs: 2, md: 1.75 },
           display: { xs: 'none', md: 'flex' },
           flexDirection: 'column',
-          gap: 1.5,
+          gap: 1.25,
           position: { md: 'sticky' },
           top: 0,
           maxHeight: { md: '100vh' },
           overflowY: { md: 'auto' },
           minHeight: { md: '100vh' },
-          borderRight: { md: '1px solid rgba(255,255,255,0.12)' },
+          borderRight: { md: '1px solid rgba(255,255,255,0.14)' },
         }}
       >
         <SidebarContent onNavigate={() => {}} />
       </Box>
 
       {/* Main Content Area */}
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, p: { xs: 1.5, sm: 2, md: 3 }, bgcolor: 'background.default', minWidth: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5, p: { xs: 1.5, sm: 2.5, md: 3.5 }, bgcolor: 'background.default', minWidth: 0 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5 }}>
           <Stack direction="row" spacing={1.5} alignItems="center">
             <IconButton
@@ -316,7 +416,7 @@ export default function DashboardLayout() {
               <Menu size={20} />
             </IconButton>
             <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', md: '1.45rem' } }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', md: '1.4rem' } }}>
                 Welcome back, {user?.full_name?.split(' ')[0] || 'Team'}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' }, fontSize: '0.88rem' }}>
@@ -325,9 +425,17 @@ export default function DashboardLayout() {
             </Box>
           </Stack>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+            <IconButton
+              onClick={toggleColorMode}
+              aria-label="Toggle dark mode"
+              title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              sx={{ color: 'text.secondary', border: '1px solid', borderColor: 'divider' }}
+            >
+              {mode === 'dark' ? <LightModeIcon size={20} /> : <DarkModeIcon size={20} />}
+            </IconButton>
             <NotificationBell />
-            <Button variant="outlined" color="primary" size="small" onClick={logout} sx={{ display: { xs: 'none', md: 'inline-flex' }, textTransform: 'none', fontWeight: 600 }}>
-              🚪 Logout
+            <Button variant="outlined" color="primary" size="small" onClick={logout} startIcon={<LogoutIcon size={17} />} sx={{ display: { xs: 'none', md: 'inline-flex' }, textTransform: 'none', fontWeight: 600 }}>
+              Logout
             </Button>
           </Stack>
         </Box>
@@ -335,7 +443,7 @@ export default function DashboardLayout() {
         <Divider sx={{ my: 1 }} />
 
         {/* Page Content */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, overflow: 'auto', minHeight: 0 }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5, overflow: 'auto', minHeight: 0 }}>
           <ToastAlerts />
           <Outlet />
         </Box>

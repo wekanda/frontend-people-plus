@@ -35,14 +35,14 @@ export default function Pipeline() {
   return (
     <Box>
       <PageHeader
-        title="📈 Pipeline & Upcoming"
+        title="Pipeline & Upcoming"
         subtitle="Recruitment pipeline plus everything coming up — contract ends, project completions and milestones."
         primaryAction={<Button variant="contained" onClick={load} sx={{ textTransform: 'none' }}>Refresh</Button>}
       />
 
       <Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 2 }}>
-        <Tab label="🧑‍💼 Recruitment Pipeline" value="recruitment" />
-        <Tab label="📅 Upcoming (Contracts & Projects)" value="upcoming" />
+        <Tab label="Recruitment Pipeline" value="recruitment" />
+        <Tab label="Upcoming (Contracts & Projects)" value="upcoming" />
       </Tabs>
 
       {loading ? <Box sx={{ textAlign: 'center', py: 10 }}><CircularProgress /></Box> : (
@@ -76,11 +76,11 @@ export default function Pipeline() {
           {tab === 'upcoming' && (
             <Grid container spacing={3}>
               {[
-                { key: 'contract_expiry', title: '📜 Contracts Ending Soon', color: '#ed6c02' },
-                { key: 'project_end', title: '🏗️ Projects Completing', color: '#9c27b0' },
-                { key: 'anniversaries', title: '🎉 Anniversaries', color: '#2e7d32' },
-                { key: 'birthdays', title: '🎂 Birthdays', color: '#d32f2f' },
-                { key: 'probation_end', title: '🧑‍🎓 Probation Ends', color: '#0288d1' },
+                { key: 'contract_expiry', title: 'Contracts Ending Soon', color: '#ed6c02' },
+                { key: 'project_end', title: 'Projects Completing', color: '#9c27b0' },
+                { key: 'anniversaries', title: 'Anniversaries', color: '#2e7d32' },
+                { key: 'birthdays', title: 'Birthdays', color: '#d32f2f' },
+                { key: 'probation_end', title: 'Probation Ends', color: '#0288d1' },
               ].map((s) => (
                 <Grid item xs={12} md={6} lg={4} key={s.key}>
                   <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>

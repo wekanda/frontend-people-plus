@@ -1,53 +1,109 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
-import CakeIcon from '@mui/icons-material/Cake';
-import { ChevronDown } from 'lucide-react';
-import { Container, Grid, Paper, Typography, Box, CircularProgress, Button, Stack, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Divider, Chip, TextField, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import {
+  Container, Grid, Paper, Typography, Box, CircularProgress, Button, Stack,
+  TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Divider,
+  Chip, TextField,
+} from '@mui/material';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  BellRing as NotificationsActiveIcon,
+  ChartColumn as AnalyticsIcon,
+  TrendingUp as TrendingUpIcon,
+  FileText as SummarizeIcon,
+  Gauge as AssessmentIcon,
+  Cake as CakeIcon,
+  Briefcase as BusinessCenterIcon,
+  Star as StarIcon,
+  Award as WorkspacePremiumIcon,
+  FolderOpen as FolderOpenIcon,
+  CalendarDays as EventNoteIcon,
+  Clock as AccessTimeIcon,
+  FileText as DescriptionIcon,
+  TreePalm as HolidayVillageIcon,
+  User as ManIcon,
+  IdCard as BadgeIcon,
+  ArrowRight as ArrowForwardIcon,
+} from 'lucide-react';
 
-const DASHBOARD_SECTIONS = [
-  {
-    id: 'analytics',
-    icon: '📊',
-    title: 'Analytics',
-    subtitle: 'Workforce analytics at a glance.',
-  },
-  {
-    id: 'performance',
-    icon: '⭐',
-    title: 'Performance Analysis',
-    subtitle: 'Ratings across units, staff and projects.',
-  },
-  {
-    id: 'pipeline',
-    icon: '📈',
-    title: 'Pipeline',
-    subtitle: 'Vacancies, applications, internships & volunteers.',
-  },
-  {
-    id: 'reports',
-    icon: '📋',
-    title: 'Reports',
-    subtitle: 'Standard report types and reporting schedule.',
-  },
+const DASHBOARD_TABS = [
+  { key: 'alerts', label: 'Smart Alerts', icon: NotificationsActiveIcon },
+  { key: 'analytics', label: 'Analytics', icon: AnalyticsIcon },
+  { key: 'performance', label: 'Performance', icon: AssessmentIcon },
+  { key: 'pipeline', label: 'Pipeline', icon: TrendingUpIcon },
+  { key: 'reports', label: 'Reports', icon: SummarizeIcon },
 ];
+
+const ALERT_ITEMS = [
+  { key: 'birthdays', label: 'Birthdays', color: '#d32f2f', path: '/staff' },
+  { key: 'company_anniversaries', label: 'Company anniversary', color: '#7b1fa2', path: '/staff' },
+  { key: 'staff_anniversaries', label: 'Staff anniversary', color: '#2e7d32', path: '/staff' },
+  { key: 'employee_of_the_month', label: 'Employee of the month', color: '#ed6c02', path: '/staff' },
+  { key: 'missing_docs', label: 'Missing documents', color: '#c62828', path: '/personnel-file' },
+  { key: 'end_of_project_notice', label: 'End of project notice', color: '#9c27b0', path: '/pipeline' },
+  { key: 'contract_expiring', label: 'Contract expiry', color: '#ed6c02', path: '/alerts' },
+  { key: 'probation_period', label: 'Probation period', color: '#0288d1', path: '/alerts' },
+  { key: 'contracts_to_review', label: 'Contracts to review', color: '#7b1fa2', path: '/contracts' },
+  { key: 'leave_requests_approvals', label: 'Leave requests & approvals', color: '#1565c0', path: '/leave' },
+  { key: 'retirement', label: 'Retirement', color: '#6d4c41', path: '/staff' },
+  { key: 'registration', label: 'Registration', color: '#00838f', path: '/staff' },
+];
+
+const ALERT_ICONS = {
+  birthdays: CakeIcon,
+  company_anniversaries: BusinessCenterIcon,
+  staff_anniversaries: StarIcon,
+  employee_of_the_month: WorkspacePremiumIcon,
+  missing_docs: FolderOpenIcon,
+  end_of_project_notice: TrendingUpIcon,
+  contract_expiring: EventNoteIcon,
+  probation_period: AccessTimeIcon,
+  contracts_to_review: DescriptionIcon,
+  leave_requests_approvals: HolidayVillageIcon,
+  retirement: ManIcon,
+  registration: BadgeIcon,
+};
 
 function MetricCard({ label, value, color }) {
   return (
     <Paper
       sx={{
         p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%',
-        display: 'flex', flexDirection: 'column',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center',
       }}
     >
       <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.4 }}>{label}</Typography>
-      <Typography variant="h4" sx={{ fontWeight: 800, color }}>{value}</Typography>
+      <Typography variant="h4" sx={{ fontWeight: 800, color: color || 'text.primary' }}>{value ?? '—'}</Typography>
     </Paper>
   );
 }
 
+function AlertCard({ item, value, onOpen }) {
+  const Icon = ALERT_ICONS[item.key] || NotificationsActiveIcon;
+  const shown = value === undefined || value === null || value === '' ? '—' : value;
+  return (
+    <Paper
+      onClick={onOpen}
+      sx={{
+        p: 1.75, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%',
+        display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer',
+        transition: 'all 0.15s ease',
+        '&:hover': { boxShadow: 3, borderColor: 'primary.main' },
+      }}
+    >
+      <Box sx={{ width: 40, height: 40, borderRadius: '12px', bgcolor: `${item.color}1a`, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+        <Icon size={22} style={{ color: item.color }} />
+      </Box>
+      <Box sx={{ minWidth: 0, flex: 1 }}>
+        <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.15rem', lineHeight: 1.1 }}>{shown}</Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.25 }}>{item.label}</Typography>
+      </Box>
+      <ArrowForwardIcon size={18} style={{ color: 'inherit' }} />
+    </Paper>
+  );
+}
 export default function Dashboard() {
   const navigate = useNavigate();
   const { token, user } = useAuth();
@@ -56,12 +112,13 @@ export default function Dashboard() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [section, setSection] = useState('alerts');
 
   const role = user?.role;
-  const [sub, setSub] = useState(null);
-  const isHRorManager = role === 'hr_admin' || role === 'project_manager' || role === 'it_officer' || role === 'ceo' || role === 'ceo_assistant';
+  const isHRorManager = ['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant'].includes(role);
   const isFinance = role === 'finance' || role === 'pay';
   const isStaff = role === 'staff';
+  const [sub, setSub] = useState(null);
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -127,7 +184,6 @@ export default function Dashboard() {
     );
   }
 
-  const featuredEmployee = dashboardData.featured_employee;
   const birthdaysToday = dashboardData.birthdays_today || [];
   const upcomingBirthdays = dashboardData.upcoming_birthdays || [];
   const birthdayMessage = dashboardData.birthday_message;
@@ -137,554 +193,405 @@ export default function Dashboard() {
   const pipeline = dashboardData.pipeline || {};
   const reports = dashboardData.reports || {};
   const smartAlerts = dashboardData.smart_alerts || {};
-
-  const renderBirthdayEntry = (entry, isToday = false) => (
-    <Box key={entry.id} sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 1.5, borderRadius: 2, bgcolor: isToday ? '#ffffff' : '#f8fafc', border: '1px solid', borderColor: isToday ? '#bfdbfe' : '#e2e8f0' }}>
+const renderBirthdayEntry = (entry, isToday = false) => (
+    <Box key={entry.id} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1, borderRadius: 2, bgcolor: isToday ? 'background.paper' : 'transparent', border: '1px solid', borderColor: isToday ? 'primary.light' : 'divider' }}>
       <Box
         component="img"
         src={entry.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(entry.full_name)}&background=2563eb&color=fff&rounded=true`}
         alt={entry.full_name}
-        sx={{ width: 48, height: 48, borderRadius: '14px', objectFit: 'cover' }}
+        sx={{ width: 44, height: 44, borderRadius: '12px', objectFit: 'cover' }}
       />
       <Box sx={{ minWidth: 0, flex: 1 }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>{entry.full_name}</Typography>
-        <Typography variant="body2" color="text.secondary">{entry.position || 'Team member'}</Typography>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{entry.full_name}</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.position || 'Team member'}</Typography>
       </Box>
-      <Chip label={isToday ? 'Today' : `In ${entry.days_until}d`} size="small" color={isToday ? 'primary' : 'default'} sx={{ minWidth: 80 }} />
+      <Chip label={isToday ? 'Today' : `In ${entry.days_until}d`} size="small" color={isToday ? 'primary' : 'default'} sx={{ minWidth: 76 }} />
     </Box>
   );
 
-  const documentChecklist = featuredEmployee ? [
-    { label: 'App Resume', missing: featuredEmployee.missing_app_resume },
-    { label: 'Appointment Letter', missing: featuredEmployee.missing_appointment_letter },
-    { label: 'Academic Docs', missing: featuredEmployee.missing_academic_docs },
-    { label: 'National ID', missing: featuredEmployee.missing_national_id },
-  ] : [];
-
   const topCards = isHRorManager
     ? [
-        { label: 'Total Staff', value: dashboardData.total_staff, borderColor: '#d1d5db' },
-        { label: 'Active Staff', value: dashboardData.active_staff, borderColor: '#d1d5db' },
-        { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, borderColor: '#fde68a' },
-        { label: 'Missing Documents', value: dashboardData.staff_with_missing_docs, borderColor: '#e9d5ff' },
+        { label: 'Total Staff', value: dashboardData.total_staff, color: '#111827' },
+        { label: 'Active Staff', value: dashboardData.active_staff, color: '#16a34a' },
+        { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, color: '#d97706' },
+        { label: 'Missing Documents', value: dashboardData.staff_with_missing_docs, color: '#dc2626' },
       ]
     : isFinance
       ? [
-          { label: 'Total Staff', value: dashboardData.total_staff, borderColor: '#d1d5db' },
-          { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, borderColor: '#fde68a' },
-          { label: 'Pending Timesheets', value: dashboardData.pending_timesheet_approvals, borderColor: '#dbeafe' },
+          { label: 'Total Staff', value: dashboardData.total_staff, color: '#111827' },
+          { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, color: '#d97706' },
+          { label: 'Pending Timesheets', value: dashboardData.pending_timesheet_approvals, color: '#2563eb' },
         ]
       : isStaff
         ? [
-            { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, borderColor: '#fde68a' },
-            { label: 'Missing Documents', value: dashboardData.staff_with_missing_docs, borderColor: '#e9d5ff' },
-            { label: 'Notifications', value: notifications.length, borderColor: '#bfdbfe' },
+            { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, color: '#d97706' },
+            { label: 'Missing Documents', value: dashboardData.staff_with_missing_docs, color: '#dc2626' },
+            { label: 'Notifications', value: notifications.length, color: '#2563eb' },
           ]
         : [
-            { label: 'Total Staff', value: dashboardData.total_staff, borderColor: '#d1d5db' },
-            { label: 'Active Staff', value: dashboardData.active_staff, borderColor: '#d1d5db' },
-            { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, borderColor: '#fde68a' },
+            { label: 'Total Staff', value: dashboardData.total_staff, color: '#111827' },
+            { label: 'Active Staff', value: dashboardData.active_staff, color: '#16a34a' },
+            { label: 'Contracts Expiring', value: dashboardData.contracts_expiring_soon, color: '#d97706' },
           ];
 
-  const primaryActionLabel = isStaff ? 'View your documents' : role === 'ceo' || role === 'ceo_assistant' ? 'View Executive Reports' : isFinance ? 'Open Financial Management' : 'Open HR Tools & Downloads';
-  const primaryActionHandler = () => navigate(isStaff ? '/documents' : role === 'ceo' || role === 'ceo_assistant' ? '/reports' : isFinance ? '/finance' : '/hr-tools');
+  const quickActions = isStaff
+    ? [['My Documents', '/documents'], ['Apply Leave', '/leave'], ['My Timesheet', '/timesheet'], ['Smart Alerts', '/alerts']]
+    : isFinance
+      ? [['Payslips', '/payslips'], ['Finance', '/finance'], ['HR Tools', '/hr-tools'], ['Smart Alerts', '/alerts']]
+      : [['Smart Alerts', '/alerts'], ['Staff', '/staff'], ['HR Tools', '/hr-tools'], ['Leave', '/leave'], ['Timesheets', '/timesheet'], ['Reports', '/reports']];
 
-  return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+  const primaryActionLabel = isStaff ? 'My Documents' : role === 'ceo' || role === 'ceo_assistant' ? 'Executive Reports' : isFinance ? 'Financial Management' : 'HR Tools';
+  const primaryActionPath = isStaff ? '/documents' : role === 'ceo' || role === 'ceo_assistant' ? '/reports' : isFinance ? '/finance' : '/hr-tools';
+
+  const renderAlerts = (
+    <Box sx={{ p: 3 }}>
+      <Grid container spacing={2}>
+        {ALERT_ITEMS.map((item) => (
+          <Grid item xs={6} sm={4} md={3} key={item.key}>
+            <AlertCard item={item} value={smartAlerts[item.key]} onOpen={() => navigate(item.path)} />
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  );
+const renderAnalytics = (
+    <Box sx={{ p: 3 }}>
+      <Grid container spacing={2}>
+        <Grid item xs={6} sm={4} md={3}><MetricCard label="Total staff" value={analytics.total_staff ?? 0} color="#111827" /></Grid>
+        <Grid item xs={6} sm={4} md={3}><MetricCard label="Active staff" value={analytics.active_staff ?? 0} color="#16a34a" /></Grid>
+        <Grid item xs={6} sm={4} md={3}><MetricCard label="Permanent staff" value={analytics.permanent_staff ?? 0} color="#2563eb" /></Grid>
+        <Grid item xs={6} sm={4} md={3}><MetricCard label="Temporary / SLA" value={analytics.temporary_staff ?? 0} color="#ed6c02" /></Grid>
+        <Grid item xs={6} sm={4} md={3}><MetricCard label="On recess" value={analytics.on_recess ?? 0} color="#7c3aed" /></Grid>
+        <Grid item xs={6} sm={4} md={3}><MetricCard label="Exited staff" value={analytics.exited_staff ?? 0} color="#dc2626" /></Grid>
+        <Grid item xs={6} sm={4} md={3}><MetricCard label="Turnover rate" value={`${analytics.turnover_rate_percent ?? 0}%`} color="#b45309" /></Grid>
+        <Grid item xs={6} sm={4} md={3}><MetricCard label="Organizational" value={analytics.organizational ?? 0} color="#0f766e" /></Grid>
+      </Grid>
+
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Per project</Typography>
+            <Box sx={{ display: 'grid', gap: 0.75 }}>
+              {Object.entries(analytics.per_project || {}).map(([k, v]) => (
+                <Box key={k} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid', borderTopColor: 'divider', pt: 0.75 }}>
+                  <Typography variant="body2">{k}</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 700 }}>{v}</Typography>
+                </Box>
+              ))}
+              {Object.keys(analytics.per_project || {}).length === 0 && <Typography variant="body2" color="text.secondary">No projects recorded.</Typography>}
+            </Box>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Per unit / department</Typography>
+            <Box sx={{ display: 'grid', gap: 0.75 }}>
+              {Object.entries(analytics.per_unit || {}).map(([k, v]) => (
+                <Box key={k} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid', borderTopColor: 'divider', pt: 0.75 }}>
+                  <Typography variant="body2">{k}</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 700 }}>{v}</Typography>
+                </Box>
+              ))}
+              {Object.keys(analytics.per_unit || {}).length === 0 && <Typography variant="body2" color="text.secondary">No units recorded.</Typography>}
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
+
+      <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', mt: 2 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Gender breakdown</Typography>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          {Object.entries(analytics.gender_breakdown || {}).map(([k, v]) => (
+            <Chip key={k} label={`${k}: ${v}`} color={k.toLowerCase() === 'male' ? 'primary' : k.toLowerCase() === 'female' ? 'secondary' : 'default'} sx={{ fontWeight: 700 }} />
+          ))}
+        </Box>
+      </Paper>
+    </Box>
+  );
+const renderPerformance = (
+    <Box sx={{ p: 3 }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={4}><MetricCard label="Organizational rating" value={performance.organizational_rating ?? '—'} color="#7c3aed" /></Grid>
+      </Grid>
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Per unit / department rating</Typography>
+            <Box sx={{ display: 'grid', gap: 0.75 }}>
+              {Object.entries(performance.per_unit || {}).map(([k, v]) => (
+                <Box key={k} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid', borderTopColor: 'divider', pt: 0.75 }}>
+                  <Typography variant="body2">{k}</Typography>
+                  <Chip size="small" label={v} sx={{ fontWeight: 700 }} />
+                </Box>
+              ))}
+              {Object.keys(performance.per_unit || {}).length === 0 && <Typography variant="body2" color="text.secondary">No unit ratings yet.</Typography>}
+            </Box>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Per project rating</Typography>
+            <Box sx={{ display: 'grid', gap: 0.75 }}>
+              {(performance.per_project || []).map((p) => (
+                <Box key={p.project} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid', borderTopColor: 'divider', pt: 0.75 }}>
+                  <Typography variant="body2">{p.project}</Typography>
+                  <Chip size="small" label={`${p.score}`} sx={{ fontWeight: 700 }} />
+                </Box>
+              ))}
+              {(performance.per_project || []).length === 0 && <Typography variant="body2" color="text.secondary">No project ratings yet.</Typography>}
+            </Box>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Per staff rating</Typography>
+            <Box sx={{ display: 'grid', gap: 0.5, maxHeight: 300, overflow: 'auto' }}>
+              {(performance.per_staff || []).map((s) => (
+                <Box key={`${s.file_code}-${s.name}`} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid', borderTopColor: 'divider', pt: 0.5 }}>
+                  <Typography variant="body2">{s.name} <Box component="span" sx={{ color: 'text.secondary' }}>({s.file_code})</Box></Typography>
+                  <Chip size="small" label={`${s.score}`} sx={{ fontWeight: 700 }} />
+                </Box>
+              ))}
+              {(performance.per_staff || []).length === 0 && <Typography variant="body2" color="text.secondary">No staff ratings yet.</Typography>}
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+const renderPipeline = (
+    <Box sx={{ p: 3 }}>
+      <Grid container spacing={2}>
+        <Grid item xs={6} sm={4} md={2}><MetricCard label="Open vacancies" value={pipeline.open_vacancies ?? 0} color="#2563eb" /></Grid>
+        <Grid item xs={6} sm={4} md={2}><MetricCard label="Applications" value={pipeline.applications ?? 0} color="#7c3aed" /></Grid>
+        <Grid item xs={6} sm={4} md={2}><MetricCard label="Volunteer requests" value={pipeline.volunteer_requests ?? 0} color="#0d9488" /></Grid>
+        <Grid item xs={6} sm={4} md={2}><MetricCard label="Internship requests" value={pipeline.internship_requests ?? 0} color="#0288d1" /></Grid>
+        <Grid item xs={6} sm={4} md={2}><MetricCard label="Total vacancies" value={pipeline.vacancies ?? 0} color="#dc2626" /></Grid>
+        <Grid item xs={6} sm={4} md={2}>
+          <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%', display: 'flex', alignItems: 'center' }}>
+            <Button size="small" variant="contained" fullWidth sx={{ textTransform: 'none' }} onClick={() => navigate('/pipeline')}>Open Pipeline</Button>
+          </Paper>
+        </Grid>
+      </Grid>
+      <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', mt: 2 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Job description sections</Typography>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          {(pipeline.job_description_sections || []).map((s) => (
+            <Chip key={s} size="small" label={s} variant="outlined" />
+          ))}
+        </Box>
+      </Paper>
+    </Box>
+  );
+
+  const renderReports = (
+    <Box sx={{ p: 3 }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={7}>
+          <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Report types</Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {(reports.report_types || []).map((r) => (
+                <Chip key={r} label={r} variant="outlined" sx={{ fontWeight: 600 }} />
+              ))}
+            </Box>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={5}>
+          <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Report durations</Typography>
+            <Box sx={{ display: 'grid', gap: 0.75 }}>
+              {(reports.report_durations || []).map((d) => (
+                <Box key={d.name} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid', borderTopColor: 'divider', pt: 0.75 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 700 }}>{d.name}</Typography>
+                  <Typography variant="body2" color="text.secondary">{d.frequency}</Typography>
+                </Box>
+              ))}
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
+      <Button variant="outlined" sx={{ mt: 2, textTransform: 'none' }} endIcon={<ArrowForwardIcon size={16} />} onClick={() => navigate('/reports')}>
+        Open Reports
+      </Button>
+    </Box>
+  );
+return (
+    <Container maxWidth="xl" sx={{ py: 3 }}>
       <PageHeader
-        title="Internal HR Dashboard"
-        subtitle="Your workspace for contract tracking, staff status, payroll metrics and action alerts."
+        title="Dashboard"
         primaryAction={(
-          <Button variant="contained" sx={{ background: '#111827', color: '#ffffff', textTransform: 'none' }} onClick={primaryActionHandler}>
+          <Button variant="contained" sx={{ textTransform: 'none' }} onClick={() => navigate(primaryActionPath)}>
             {primaryActionLabel}
           </Button>
         )}
         menuItems={[
-          { label: 'Refresh dashboard', onClick: () => window.location.reload() },
           { label: 'View notifications', onClick: () => navigate('/notifications') },
           { label: 'Open staff directory', onClick: () => navigate('/staff') },
+          { label: 'Refresh dashboard', onClick: () => window.location.reload() },
         ]}
       />
 
-      {(role === 'ceo' || role === 'ceo_assistant' || role === 'it_officer') && (
-        <Paper sx={{ p: 1.5, mb: 3, borderRadius: 3, bgcolor: '#eef2ff', border: '1px solid #c7d2fe', display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
-          <Box component="span" sx={{ fontSize: 22 }}>{role === 'it_officer' ? '🛠️' : '👔'}</Box>
-          <Box flex={1}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#312e81' }}>
-              {role === 'ceo' ? 'CEO — Executive View' : role === 'ceo_assistant' ? 'CEO Assistant — Executive Access' : 'IT Officer — System Administration'}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {role === 'it_officer'
-                ? 'You manage the whole app: employees, documents, HR tools, organization branding and subscriptions.'
-                : 'High-level view of how the system is running — reports, analytics, alerts, staff and the organization plan.'}
-            </Typography>
-          </Box>
+      {(role === 'ceo' || role === 'ceo_assistant') && (
+        <Paper sx={{ p: 1.5, mb: 2.5, borderRadius: 3, bgcolor: 'primary.main', color: 'primary.contrastText', display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+            {role === 'ceo' ? 'CEO — Executive View' : 'CEO Assistant — Executive Access'}
+          </Typography>
+          <Box flex={1} />
+          <Button size="small" variant="outlined" onClick={() => navigate('/reports')} sx={{ color: 'inherit', borderColor: 'rgba(255,255,255,0.5)', textTransform: 'none' }}>
+            Executive Reports
+          </Button>
         </Paper>
       )}
 
       {['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant'].includes(role) && (
-        <Paper sx={{ p: 1.5, mb: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap', bgcolor: '#f8fafc' }}>
-          <Box component="span" sx={{ fontSize: 22 }}>💳</Box>
-          <Box flex={1}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-              Organization plan: {(sub?.plan || 'yearly').charAt(0).toUpperCase() + (sub?.plan || 'yearly').slice(1)} · {sub?.status || 'inactive'}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {(sub?.status === 'active' || sub?.status === 'trial')
-                ? `Subscription runs ${sub?.start_date || 'soon'} → ${sub?.end_date || '…'}. Payments will be activated at full launch.`
-                : 'Payments & subscriptions activate once the app is fully built — set your quarterly/yearly plan now.'}
-            </Typography>
-          </Box>
+        <Paper sx={{ p: 1.5, mb: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap', bgcolor: 'background.paper' }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+            Plan: {(sub?.plan || 'yearly').charAt(0).toUpperCase() + (sub?.plan || 'yearly').slice(1)} · {sub?.status || 'inactive'}
+          </Typography>
+          <Box flex={1} />
           <Button size="small" variant="outlined" onClick={() => navigate('/subscription')} sx={{ textTransform: 'none' }}>
             Plan &amp; Billing
           </Button>
         </Paper>
       )}
 
-      {(() => {
-        const actions =
-          role === 'ceo' || role === 'ceo_assistant'
-            ? [['📋 Reports', '/reports'], ['🔔 Smart Alerts', '/alerts'], ['👥 Staff', '/staff'], ['🌐 Subscription', '/subscription']]
-            : role === 'hr_admin' || role === 'project_manager' || role === 'it_officer'
-              ? [['🔔 Smart Alerts', '/alerts'], ['🧰 HR Tools', '/hr-tools'], ['🏖️ Leave', '/leave'], ['⏱️ Timesheets', '/timesheet'], ['🌐 Subscription', '/subscription']]
-              : isFinance
-                ? [['🔔 Smart Alerts', '/alerts'], ['🧾 Payslips', '/payslips'], ['🏦 Finance', '/finance'], ['🧰 HR Tools', '/hr-tools']]
-                : [['🔔 Smart Alerts', '/alerts'], ['📄 My Documents', '/documents'], ['🏖️ Apply Leave', '/leave'], ['⏱️ My Timesheet', '/timesheet']];
-        return (
-          <Stack direction="row" spacing={1} sx={{ mb: 3, flexWrap: 'wrap' }}>
-            {actions.map(([label, path]) => (
-              <Button key={path + label} size="small" variant="outlined" sx={{ textTransform: 'none', borderRadius: 20 }} onClick={() => navigate(path)}>
-                {label}
-              </Button>
-            ))}
-          </Stack>
-        );
-      })()}
+      {/* Quick actions */}
+      <Stack direction="row" spacing={1} sx={{ mb: 3, flexWrap: 'wrap' }}>
+        {quickActions.map(([label, path]) => (
+          <Button key={path + label} size="small" variant="outlined" sx={{ textTransform: 'none', borderRadius: 20 }} onClick={() => navigate(path)}>
+            {label}
+          </Button>
+        ))}
+      </Stack>
 
-      {birthdayMessage && (
-        <Paper sx={{ p: 3, mb: 3, borderRadius: 3, bgcolor: '#dbeafe', border: '1px solid #bfdbfe' }} elevation={0}>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Box sx={{ width: 44, height: 44, borderRadius: '14px', bgcolor: '#2563eb', display: 'grid', placeItems: 'center', color: '#fff' }}>
-              <CakeIcon fontSize="small" />
-            </Box>
-            <Box>
-              <Typography variant="h6" sx={{ fontWeight: 800, color: '#1d4ed8' }}>
-                {birthdayMessage}
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#1e3a8a', mt: 1 }}>
-                Celebrate with your teammates today. Check the birthday section for details and plans.
-              </Typography>
-            </Box>
-          </Box>
-        </Paper>
-      )}
-
-      <Grid container spacing={3} sx={{ mb: 3 }}>
+      {/* Top summary cards */}
+      <Grid container spacing={2.5} sx={{ mb: 3 }}>
         {topCards.map((item) => (
           <Grid item xs={12} sm={6} md={3} key={item.label}>
-            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: item.borderColor, bgcolor: '#ffffff' }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, textTransform: 'uppercase', letterSpacing: 0.8, color: '#475569' }}>
-                {item.label}
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 700, color: '#111827' }}>
-                {item.value}
-              </Typography>
-            </Paper>
+            <MetricCard label={item.label} value={item.value} color={item.color} />
           </Grid>
         ))}
       </Grid>
 
+      {/* Contracts + Birthdays */}
       <Grid container spacing={3}>
         <Grid item xs={12} lg={8}>
           <Paper sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
-            <Box sx={{ p: 3, bgcolor: '#f8fafc', borderBottom: '1px solid #e5e7eb' }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: '#111827' }}>Contracts Notes</Typography>
-              <Typography variant="body2" sx={{ mt: 1, color: '#6b7280' }}>
-                Track contracts that require review soon and drill into the most urgent records.
-              </Typography>
+            <Box sx={{ px: 3, py: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>Contracts Expiring</Typography>
             </Box>
-            <Box sx={{ p: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-              <TextField
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search contracts, names or project codes"
-                size="small"
-                sx={{ width: '100%', maxWidth: 400 }}
-              />
-              <Chip label={`${dashboardData.expiring_contracts.length} expiring contracts`} color="warning" />
+            <Box sx={{ px: 3, py: 1.5, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+              <TextField value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search contracts..." size="small" sx={{ width: '100%', maxWidth: 360 }} />
+              <Chip label={`${dashboardData.expiring_contracts.length} expiring`} color="warning" />
               <Chip label={`${dashboardData.staff_with_missing_docs} missing docs`} color="error" />
             </Box>
-            <TableContainer sx={{ maxHeight: 420 }}>
+            <TableContainer sx={{ maxHeight: 400 }}>
               <Table stickyHeader>
-                <TableHead sx={{ backgroundColor: '#f8fafc' }}>
+                <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 700, color: '#374151' }}>Staff Name</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#374151' }}>File Code</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#374151' }}>Project</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#374151' }}>Contract End</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#374151' }}>Status</TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>Staff Name</TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>File Code</TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>Project</TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>Contract End</TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {filteredContracts.length > 0 ? (
                     filteredContracts.map((contract, index) => (
-                      <TableRow key={index} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                        <TableCell sx={{ color: '#111827' }}>{contract.full_name}</TableCell>
-                        <TableCell sx={{ color: '#111827' }}>{contract.file_code}</TableCell>
-                        <TableCell sx={{ color: '#111827' }}>{contract.project}</TableCell>
-                        <TableCell sx={{ color: '#b91c1c', fontWeight: 600 }}>{contract.contract_end}</TableCell>
-                        <TableCell>
-                          <Chip label="Expiring" size="small" sx={{ bgcolor: '#fef3c7', color: '#92400e' }} />
-                        </TableCell>
+                      <TableRow key={contract.id || index} hover sx={{ cursor: 'pointer' }} onClick={() => navigate('/staff')}>
+                        <TableCell>{contract.full_name}</TableCell>
+                        <TableCell>{contract.file_code}</TableCell>
+                        <TableCell>{contract.project}</TableCell>
+                        <TableCell sx={{ color: '#b45309', fontWeight: 600 }}>{contract.contract_end}</TableCell>
+                        <TableCell><Chip label="Expiring" size="small" color="warning" /></TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
-                        No expiring contracts match your search.
-                      </TableCell>
+                      <TableCell colSpan={5} align="center" sx={{ py: 5, color: 'text.secondary' }}>No expiring contracts match your search.</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
             </TableContainer>
-            <Box sx={{ px: 3, py: 2, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 2, borderTop: '1px solid #e5e7eb', bgcolor: '#f8fafc' }}>
-              <Typography variant="caption" sx={{ color: '#475569', lineHeight: 1.4 }}>
-                Showing {filteredContracts.length} of {dashboardData.expiring_contracts.length} expiring contracts
-              </Typography>
-              <Button size="small" variant="contained" sx={{ background: '#111827', color: '#ffffff', textTransform: 'none', px: 2, py: 1, minHeight: 32, fontSize: '0.78rem' }} onClick={() => navigate('/staff')}>
-                View all
+            <Box sx={{ px: 3, py: 1.5, display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid', borderColor: 'divider' }}>
+              <Button size="small" onClick={() => navigate('/alerts')} sx={{ textTransform: 'none' }} endIcon={<ArrowForwardIcon size={16} />}>
+                View all alerts
               </Button>
             </Box>
           </Paper>
         </Grid>
 
         <Grid item xs={12} lg={4}>
-          <Stack spacing={3}>
-            {birthdayMessage && (
-              <Paper sx={{ p: 3, borderRadius: 3, bgcolor: '#eef2ff', border: '1px solid #c7d2fe' }} elevation={0}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                  <Box sx={{ width: 48, height: 48, borderRadius: '16px', bgcolor: '#6366f1', display: 'grid', placeItems: 'center', color: '#fff' }}>
-                    <CakeIcon fontSize="medium" />
-                  </Box>
-                  <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1e3a8a' }}>Birthday Dashboard</Typography>
-                    <Typography variant="body2" color="text.secondary">Keep the team celebration on schedule.</Typography>
-                  </Box>
-                </Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#1e3a8a' }}>{birthdayMessage}</Typography>
-                <Typography variant="body2" sx={{ color: '#334155', mt: 1 }}>Today’s birthdays and upcoming staff celebrations are listed below.</Typography>
-              </Paper>
-            )}
-
-            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: '#d1d5db', bgcolor: '#f8fafc' }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#111827' }}>Birthdays</Typography>
-              <Typography variant="body2" sx={{ color: '#475569', mb: 3 }}>Celebrate the next two weeks of staff birthdays and stay ahead of recognition plans.</Typography>
-              {birthdaysToday.length > 0 ? (
-                <Box sx={{ display: 'grid', gap: 1, mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>Today</Typography>
+          <Stack spacing={2.5}>
+            <Paper sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                <CakeIcon size={22} style={{ color: 'inherit' }} />
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Birthdays</Typography>
+              </Box>
+              {birthdaysToday.length > 0 && (
+                <Box sx={{ display: 'grid', gap: 1, mb: 1.5 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Today</Typography>
                   {birthdaysToday.map((entry) => renderBirthdayEntry(entry, true))}
                 </Box>
-              ) : (
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>No birthdays today. Keep an eye on upcoming team milestones.</Typography>
               )}
               {upcomingBirthdays.length > 0 && (
                 <Box sx={{ display: 'grid', gap: 1 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>Upcoming</Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Upcoming</Typography>
                   {upcomingBirthdays.map((entry) => renderBirthdayEntry(entry))}
                 </Box>
               )}
+              {birthdaysToday.length === 0 && upcomingBirthdays.length === 0 && (
+                <Typography variant="body2" color="text.secondary">No birthdays this week.</Typography>
+              )}
             </Paper>
 
-            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: '#d1d5db', bgcolor: '#f8fafc' }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#111827' }}>🔔 Smart Alerts Snapshot</Typography>
-              <Typography sx={{ mb: 2, color: '#475569' }}>
-                Key dates and actions needing attention.
-              </Typography>
-              <Box sx={{ display: 'grid', gap: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">Contracts expiring</Typography>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{dashboardData.contracts_expiring_soon}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">Staff with missing docs</Typography>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: dashboardData.staff_with_missing_docs ? '#b91c1c' : 'inherit' }}>{dashboardData.staff_with_missing_docs}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">Approvals pending</Typography>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{dashboardData.pending_timesheet_approvals}</Typography>
-                </Box>
+            <Paper sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                <FolderOpenIcon size={22} style={{ color: 'inherit' }} />
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Personnel Files</Typography>
               </Box>
-              <Button variant="contained" fullWidth sx={{ mt: 2, bgcolor: '#0f172a', textTransform: 'none' }} onClick={() => navigate('/alerts')}>
-                Open Smart Alerts
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body2" color="text.secondary">Staff with missing documents</Typography>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{dashboardData.staff_with_missing_docs}</Typography>
+              </Box>
+              <Button fullWidth variant="contained" sx={{ mt: 1, textTransform: 'none' }} onClick={() => navigate('/personnel-file')}>
+                Open Personnel File Tracker
               </Button>
-            </Paper>
-
-            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: '#d1d5db', bgcolor: '#f8fafc' }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#111827' }}>Payroll Summary</Typography>
-              <Typography sx={{ mb: 2, color: '#475569' }}>
-                Summaries are based on the current year’s timesheet entries.
-              </Typography>
-              <Box sx={{ display: 'grid', gap: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">YTD hours</Typography>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{dashboardData.year_to_date_hours}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">Pending timesheets</Typography>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{dashboardData.pending_timesheet_approvals}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">Contract alerts</Typography>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{dashboardData.contracts_expiring_soon}</Typography>
-                </Box>
-              </Box>
             </Paper>
           </Stack>
         </Grid>
       </Grid>
 
-      {/* ── Dashboard content groups ── */}
-      <Divider sx={{ my: 4 }} />
-      <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.5 }}>Dashboard</Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Smart Alerts, Analytics, Performance Analysis, Pipeline and Reports at a glance.
-      </Typography>
-
-      <Stack spacing={4}>
-        {/* Smart Alerts */}
-        <Accordion square>
-          <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary', '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } }}>
-            Smart Alerts
-          </AccordionSummary>
-          <AccordionDetails sx={{ p: 1 }}>
-        <Box>
-          <SectionTitle icon="🔔" title="Smart Alerts" subtitle="Milestones and approvals that need attention." />
-          <Grid container spacing={2}>
-            {[
-              { label: 'Birthdays', value: smartAlerts.birthdays, color: '#d32f2f', icon: '🎂' },
-              { label: 'Company anniversary', value: smartAlerts.company_anniversaries, color: '#7b1fa2', icon: '🏢' },
-              { label: 'Staff anniversary', value: smartAlerts.staff_anniversaries, color: '#2e7d32', icon: '🎉' },
-              { label: 'Employee of the month', value: smartAlerts.employee_of_the_month || '—', color: '#ed6c02', icon: '🏆' },
-              { label: 'Missing docs', value: smartAlerts.missing_docs, color: '#c62828', icon: '📂' },
-              { label: 'End of project notice', value: smartAlerts.end_of_project_notice, color: '#9c27b0', icon: '🏗️' },
-              { label: 'Contract expiring', value: smartAlerts.contract_expiring, color: '#ed6c02', icon: '📜' },
-              { label: 'Probation period', value: smartAlerts.probation_period, color: '#0288d1', icon: '🧑‍🎓' },
-              { label: 'Contracts to review', value: smartAlerts.contracts_to_review, color: '#7b1fa2', icon: '📝' },
-              { label: 'Leave reqs & approvals', value: smartAlerts.leave_requests_approvals, color: '#1565c0', icon: '🏖️' },
-              { label: 'Retirement', value: smartAlerts.retirement, color: '#6d4c41', icon: '👵' },
-              { label: 'Registration', value: smartAlerts.registration, color: '#00838f', icon: '📌' },
-            ].map((item) => (
-              <Grid item xs={6} sm={4} md={2} key={item.label}>
-                <Paper sx={{ p: 1.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%', bgcolor: 'background.paper' }}>
-                  <Typography variant="h6" sx={{ fontWeight: 800, color: item.color }}>{item.icon} {item.value}</Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2, display: 'block' }}>{item.label}</Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Analytics */}
-        <Accordion square defaultExpanded>
-          <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary', '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } }}>
-            Analytics
-          </AccordionSummary>
-          <AccordionDetails sx={{ p: 1 }}>
-        <Box>
-          <SectionTitle icon="📊" title="Analytics" subtitle="Total staff, employment types, recess, exits, gender and organizational spread." />
-          <Grid container spacing={2}>
-            <Grid item xs={6} sm={4} md={3}><MetricCard label="Total staff" value={analytics.total_staff ?? 0} color="#111827" /></Grid>
-            <Grid item xs={6} sm={4} md={3}><MetricCard label="Active staff" value={analytics.active_staff ?? 0} color="#16a34a" /></Grid>
-            <Grid item xs={6} sm={4} md={3}><MetricCard label="Permanent staff" value={analytics.permanent_staff ?? 0} color="#2563eb" /></Grid>
-            <Grid item xs={6} sm={4} md={3}><MetricCard label="Temporary / SLA" value={analytics.temporary_staff ?? 0} color="#ed6c02" /></Grid>
-            <Grid item xs={6} sm={4} md={3}><MetricCard label="On recess" value={analytics.on_recess ?? 0} color="#7c3aed" /></Grid>
-            <Grid item xs={6} sm={4} md={3}><MetricCard label="Exited staff" value={analytics.exited_staff ?? 0} color="#dc2626" /></Grid>
-            <Grid item xs={6} sm={4} md={3}><MetricCard label="Turnover rate" value={`${analytics.turnover_rate_percent ?? 0}%`} color="#b45309" /></Grid>
-            <Grid item xs={6} sm={4} md={3}><MetricCard label="Organizational" value={analytics.organizational ?? 0} color="#0f766e" /></Grid>
-          </Grid>
-        <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Per project</Typography>
-                <Box sx={{ display: 'grid', gap: 0.75 }}>
-                  {Object.entries(analytics.per_project || {}).map(([k, v]) => (
-                    <Box key={k} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', pt: 0.75 }}>
-                      <Typography variant="body2">{k}</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 700 }}>{v}</Typography>
-                    </Box>
-                  ))}
-                  {Object.keys(analytics.per_project || {}).length === 0 && <Typography variant="body2" color="text.secondary">No projects recorded.</Typography>}
-                </Box>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Per unit / department</Typography>
-                <Box sx={{ display: 'grid', gap: 0.75 }}>
-                  {Object.entries(analytics.per_unit || {}).map(([k, v]) => (
-                    <Box key={k} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', pt: 0.75 }}>
-                      <Typography variant="body2">{k}</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 700 }}>{v}</Typography>
-                    </Box>
-                  ))}
-                  {Object.keys(analytics.per_unit || {}).length === 0 && <Typography variant="body2" color="text.secondary">No units recorded.</Typography>}
-                </Box>
-              </Paper>
-            </Grid>
-          </Grid>
-
-          <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', mt: 2 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Gender breakdown</Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {Object.entries(analytics.gender_breakdown || {}).map(([k, v]) => (
-                <Chip key={k} label={`${k}: ${v}`} color={k.toLowerCase() === 'male' ? 'primary' : k.toLowerCase() === 'female' ? 'secondary' : 'default'} sx={{ fontWeight: 700 }} />
-              ))}
-            </Box>
-          </Paper>
-        </Box>
-          </AccordionDetails>
-        </Accordion>
-{/* Performance Analysis */}
-        <Accordion square>
-          <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary', '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } }}>
-            Performance Analysis
-          </AccordionSummary>
-          <AccordionDetails sx={{ p: 1 }}>
-        <Box>
-          <SectionTitle icon="⭐" title="Performance Analysis" subtitle="Ratings across the organization, units, staff and projects." />
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <MetricCard label="Organizational rating" value={performance.organizational_rating ?? '—'} color="#7c3aed" />
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Per unit / department rating</Typography>
-                <Box sx={{ display: 'grid', gap: 0.75 }}>
-                  {Object.entries(performance.per_unit || {}).map(([k, v]) => (
-                    <Box key={k} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', pt: 0.75 }}>
-                      <Typography variant="body2">{k}</Typography>
-                      <Chip size="small" label={v} sx={{ fontWeight: 700 }} />
-                    </Box>
-                  ))}
-                  {Object.keys(performance.per_unit || {}).length === 0 && <Typography variant="body2" color="text.secondary">No unit ratings yet.</Typography>}
-                </Box>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Per project rating</Typography>
-                <Box sx={{ display: 'grid', gap: 0.75 }}>
-                  {(performance.per_project || []).map((p) => (
-                    <Box key={p.project} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', pt: 0.75 }}>
-                      <Typography variant="body2">{p.project}</Typography>
-                      <Chip size="small" label={`${p.score}`} sx={{ fontWeight: 700 }} />
-                    </Box>
-                  ))}
-                  {(performance.per_project || []).length === 0 && <Typography variant="body2" color="text.secondary">No project ratings yet.</Typography>}
-                </Box>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Per staff rating</Typography>
-                <Box sx={{ display: 'grid', gap: 0.5, maxHeight: 260, overflow: 'auto' }}>
-                  {(performance.per_staff || []).map((s) => (
-                    <Box key={`${s.file_code}-${s.name}`} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f8fafc', pt: 0.5 }}>
-                      <Typography variant="body2">{s.name} <Box component="span" sx={{ color: 'text.secondary' }}>({s.file_code})</Box></Typography>
-                      <Chip size="small" label={`${s.score}`} sx={{ fontWeight: 700 }} />
-                    </Box>
-                  ))}
-                  {(performance.per_staff || []).length === 0 && <Typography variant="body2" color="text.secondary">No staff ratings yet.</Typography>}
-                </Box>
-              </Paper>
-            </Grid>
-          </Grid>
-        </Box>
-          </AccordionDetails>
-        </Accordion>
-{/* Pipeline */}
-        <Accordion square>
-          <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary', '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } }}>
-            Pipeline
-          </AccordionSummary>
-          <AccordionDetails sx={{ p: 1 }}>
-        <Box>
-          <SectionTitle icon="📈" title="Pipeline" subtitle="Vacancies, job-description building blocks, applications, internships and volunteers." />
-          <Grid container spacing={2}>
-            <Grid item xs={6} sm={4} md={2}><MetricCard label="Open vacancies" value={pipeline.open_vacancies ?? 0} color="#2563eb" /></Grid>
-            <Grid item xs={6} sm={4} md={2}><MetricCard label="Applications" value={pipeline.applications ?? 0} color="#7c3aed" /></Grid>
-            <Grid item xs={6} sm={4} md={2}><MetricCard label="Volunteer requests" value={pipeline.volunteer_requests ?? 0} color="#16a34a" /></Grid>
-            <Grid item xs={6} sm={4} md={2}><MetricCard label="Internship requests" value={pipeline.internship_requests ?? 0} color="#0288d1" /></Grid>
-            <Grid item xs={6} sm={4} md={2}><MetricCard label="Total vacancies" value={pipeline.vacancies ?? 0} color="#dc2626" /></Grid>
-            <Grid item xs={6} sm={4} md={2}>
-              <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%', display: 'flex', alignItems: 'center' }}>
-                <Button size="small" variant="contained" fullWidth sx={{ textTransform: 'none' }} onClick={() => navigate('/pipeline')}>Open Pipeline</Button>
-              </Paper>
-            </Grid>
-          </Grid>
-          <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', mt: 2 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Job description sections</Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {(pipeline.job_description_sections || []).map((s) => (
-                <Chip key={s} size="small" label={s} variant="outlined" />
-              ))}
-            </Box>
-          </Paper>
-        </Box>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Reports */}
-        <Accordion square>
-          <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary', '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } }}>
-            Reports
-          </AccordionSummary>
-          <AccordionDetails sx={{ p: 1 }}>
-        <Box>
-          <SectionTitle icon="📋" title="Reports" subtitle="Standard report types and the schedule that keeps reporting on track." />
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={7}>
-              <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Report types</Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {(reports.report_types || []).map((r) => (
-                    <Chip key={r} label={r} variant="outlined" sx={{ fontWeight: 600 }} />
-                  ))}
-                </Box>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={5}>
-              <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Report durations</Typography>
-                <Box sx={{ display: 'grid', gap: 0.75 }}>
-                  {(reports.report_durations || []).map((d) => (
-                    <Box key={d.name} sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', pt: 0.75 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 700 }}>{d.name}</Typography>
-                      <Typography variant="body2" color="text.secondary">{d.frequency}</Typography>
-                    </Box>
-                  ))}
-                </Box>
-              </Paper>
-            </Grid>
-          </Grid>
-        </Box>
-          </AccordionDetails>
-        </Accordion>
-      </Stack>
+      {/* Breakdown navigation */}
+      <Box sx={{ mt: 4, mb: 2 }}>
+        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+          {DASHBOARD_TABS.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <Button
+                key={tab.key}
+                size="small"
+                variant={section === tab.key ? 'contained' : 'outlined'}
+                startIcon={<Icon size={18} />}
+                onClick={() => setSection(tab.key)}
+                sx={{ textTransform: 'none', borderRadius: 30 }}
+              >
+                {tab.label}
+              </Button>
+            );
+          })}
+        </Stack>
+      </Box>
+      <Paper sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
+        {section === 'alerts' && renderAlerts}
+        {section === 'analytics' && renderAnalytics}
+        {section === 'performance' && renderPerformance}
+        {section === 'pipeline' && renderPipeline}
+        {section === 'reports' && renderReports}
+      </Paper>
     </Container>
-  );
-}
-
-function SectionTitle({ icon, title, subtitle }) {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
-      <Typography variant="h6" sx={{ fontWeight: 800 }}>{icon} {title}</Typography>
-      {subtitle && <Typography variant="body2" color="text.secondary">{subtitle}</Typography>}
-    </Box>
   );
 }

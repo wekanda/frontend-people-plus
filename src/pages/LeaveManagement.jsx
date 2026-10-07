@@ -98,7 +98,7 @@ export default function LeaveManagement() {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <PageHeader
-        title="🏖️ Leave Management"
+        title="Leave Management"
         subtitle="Manage leave requests with a dedicated menu for actions and approvals."
         primaryAction={(
           <Button variant="contained" onClick={() => setOpenDialog(true)} sx={{ background: 'primary.main' }}>
@@ -147,7 +147,7 @@ export default function LeaveManagement() {
       <Paper sx={{ borderRadius: 3, boxShadow: 3, overflow: 'hidden' }}>
         <Box sx={{ p: 3, borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-            📅 Leave Requests
+             Leave Requests
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Review leave activity with clean row spacing and actions.

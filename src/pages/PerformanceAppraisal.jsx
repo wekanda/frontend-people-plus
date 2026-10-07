@@ -89,7 +89,7 @@ export default function PerformanceAppraisal() {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <PageHeader
-        title="📝 Performance Appraisals"
+        title="Performance Appraisals"
         subtitle="Review and manage appraisal records with an independent action menu."
         primaryAction={(
           <Button variant="contained" onClick={() => setOpenDialog(true)} sx={{ background: 'primary.main', color: 'primary.contrastText', textTransform: 'none' }}>

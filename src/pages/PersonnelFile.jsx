@@ -108,7 +108,7 @@ export default function PersonnelFile() {
   return (
     <Container maxWidth="xl">
       <PageHeader
-        title="📋 Electronic Personnel File (e-PFile)"
+        title="Electronic Personnel File (e-PFile)"
         subtitle="View employee document completeness and track missing or expired documents"
       />
 

@@ -15,9 +15,15 @@ const professionalColors = {
   coral: '#E64A19',             // Accent/warning
   lightGray: '#F5F7FA',         // Light backgrounds
   mediumGray: '#ECEFF1',        // Medium backgrounds
-  darkGray: '#37474F',          // Dark text
-  textGray: '#546E7A',          // Secondary text
+  darkGray: '#263238',          // Dark text
+  textGray: '#455A64',          // Secondary text (darker for readability)
   white: '#FFFFFF'
+};
+
+// Sidebar palette: always dark so the white navigation text stays highly readable.
+const sidebarColors = {
+  light: { main: '#0D1B3A', contrastText: '#FFFFFF', subtext: 'rgba(255,255,255,0.88)' },
+  dark: { main: '#0A101F', contrastText: '#FFFFFF', subtext: 'rgba(255,255,255,0.9)' },
 };
 
 // Light theme
@@ -59,6 +65,11 @@ export const lightTheme = createTheme({
     background: {
       default: professionalColors.white,
       paper: professionalColors.lightGray,
+    },
+    sidebar: {
+      main: sidebarColors.light.main,
+      contrastText: sidebarColors.light.contrastText,
+      subtext: sidebarColors.light.subtext,
     },
     text: {
       primary: professionalColors.darkGray,
@@ -316,9 +327,14 @@ export const darkTheme = createTheme({
       default: '#121212',
       paper: '#1E1E1E',
     },
+    sidebar: {
+      main: sidebarColors.dark.main,
+      contrastText: sidebarColors.dark.contrastText,
+      subtext: sidebarColors.dark.subtext,
+    },
     text: {
       primary: '#FFFFFF',
-      secondary: '#B0BEC5',
+      secondary: '#C7CDD6',
     },
     divider: '#424242',
     action: {
@@ -347,12 +363,12 @@ export const darkTheme = createTheme({
     body1: {
       fontSize: '1rem',
       lineHeight: 1.6,
-      color: '#B0BEC5',
+      color: '#C7CDD6',
     },
     body2: {
       fontSize: '0.875rem',
       lineHeight: 1.5,
-      color: '#90A4AE',
+      color: '#B0BEC5',
     },
     button: {
       fontWeight: 600,

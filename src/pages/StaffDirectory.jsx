@@ -128,7 +128,7 @@ export default function StaffDirectory() {
   return (
     <Container maxWidth="lg" sx={{ py: 4, mb: 4 }}>
       <PageHeader
-        title="👥 Staff Directory"
+        title="Staff Directory"
         subtitle="Manage and view all employees in your organization."
         primaryAction={canManageEmployees ? (
           <Button
@@ -136,7 +136,7 @@ export default function StaffDirectory() {
             onClick={() => setOpenDialog(true)}
             sx={{ textTransform: 'none', fontWeight: 600 }}
           >
-            ➕ Add Employee
+             Add Employee
           </Button>
         ) : undefined}
       />
@@ -202,7 +202,7 @@ export default function StaffDirectory() {
             size="small"
             sx={{ flex: { xs: '1 1 100%', md: '1 1 300px' } }}
             InputProps={{
-              startAdornment: '🔍',
+              startAdornment: '',
             }}
           />
           <ButtonGroup variant="outlined" size="small">
@@ -369,7 +369,7 @@ export default function StaffDirectory() {
                     onClick={() => setOpenDialog(true)}
                     sx={{ textTransform: 'none', fontWeight: 600 }}
                   >
-                    ➕ Add Employee
+                     Add Employee
                   </Button>
                 )}
               </Box>
@@ -381,7 +381,7 @@ export default function StaffDirectory() {
       {/* Add Employee Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: 700, fontSize: '1.1rem' }}>
-          ➕ Add New Employee
+           Add New Employee
         </DialogTitle>
         <DialogContent sx={{ display: 'grid', gap: 2, pt: 2 }}>
           <TextField

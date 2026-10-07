@@ -65,7 +65,7 @@ export default function NotificationBell() {
         PaperProps={{ sx: { width: 360, borderRadius: 3, maxHeight: 480, overflow: 'hidden', display: 'flex', flexDirection: 'column' } }}
       >
         <Box sx={{ px: 2, py: 1.5, bgcolor: 'primary.main', color: 'primary.contrastText', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700, fontSize: '0.95rem' }}>🔔 Notifications</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Notifications</Typography>
           <Stack direction="row" spacing={1}>
             {unreadCount > 0 && (
               <Button size="small" sx={{ color: 'inherit', fontSize: '0.75rem', textTransform: 'none' }} onClick={markAll}>

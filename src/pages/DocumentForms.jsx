@@ -15,21 +15,21 @@ import api from '../api';
 import { useAuth } from '../contexts/AuthContext';
 
 const CATEGORY_ICON = {
-  'Contracts & Letters': '📜',
-  'Internships & Volunteers': '🎓',
-  'HR & Finance': '🏦',
-  'Procurement & Stores': '🧾',
-  'Performance & Appraisals': '⭐',
-  'Leave & Attendance': '🏖️',
-  'Payroll & Benefits': '💰',
-  'Employee Records': '👥',
-  'Communications & Engagement': '📣',
-  'Operations': '🧾',
-  'Payroll': '💰',
-  'Leave': '🏖️',
-  'Performance': '⭐',
-  'Internships': '🎓',
-  'Communications': '📣',
+  'Contracts & Letters': '',
+  'Internships & Volunteers': '',
+  'HR & Finance': '',
+  'Procurement & Stores': '',
+  'Performance & Appraisals': '',
+  'Leave & Attendance': '',
+  'Payroll & Benefits': '',
+  'Employee Records': '',
+  'Communications & Engagement': '',
+  'Operations': '',
+  'Payroll': '',
+  'Leave': '',
+  'Performance': '',
+  'Internships': '',
+  'Communications': '',
 };
 
 function RichTextEditor({ value, onChange }) {
@@ -191,7 +191,7 @@ export default function DocumentForms() {
         })
         .catch((e) => {
           if (e.response?.status === 403) {
-            setNotice({ ok: false, text: '🔒 Only HR Admin can generate this document.' });
+            setNotice({ ok: false, text: 'Only HR Admin can generate this document.' });
             setPreview('');
           } else {
             console.error('Render failed', e);
@@ -221,7 +221,7 @@ export default function DocumentForms() {
 
   const setField = (name, val) => setValues((prev) => ({ ...prev, [name]: val }));
 const handlePrint = () => {
-    if (!canGenerate) { setNotice({ ok: false, text: '🔒 Generation is Admin-only for this document.' }); return; }
+    if (!canGenerate) { setNotice({ ok: false, text: 'Generation is Admin-only for this document.' }); return; }
     const win = iframeRef.current;
     if (win?.contentWindow) {
       win.contentWindow.focus();
@@ -302,7 +302,7 @@ const handlePrint = () => {
   };
 
   const handleDownload = async () => {
-    if (!canGenerate) { setNotice({ ok: false, text: '🔒 Only HR Admin can download official documents.' }); return; }
+    if (!canGenerate) { setNotice({ ok: false, text: 'Only HR Admin can download official documents.' }); return; }
     try {
       setBusy(true);
       const res = await api.post(`/api/form-documents/${activeKey}/download`, { values }, { responseType: 'blob' });
@@ -442,7 +442,7 @@ if (loadingList) {
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
       <PageHeader
-        title="📄  Document Forms & Templates"
+        title="Document Forms & Templates"
         subtitle="Fill the form on the left and watch the A4 document update live — print it exactly as your organization’s official documents, or download the .doc. Upload an Excel file to auto-complete every document at once."
       />
 
@@ -450,7 +450,7 @@ if (loadingList) {
         <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" gap={1} sx={{ flexWrap: 'wrap' }}>
             <Typography variant="body2">
-              🏢 Your organization hasn't set its name, logo or letterhead yet. They appear at the top of every document you generate here.
+               Your organization hasn't set its name, logo or letterhead yet. They appear at the top of every document you generate here.
             </Typography>
             <Button size="small" variant="outlined" onClick={() => navigate('/hr-tools?tab=company')} sx={{ textTransform: 'none' }}>
               Set Organization Branding
@@ -468,7 +468,7 @@ if (loadingList) {
 
       {/* Contractual Document Management Workflow */}
       <Paper sx={{ p: 2, mb: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: '#f8fafc' }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>📂 Contractual Document Management Flow</Typography>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}> Contractual Document Management Flow</Typography>
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
           {[
             ['1', 'Template Upload', 'Managers select & upload HRM contractual templates'],
@@ -502,7 +502,7 @@ if (loadingList) {
               <Chip
                 key={cat}
                 size="small"
-                label={cat === 'All' ? 'All' : `${CATEGORY_ICON[cat] || '📄'} ${cat}`}
+                label={cat === 'All' ? 'All' : `${CATEGORY_ICON[cat] || ''} ${cat}`}
                 onClick={() => setActiveCategory(cat)}
                 color={activeCategory === cat ? 'primary' : 'default'}
                 variant={activeCategory === cat ? 'filled' : 'outlined'}
@@ -564,11 +564,11 @@ if (loadingList) {
                 }}
               >
                 <Typography variant="body2" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-                  {CATEGORY_ICON[f.category] || '📄'} {f.name}
+                  {CATEGORY_ICON[f.category] || ''} {f.name}
                 </Typography>
                 <Typography variant="caption" sx={{ opacity: 0.8 }}>{f.category}</Typography>
                 {f.generate_roles && !f.generate_roles.includes(role) && (
-                  <Chip size="small" label="🔒 HRM only" color="warning" sx={{ mt: 0.5, height: 18, fontSize: 10 }} />
+                  <Chip size="small" label="HRM only" color="warning" sx={{ mt: 0.5, height: 18, fontSize: 10 }} />
                 )}
               </Box>
             ))}
@@ -598,13 +598,13 @@ if (loadingList) {
             <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{activeForm.name}</Typography>
             <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap' }}>
               {!canGenerate && (
-                <Chip size="small" color="warning" label="🔒 Read-only for HR Admin only" />
+                <Chip size="small" color="warning" label="Read-only for HR Admin only" />
               )}
               <Button size="small" variant="outlined" onClick={handleSaveDraft} disabled={busy} sx={{ textTransform: 'none' }}>
-                💾 Save
+                 Save
               </Button>
               <Button size="small" variant="outlined" color="error" onClick={resetForm} disabled={busy} sx={{ textTransform: 'none' }}>
-                🗑️ Delete
+                 Delete
               </Button>
             </Stack>
           </Stack>
@@ -620,13 +620,13 @@ if (loadingList) {
           <Divider sx={{ my: 2 }} />
           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexWrap: 'wrap', gap: 1 }}>
             <Button size="small" variant="outlined" onClick={() => goNav(-1)} sx={{ textTransform: 'none' }} disabled={!filteredForms.length}>
-              ← Previous document
+               Previous document
             </Button>
             <Typography variant="caption" color="text.secondary">
               Step {filteredForms.findIndex((f) => f.key === activeKey) + 1} of {filteredForms.length} in this category
             </Typography>
             <Button size="small" variant="contained" onClick={() => goNav(1)} sx={{ textTransform: 'none' }} disabled={!filteredForms.length}>
-              Next document →
+              Next document 
             </Button>
           </Stack>
         </Paper>
@@ -642,7 +642,7 @@ if (loadingList) {
                 Print
               </Button>
               <Button size="small" variant="outlined" startIcon={<Download size={14} />} onClick={handleDownload} disabled={busy} sx={{ textTransform: 'none', color: '#fff', borderColor: 'rgba(255,255,255,0.5)' }}>
-                ⚙️ Generate .doc
+                 Generate .doc
               </Button>
               <Button size="small" variant="text" startIcon={<ExternalLink size={14} />} onClick={handleOpenExternal} sx={{ textTransform: 'none', color: '#fff' }}>
                 Open
@@ -663,7 +663,7 @@ if (loadingList) {
             ) : (
               <Box sx={{ color: '#eee', textAlign: 'center', py: 10 }}>
                 <Typography variant="body1" sx={{ mb: 1 }}>
-                  {canGenerate ? 'The A4 preview will appear here — fill the form on the left.' : '🔒 This document is restricted to HR Admin for generation.'}
+                  {canGenerate ? 'The A4 preview will appear here — fill the form on the left.' : ' This document is restricted to HR Admin for generation.'}
                 </Typography>
                 <Typography variant="caption">Fill the fields to update the preview live.</Typography>
               </Box>

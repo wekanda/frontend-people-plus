@@ -3,21 +3,21 @@ import { Container, Paper, Typography, Box, Grid, Chip, Stack } from '@mui/mater
 import PageHeader from '../components/PageHeader';
 
 const STEPS = [
-  { icon: '📤', title: 'Template Upload', desc: 'Managers from different companies upload their contractual document templates into the system.' },
-  { icon: '🧩', title: 'Data Population', desc: 'Populate templates with relevant company, employee, or project information through structured input fields.' },
-  { icon: '💾', title: 'Draft Save', desc: 'Save partially completed documents for later editing or review.' },
-  { icon: '👁️', title: 'Document Preview', desc: 'Generate a preview version for validation, formatting checks, and approval before finalization.' },
-  { icon: '🔒', title: 'Final Save', desc: 'Store the completed contractual document securely in the system repository.' },
-  { icon: '🛠️', title: 'Document Generation', desc: 'Automatically compile the populated data into a finalized contractual document (PDF/Word).' },
-  { icon: '🖨️', title: 'Print Dispatch', desc: 'Send the finalized document to the printer queue for physical copies.' },
-  { icon: '🧾', title: 'Audit & Version Control', desc: 'Maintain logs of edits, approvals, and versions for compliance and traceability.' },
+  { icon: '', title: 'Template Upload', desc: 'Managers from different companies upload their contractual document templates into the system.' },
+  { icon: '', title: 'Data Population', desc: 'Populate templates with relevant company, employee, or project information through structured input fields.' },
+  { icon: '', title: 'Draft Save', desc: 'Save partially completed documents for later editing or review.' },
+  { icon: '', title: 'Document Preview', desc: 'Generate a preview version for validation, formatting checks, and approval before finalization.' },
+  { icon: '', title: 'Final Save', desc: 'Store the completed contractual document securely in the system repository.' },
+  { icon: '', title: 'Document Generation', desc: 'Automatically compile the populated data into a finalized contractual document (PDF/Word).' },
+  { icon: '', title: 'Print Dispatch', desc: 'Send the finalized document to the printer queue for physical copies.' },
+  { icon: '', title: 'Audit & Version Control', desc: 'Maintain logs of edits, approvals, and versions for compliance and traceability.' },
 ];
 
 export default function DocumentWorkflow() {
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <PageHeader
-        title="🔁 Document Generation Workflow"
+        title="Document Generation Workflow"
         subtitle="From template upload to audit trail — how contractual documents are produced end-to-end."
       />
 
@@ -36,7 +36,7 @@ export default function DocumentWorkflow() {
       </Grid>
 
       <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', mt: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>⚙️ Available Contractual Templates</Typography>
+        <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}> Available Contractual Templates</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Templates are uploaded by the managers of the different organisations and align with the in-built tools in the system.
         </Typography>

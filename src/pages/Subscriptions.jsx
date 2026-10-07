@@ -156,7 +156,7 @@ export default function Subscriptions() {
             {sub?.prices && (
               <Alert severity="info" sx={{ mt: 1 }}>
                 <Typography variant="caption">
-                  📊 Quarterly billing: <strong>UGX {Number(sub.prices.quarterly).toLocaleString()}</strong>
+                   Quarterly billing: <strong>UGX {Number(sub.prices.quarterly).toLocaleString()}</strong>
                   {' '}· Yearly billing: <strong>UGX {Number(sub.prices.yearly).toLocaleString()}</strong> (per year)
                 </Typography>
               </Alert>
@@ -168,7 +168,7 @@ export default function Subscriptions() {
           {isAdmin ? (
             <Accordion square defaultExpanded>
               <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, fontWeight: 700 }}>
-                🛠️ Manage Subscription (Admin / IT Officer)
+                 Manage Subscription (Admin / IT Officer)
               </AccordionSummary>
               <AccordionDetails sx={{ p: 1.5 }}>
                 <Stack spacing={1.5}>
@@ -229,7 +229,7 @@ export default function Subscriptions() {
           )}
 
           <Card sx={{ mt: 2, p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>💡 How it works once live</Typography>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}> How it works once live</Typography>
             <Typography variant="caption" color="text.secondary">
               Companies subscribe quarterly or yearly to keep using the system. Data stays intact when a
               subscription renews; a grace period protects the organization if a payment is late.

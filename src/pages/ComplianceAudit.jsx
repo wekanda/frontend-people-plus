@@ -3,8 +3,7 @@ import api from '../api';
 import { Container, Grid, Paper, Typography, Box, CircularProgress, Button, Card, CardContent, Stack, Checkbox, FormControlLabel, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../contexts/AuthContext';
-import DownloadIcon from '@mui/icons-material/Download';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { Download as DownloadIcon, RefreshCcw as RefreshIcon } from 'lucide-react';
 
 export default function ComplianceAudit() {
   const { user, token } = useAuth();
@@ -77,10 +76,10 @@ export default function ComplianceAudit() {
         subtitle="Monitor compliance metrics and track all system activities."
         primaryAction={
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button variant="contained" startIcon={<RefreshIcon />} sx={{ background: '#111827', textTransform: 'none' }} onClick={loadComplianceData}>
+            <Button variant="contained" startIcon={<RefreshIcon size={18} />} sx={{ background: '#111827', textTransform: 'none' }} onClick={loadComplianceData}>
               Refresh
             </Button>
-            <Button variant="outlined" startIcon={<DownloadIcon />} onClick={() => setOpenExport(true)}>
+            <Button variant="outlined" startIcon={<DownloadIcon size={18} />} onClick={() => setOpenExport(true)}>
               Export
             </Button>
           </Box>

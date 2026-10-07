@@ -79,7 +79,7 @@ export default function Notifications() {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <PageHeader
-        title="🔔 Notifications"
+        title="Notifications"
         subtitle="Review all alerts, approvals, and reminders in one place."
         primaryAction={(
           <Button variant="contained" sx={{ background: 'primary.main' }} onClick={() => navigate('/') }>

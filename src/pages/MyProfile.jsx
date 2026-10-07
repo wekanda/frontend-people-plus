@@ -108,13 +108,13 @@ export default function MyProfile() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-      <PageHeader title="✍️ My Digital Identity" subtitle="Upload your personal digital signature, passport photo and full-length photo for digital signing, ID generation and recognition." />
+      <PageHeader title="My Digital Identity" subtitle="Upload your personal digital signature, passport photo and full-length photo for digital signing, ID generation and recognition." />
       {notice && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setNotice('')}>{notice}</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
 
       {employee && (
         <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', mb: 3 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>👤 My Staff Record</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}> My Staff Record</Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ flexWrap: 'wrap' }}>
             <Box>Name: <strong>{employee.full_name}</strong></Box>
             <Box>File code: <strong>{employee.file_code}</strong></Box>
@@ -125,7 +125,7 @@ export default function MyProfile() {
       )}
 
       <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', mb: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>📧 Company Email & Name</Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}> Company Email & Name</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Use your real company email so colleagues, the CEO and the IT Officer can reach you across the system.
         </Typography>
@@ -145,7 +145,7 @@ export default function MyProfile() {
 {/* Digital signature */}
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>✍️ Digital Signature</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}> Digital Signature</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Sign on plain white paper, scan or photograph it, then upload. Use it to sign forms, contracts and approvals online.
             </Typography>
@@ -168,7 +168,7 @@ export default function MyProfile() {
         {isAdmin && (
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>🏛️ Official HR Electronic Stamp</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}> Official HR Electronic Stamp</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 The People & Culture department uploads the official electronic stamp used to authenticate HR documents digitally.
               </Typography>
@@ -190,7 +190,7 @@ export default function MyProfile() {
 {/* Passport photo */}
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>📸 Passport Photo</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}> Passport Photo</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Upload a passport-size photo — supports ID generation and medical-insurance beneficiary records.
             </Typography>
@@ -211,7 +211,7 @@ export default function MyProfile() {
         {/* Full photo */}
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>🧍 Full-Length Photo</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}> Full-Length Photo</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Upload a full-length photo — used for birthday celebrations and recognition (Employee of the Month).
             </Typography>

@@ -190,22 +190,22 @@ export default function HRTools() {
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <PageHeader
-        title="🧰 HR Tools & Resources"
+        title="HR Tools & Resources"
         subtitle="Built-in Excel HR tools, company brand assets, email and the real document masters — all in one place."
         primaryAction={<Button variant="contained" onClick={() => downloadBuiltin('CONTRACT TOOL.xlsx')} sx={{ textTransform: 'none' }} startIcon={<Download size={15} />}>Download Contract Tool</Button>}
       />
 
       <Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 3 }}>
-        <Tab label="📊 Excel Tools" value="excel" />
-        <Tab label="📄 Reference Documents" value="documents" />
-        <Tab label="🏢 Company Profile" value="company" />
+        <Tab label="Excel Tools" value="excel" />
+        <Tab label="Reference Documents" value="documents" />
+        <Tab label="Company Profile" value="company" />
       </Tabs>
 
       {!loading && !company?.header_url && (
         <Alert severity="info" sx={{ mb: 2 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" gap={1} sx={{ flexWrap: 'wrap' }}>
             <Typography variant="body2">
-              🏢 Your organization's logo &amp; letterhead appear on every generated document.
+               Your organization's logo &amp; letterhead appear on every generated document.
             </Typography>
             <Button size="small" variant="outlined" onClick={() => setTab('company')} sx={{ textTransform: 'none' }}>
               Upload header &amp; logo
@@ -221,7 +221,7 @@ export default function HRTools() {
         <>
           <Accordion square defaultExpanded>
             <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary' }}>
-              🧾 Built-in Excel HR Tools ({builtinExcelFiles.length})
+               Built-in Excel HR Tools ({builtinExcelFiles.length})
             </AccordionSummary>
             <AccordionDetails sx={{ p: 1.5 }}>
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
@@ -260,7 +260,7 @@ export default function HRTools() {
           <Divider sx={{ my: 3 }} />
           <Accordion square>
             <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary' }}>
-              📁 Additional Excel HR Tools ({excelFiles.length})
+               Additional Excel HR Tools ({excelFiles.length})
             </AccordionSummary>
             <AccordionDetails sx={{ p: 1.5 }}>
           <Grid container spacing={2}>
@@ -296,10 +296,10 @@ export default function HRTools() {
       {!loading && tab === 'documents' && (
         <>
           {[
-            ['reference_docs', '📄 Reference Documents', refFiles],
-            ['word_documents', '📘 Word Master Documents', wordFiles],
-            ['fillable_forms', '📝 Fillable Forms', fillFiles],
-            ['pdfs', '📕 PDF Reference Files', pdfFiles],
+            ['reference_docs', ' Reference Documents', refFiles],
+            ['word_documents', ' Word Master Documents', wordFiles],
+            ['fillable_forms', ' Fillable Forms', fillFiles],
+            ['pdfs', ' PDF Reference Files', pdfFiles],
           ].map(([folder, label, files]) => (
             <Accordion square key={folder} sx={{ mb: 1 }}>
               <AccordionSummary expandIcon={<ChevronDown size={18} />} sx={{ px: 1, py: 1, m: 0, color: 'text.primary' }}>
@@ -345,7 +345,7 @@ export default function HRTools() {
           <Grid item xs={12} md={5}>
             <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
               <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-                <Typography variant="h6">🏢 {company?.company_name || 'Your Organization'}</Typography>
+                <Typography variant="h6"> {company?.company_name || 'Your Organization'}</Typography>
                 {isAdmin && !editing && (
                   <Button size="small" variant="outlined" onClick={() => setEditing(true)} startIcon={<Pencil size={14} />} sx={{ textTransform: 'none' }}>
                     Edit Profile
@@ -402,7 +402,7 @@ export default function HRTools() {
       {isAdmin && (
             <Grid item xs={12} md={7}>
               <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" sx={{ mb: 2 }}>🖼️ Organization Header & Logo</Typography>
+                <Typography variant="h6" sx={{ mb: 2 }}> Organization Header & Logo</Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
                   Upload your letterhead / banner image and company logo. Both appear automatically on every
                   document your organization generates (contracts, offer letters, notices, forms, branded Excel tools).
@@ -410,7 +410,7 @@ export default function HRTools() {
 
                 <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>🏢 Letterhead / Header image</Typography>
+                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}> Letterhead / Header image</Typography>
                     {company?.header_url ? (
                       <Box sx={{ position: 'relative' }}>
                         <img src={company.header_url} alt="organization header" style={{ maxWidth: '100%', maxHeight: 90, borderRadius: 4, display: 'block' }} />
@@ -429,7 +429,7 @@ export default function HRTools() {
                   </Box>
 
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>🎨 Company Logo</Typography>
+                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}> Company Logo</Typography>
                     {company?.logo_url ? (
                       <Box sx={{ position: 'relative' }}>
                         <img src={company.logo_url} alt="company logo" style={{ maxWidth: 160, maxHeight: 90, borderRadius: 4, display: 'block' }} />

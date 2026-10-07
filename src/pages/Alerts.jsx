@@ -8,13 +8,13 @@ import {
 import PageHeader from '../components/PageHeader';
 
 const SECTIONS = [
-  { key: 'birthdays', label: '🎂 Birthdays', color: '#d32f2f', icon: '🎂' },
-  { key: 'anniversaries', label: '🎉 Work Anniversaries', color: '#2e7d32', icon: '🎉' },
-  { key: 'contract_expiry', label: '📜 Contract Expiry', color: '#ed6c02', icon: '📜' },
-  { key: 'project_end', label: '🏗️ End of Project', color: '#9c27b0', icon: '🏗️' },
-  { key: 'probation_end', label: '🧑‍🎓 Probation Ends', color: '#0288d1', icon: '🧑‍🎓' },
-  { key: 'review_due', label: '📝 Contract Review Due', color: '#7b1fa2', icon: '📝' },
-  { key: 'missing_docs', label: '📂 Missing Personal-File Docs', color: '#c62828', icon: '📂' },
+  { key: 'birthdays', label: 'Birthdays', color: '#d32f2f' },
+  { key: 'anniversaries', label: 'Work Anniversaries', color: '#2e7d32' },
+  { key: 'contract_expiry', label: 'Contract Expiry', color: '#ed6c02' },
+  { key: 'project_end', label: 'End of Project', color: '#9c27b0' },
+  { key: 'probation_end', label: 'Probation Ends', color: '#0288d1' },
+  { key: 'review_due', label: 'Contract Review Due', color: '#7b1fa2' },
+  { key: 'missing_docs', label: 'Missing Personal-File Docs', color: '#c62828' },
 ];
 
 function daysLabel(d) {
@@ -65,7 +65,7 @@ export default function Alerts() {
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <PageHeader
-        title="🔔 Smart Alerts"
+        title="Smart Alerts"
         subtitle="Birthdays, staff anniversaries, contract & project milestones rolling up in the next 60 days."
         primaryAction={<Button variant="contained" onClick={load} sx={{ textTransform: 'none' }}>Refresh</Button>}
       />
@@ -87,7 +87,7 @@ export default function Alerts() {
                     bgcolor: flatItems(s.key, al).length ? `${s.color}18` : 'background.paper',
                   }}
                 >
-                  <Typography sx={{ fontSize: '1.6rem', lineHeight: 1 }}>{s.icon}</Typography>
+                  <Box sx={{ mx: 'auto', width: 10, height: 10, borderRadius: '50%', bgcolor: s.color, mb: 0.75 }} />
                   <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.3rem' }}>{flatItems(s.key, al).length}</Typography>
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>{s.label}</Typography>
                 </Paper>
@@ -102,7 +102,7 @@ export default function Alerts() {
               return (
                 <Grid item xs={12} md={6} lg={4} key={s.key}>
                   <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.5 }}>{s.icon} {s.label}</Typography>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.5 }}>{s.label}</Typography>
                     <Divider sx={{ mb: 1.5 }} />
                     {items.length === 0 ? (
                       <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
@@ -140,11 +140,6 @@ export default function Alerts() {
               );
             })}
           </Grid>
-
-          <Alert severity="info" sx={{ mt: 3 }}>
-            Smart alerts are computed automatically from the employee database. Onboarding a birth date for each
-            employee ({' '}<code>Employee.date_of_birth</code>) improves birthday alerts.
-          </Alert>
         </Box>
       )}
     </Container>

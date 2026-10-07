@@ -78,12 +78,12 @@ export default function Compliance() {
           <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Compliance Documents & Policies</Typography>
           <Box sx={{ display: 'grid', gap: 1.5, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
             {[
-              { icon: '📝', label: 'Employees Policy Attestation Form', desc: 'Staff sign-off confirming they understand and abide by company policies.' },
-              { icon: '🛡️', label: 'Child Protection Code of Conduct', desc: 'Safeguarding children in all operations and interactions.' },
-              { icon: '🚫', label: 'Anti-corruption, Fraud & Bribery Policy', desc: 'Zero-tolerance for corrupt practices, fraud and bribery.' },
-              { icon: '⚖️', label: 'Employee Code of Ethics', desc: 'Ethical standards for professional conduct and integrity.' },
-              { icon: '🌍', label: 'Humanitarian Code of Conduct', desc: 'Commitment to humanitarian principles and impartiality.' },
-              { icon: '✍️', label: 'Declaration to Abide by Company Policies', desc: 'Signed declaration acknowledging policy compliance.' },
+              { icon: '', label: 'Employees Policy Attestation Form', desc: 'Staff sign-off confirming they understand and abide by company policies.' },
+              { icon: '', label: 'Child Protection Code of Conduct', desc: 'Safeguarding children in all operations and interactions.' },
+              { icon: '', label: 'Anti-corruption, Fraud & Bribery Policy', desc: 'Zero-tolerance for corrupt practices, fraud and bribery.' },
+              { icon: '', label: 'Employee Code of Ethics', desc: 'Ethical standards for professional conduct and integrity.' },
+              { icon: '', label: 'Humanitarian Code of Conduct', desc: 'Commitment to humanitarian principles and impartiality.' },
+              { icon: '', label: 'Declaration to Abide by Company Policies', desc: 'Signed declaration acknowledging policy compliance.' },
             ].map((p) => (
               <Box key={p.label} sx={{ p: 1.5, borderRadius: 2, border: '1px solid', borderColor: 'divider', display: 'flex', gap: 1.5 }}>
                 <Box sx={{ fontSize: '1.4rem', lineHeight: 1 }}>{p.icon}</Box>

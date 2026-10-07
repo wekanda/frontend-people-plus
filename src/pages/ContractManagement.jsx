@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
-import { Container, Grid, Paper, Typography, Box, CircularProgress, Button, TextField, Card, CardContent, Stack, Select, MenuItem } from '@mui/material';
+import { Container, Grid, Paper, Typography, Box, Button, TextField, Stack, MenuItem } from '@mui/material';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../contexts/AuthContext';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DownloadIcon from '@mui/icons-material/Download';
+import { Copy as ContentCopyIcon, Download as DownloadIcon } from 'lucide-react';
 
-export default function ContractGeneration() {
-  const { user, token } = useAuth();
+export default function ContractManagement() {
+  const { token } = useAuth();
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [generatedDoc, setGeneratedDoc] = useState(null);
@@ -104,20 +103,16 @@ export default function ContractGeneration() {
     navigator.clipboard.writeText(generatedDoc.content);
     alert('Document copied to clipboard');
   };
-
-  return (
+return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <PageHeader
-        title="Contract & Document Generation"
-        subtitle="Generate appointment letters, contracts, offer letters, and more."
-      />
+      <PageHeader title="Contract Management" />
 
       <Grid container spacing={3}>
-        {/* Form */}
+        {/* Contract details form */}
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #d1d5db' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Generate Document</Typography>
-            
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Contract Details</Typography>
+
             <Box sx={{ display: 'grid', gap: 2 }}>
               <TextField
                 label="Document Type"
@@ -189,8 +184,7 @@ export default function ContractGeneration() {
                 onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
                 fullWidth
               />
-
-              <TextField
+<TextField
                 label="Recipient Email"
                 type="email"
                 value={formData.email}
@@ -227,7 +221,7 @@ export default function ContractGeneration() {
                 onClick={handleGenerateDocument}
                 disabled={loading}
               >
-                {loading ? 'Generating...' : 'Generate Document'}
+                {loading ? 'Preparing...' : 'Prepare Contract'}
               </Button>
             </Box>
           </Paper>
@@ -237,14 +231,15 @@ export default function ContractGeneration() {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #d1d5db', maxHeight: '600px', overflowY: 'auto' }}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Preview</Typography>
-            
+
             {generatedDoc ? (
               <>
-                <Box sx={{ 
-                  bgcolor: '#f8fafc',
+                <Box sx={{
+                  bgcolor: 'background.paper',
                   p: 2,
                   borderRadius: 2,
-                  border: '1px solid #e5e7eb',
+                  border: '1px solid',
+                  borderColor: 'divider',
                   mb: 2,
                   whiteSpace: 'pre-wrap',
                   fontFamily: 'monospace',
@@ -255,7 +250,7 @@ export default function ContractGeneration() {
                 }}>
                   {generatedDoc.content}
                 </Box>
-                
+
                 <Stack direction="row" spacing={1} flexWrap="wrap">
                   <Button
                     variant="contained"
@@ -285,20 +280,20 @@ export default function ContractGeneration() {
                 </Stack>
 
                 {sendStatus && (
-                  <Box sx={{ mt: 2, p: 2, borderRadius: 1, bgcolor: theme => theme.palette.primary.light, border: theme => `1px solid ${theme.palette.primary.light}` }}>
-                    <Typography variant="body2" sx={{ color: theme => theme.palette.primary.dark }}>{sendStatus}</Typography>
+                  <Box sx={{ mt: 2, p: 2, borderRadius: 1, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
+                    <Typography variant="body2">{sendStatus}</Typography>
                   </Box>
                 )}
 
-                <Box sx={{ mt: 2, p: 2, bgcolor: '#f0fdf4', border: '1px solid #dcfce7', borderRadius: 1 }}>
-                  <Typography variant="caption" sx={{ color: '#166534' }}>
-                    ✓ Generated at: {new Date(generatedDoc.generated_at).toLocaleString()}
+                <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Updated at: {new Date(generatedDoc.generated_at).toLocaleString()}
                   </Typography>
                 </Box>
               </>
             ) : (
               <Typography variant="body2" color="text.secondary">
-                Fill the form and click Generate to see a preview here.
+                No contract prepared yet.
               </Typography>
             )}
           </Paper>

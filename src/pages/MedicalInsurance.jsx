@@ -84,10 +84,10 @@ export default function MedicalInsurance() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-      <PageHeader title="🩺 Medical Insurance" subtitle="Populate beneficiaries, generate cover records, submit and approve." />
+      <PageHeader title="Medical Insurance" subtitle="Populate beneficiaries, generate cover records, submit and approve." />
 
       <Paper sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', mb: 2, bgcolor: '#f8fafc' }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>🏥 Top Medical Insurance Companies in Uganda</Typography>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}> Top Medical Insurance Companies in Uganda</Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
           {['Jubilee Health Insurance', 'UAP Old Mutual', 'AIG Uganda', 'ICEA LION', 'Sanlam Life Uganda',
             'Goldstar Insurance', 'Britam Uganda', 'Prudential Uganda', 'APA Insurance', 'CIC General Insurance',
@@ -119,7 +119,7 @@ export default function MedicalInsurance() {
       </Grid>
 {/* Populate form */}
       <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', mb: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>➕ Populate Beneficiary from Staff</Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}> Populate Beneficiary from Staff</Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={4}>
             <FormControl fullWidth size="small">

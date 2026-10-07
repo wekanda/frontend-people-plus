@@ -161,8 +161,8 @@ export default function CalendarPage() {
               <Typography variant="h6" sx={{ fontWeight: 700, mt: 1 }}>{selected.title}</Typography>
               <Box sx={{ height: 1, bgcolor: 'divider', my: 1 }} />
               {selected.description && <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{selected.description}</Typography>}
-              {selected.start_at && <Typography variant="body2">🕒 {selected.start_at} {selected.end_at ? `→ ${selected.end_at}` : ''}</Typography>}
-              {selected.location && <Typography variant="body2">📍 {selected.location}</Typography>}
+              {selected.start_at && <Typography variant="body2"> {selected.start_at} {selected.end_at ? ` ${selected.end_at}` : ''}</Typography>}
+              {selected.location && <Typography variant="body2"> {selected.location}</Typography>}
               <Stack sx={{ mt: 2, gap: 1 }}>
                 {selected.meeting_link && (
                   <Button variant="contained" fullWidth startIcon={<Link2 size={15} />} href={selected.meeting_link} target="_blank" sx={{ textTransform: 'none' }}>
@@ -181,7 +181,7 @@ export default function CalendarPage() {
           )}
 
           <Paper sx={{ p: 2, mt: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: '#f8fafc' }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>🎨 Event types</Typography>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}> Event types</Typography>
             {Object.entries(TYPE_COLORS).map(([k, c]) => (
               <Box key={k} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                 <Box sx={{ width: 12, height: 12, borderRadius: 1, bgcolor: c }} />
@@ -193,7 +193,7 @@ export default function CalendarPage() {
       </Grid>
 
       <Dialog open={openForm} onClose={() => setOpenForm(false)} fullWidth maxWidth="sm">
-        <DialogTitle sx={{ fontWeight: 700 }}>📅 Schedule an event</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}> Schedule an event</DialogTitle>
         <DialogContent>
           <Stack sx={{ gap: 1.5, mt: 1 }}>
             <TextField size="small" label="Title" fullWidth value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />

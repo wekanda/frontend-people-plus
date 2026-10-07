@@ -11,7 +11,7 @@ const EXCEL_TOOLS = [
   ['MEDICAL INSURANCE TOOL.xlsx', 'Medical insurance tool'],
   ['CONTRACT TOOL.xlsx', 'Contract tool'],
 ];
-const BENEFITS = ['fuel_allowance|⛽ Fuel allowance', 'condolence_benefit|🕊️ Condolence', 'transport_claim|🚌 Transport allowance', 'airtime_allowance|📱 Airtime allowance', 'internet_allowance|🌐 Internet bundles'];
+const BENEFITS = ['fuel_allowance| Fuel allowance', 'condolence_benefit| Condolence', 'transport_claim| Transport allowance', 'airtime_allowance| Airtime allowance', 'internet_allowance| Internet bundles'];
 const CAT_Q = '/forms?category=Payroll%20%26%20Benefits';
 const fmt = (v) => { try { return Number(v || 0).toLocaleString(); } catch { return v || 0; } };
 
@@ -42,11 +42,11 @@ export default function Finance() {
   };
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-      <PageHeader title="🏦 Financial Management" subtitle="Payroll master-sheet, pay slips, medical insurance and staff allowances in one place." />
+      <PageHeader title="Financial Management" subtitle="Payroll master-sheet, pay slips, medical insurance and staff allowances in one place." />
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', mb: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>🧾 Payslip Summary</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 700 }}> Payslip Summary</Typography>
           <Button size="small" variant="outlined" onClick={downloadCsv} startIcon={<Download size={14} />} sx={{ textTransform: 'none' }}>Download CSV</Button>
         </Stack>
         {summary ? (
@@ -65,9 +65,9 @@ export default function Finance() {
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>🧾 Payroll Master-Sheet</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}> Payroll Master-Sheet</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Populate with statutory deductions, then Generate → Submit → Approve.
+              Populate with statutory deductions, then Generate  Submit  Approve.
             </Typography>
             <Stack spacing={1}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, borderRadius: 2, bgcolor: '#f8fafc' }}>
@@ -80,7 +80,7 @@ export default function Finance() {
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, borderRadius: 2, bgcolor: '#f8fafc' }}>
                 <Box>
                   <Typography variant="body2" sx={{ fontWeight: 700 }}>Workflow</Typography>
-                  <Typography variant="caption" color="text.secondary">Populate → Generate → Submit → Approve</Typography>
+                  <Typography variant="caption" color="text.secondary">Populate  Generate  Submit  Approve</Typography>
                 </Box>
                 <Stack direction="row" spacing={1}>
                   <Button size="small" variant="outlined" onClick={() => navigate('/payroll')} sx={{ textTransform: 'none' }}>Open Payroll</Button>
@@ -92,15 +92,15 @@ export default function Finance() {
         </Grid>
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>🧾 Pay Slips</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}> Pay Slips</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Populate employee pay data, then Generate → Submit → Approve.
+              Populate employee pay data, then Generate  Submit  Approve.
             </Typography>
             <Stack spacing={1}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, borderRadius: 2, bgcolor: '#f8fafc' }}>
                 <Box>
                   <Typography variant="body2" sx={{ fontWeight: 700 }}>Pay slip workflow</Typography>
-                  <Typography variant="caption" color="text.secondary">Populate → Generate → Submit → Approve</Typography>
+                  <Typography variant="caption" color="text.secondary">Populate  Generate  Submit  Approve</Typography>
                 </Box>
                 <Stack direction="row" spacing={1}>
                   <Button size="small" variant="outlined" onClick={() => navigate('/payslips')} sx={{ textTransform: 'none' }}>Pay slips</Button>
@@ -110,7 +110,7 @@ export default function Finance() {
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, borderRadius: 2, bgcolor: '#f8fafc' }}>
                 <Box>
                   <Typography variant="body2" sx={{ fontWeight: 700 }}>Medical insurance</Typography>
-                  <Typography variant="caption" color="text.secondary">Populate beneficiaries → Generate → Submit → Approve</Typography>
+                  <Typography variant="caption" color="text.secondary">Populate beneficiaries  Generate  Submit  Approve</Typography>
                 </Box>
                 <Button size="small" variant="outlined" onClick={() => navigate('/medical-insurance')} sx={{ textTransform: 'none' }}>Manage</Button>
               </Box>
@@ -122,7 +122,7 @@ export default function Finance() {
       <Grid container spacing={3}>
 <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>🧮 Payroll & Pay-slip Tools</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}> Payroll & Pay-slip Tools</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Official Excel tools used to compile payroll, pay slips & insurance.</Typography>
             <Divider sx={{ mb: 2 }} />
             <Stack spacing={1.5}>
@@ -140,7 +140,7 @@ export default function Finance() {
         </Grid>
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>🎁 Staff Benefits</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}> Staff Benefits</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Fillable, print-ready benefit request forms.</Typography>
             <Divider sx={{ mb: 2 }} />
             <Stack spacing={1.5}>

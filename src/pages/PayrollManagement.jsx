@@ -170,7 +170,7 @@ export default function PayrollManagement() {
   return (
     <Container maxWidth="xl">
       <PageHeader
-        title="💰 Payroll Management"
+        title="Payroll Management"
         subtitle="Generate, approve, and manage employee payroll"
       />
 

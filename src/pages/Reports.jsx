@@ -35,7 +35,7 @@ export default function Reports() {
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <PageHeader
-        title="📋 Reports"
+        title="Reports"
         subtitle="Standard report types and the schedule (duration) that keeps reporting on track."
       />
 

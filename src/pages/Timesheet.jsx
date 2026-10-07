@@ -129,11 +129,11 @@ export default function Timesheet() {
   return (
     <Container maxWidth="lg" sx={{ py: 4, mb: 4 }}>
       <PageHeader
-        title="⏱️ Timesheet"
+        title="Timesheet"
         subtitle="Track and manage time entries with clear approval workflow."
         primaryAction={user?.employee_id ? (
           <Button variant="contained" onClick={() => setOpenDialog(true)} sx={{ textTransform: 'none', fontWeight: 600 }}>
-            ➕ Add Entry
+             Add Entry
           </Button>
         ) : null}
       />
@@ -174,7 +174,7 @@ export default function Timesheet() {
 
       {!user?.employee_id && (user?.role === 'hr_admin' || user?.role === 'project_manager') && (
         <Alert severity="info" sx={{ mb: 3 }}>
-          ℹ️ Showing all timesheet entries. You can view and approve timesheets for all employees.
+          Showing all timesheet entries. You can view and approve timesheets for all employees.
         </Alert>
       )}
 
@@ -182,7 +182,7 @@ export default function Timesheet() {
       <Paper sx={{ borderRadius: 2, overflow: 'hidden', boxShadow: 2 }}>
         <Box sx={{ p: { xs: 2, md: 3 }, borderBottom: `1px solid #E0E0E0`, bgcolor: 'background.default' }}>
           <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
-            ⏱️ Timesheet Entries
+            Timesheet Entries
           </Typography>
           <Typography variant="body2" color="textSecondary">
             {timesheets.length} entries recorded
@@ -218,7 +218,7 @@ export default function Timesheet() {
                       <TableCell align="right" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>{ts.overtime_hours}</TableCell>
                       <TableCell>
                         <Chip
-                          label={ts.approved ? '✓ Approved' : '⏳ Pending'}
+                          label={ts.approved ? 'Approved' : 'Pending'}
                           color={ts.approved ? 'success' : 'warning'}
                           variant="filled"
                           size="small"
@@ -259,7 +259,7 @@ export default function Timesheet() {
             onClick={user?.employee_id ? () => setOpenDialog(true) : fetchAllTimesheets}
             sx={{ textTransform: 'none', fontWeight: 600 }}
           >
-            {user?.employee_id ? '➕ Add Entry' : '🔄 Refresh'}
+            {user?.employee_id ? ' Add Entry' : ' Refresh'}
           </Button>
         )}
         </Box>

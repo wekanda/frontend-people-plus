@@ -131,7 +131,7 @@ EMP003,Robert Johnson,robert@example.com,HR Officer,+256-345-678901,HR,Kampala,P
   return (
     <Container maxWidth="lg">
       <PageHeader
-        title="📥 Excel Employee Import"
+        title="Excel Employee Import"
         subtitle="Bulk import employees from Excel or CSV files"
       />
 

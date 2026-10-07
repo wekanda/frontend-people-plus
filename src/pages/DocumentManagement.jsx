@@ -173,7 +173,7 @@ export default function DocumentManagement() {
   return (
     <Container maxWidth="xl" sx={{ mb: 4 }}>
       <PageHeader
-        title="📄 Document Management"
+        title="Document Management"
         subtitle="Upload, approve, and track employee documents for electronic personnel files (e-PFile)"
       />
 
@@ -190,7 +190,7 @@ export default function DocumentManagement() {
       )}
 
       <Card sx={{ mb: 3, borderRadius: 2 }}>
-        <CardHeader title="📤 Upload Document" titleTypographyProps={{ variant: 'h6' }} />
+        <CardHeader title="Upload Document" titleTypographyProps={{ variant: 'h6' }} />
         <CardContent>
           <Grid container spacing={2} alignItems={{ xs: 'stretch', sm: 'flex-end' }}>
             <Grid item xs={12} sm={6} md={4}>
@@ -217,7 +217,7 @@ export default function DocumentManagement() {
                 fullWidth={{ xs: true, sm: false }}
                 sx={{ height: '56px' }}
               >
-                📤 Upload New Document
+                 Upload New Document
               </Button>
             </Grid>
           </Grid>

@@ -19,7 +19,8 @@ export default function InterviewScheduling() {
     const fetchInterviews = async () => {
       try {
         const response = await api.get('/hr/interviews');
-        setInterviews(response.data || []);
+        const data = response.data;
+        setInterviews(Array.isArray(data) ? data : Array.isArray(data?.interviews) ? data.interviews : []);
       } catch (err) {
         console.error('Failed to load interviews:', err);
       }
@@ -52,6 +53,7 @@ export default function InterviewScheduling() {
       handleCloseDialog();
     } catch (err) {
       console.error('Failed to schedule interview:', err);
+      alert('Failed to schedule interview.');
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useState, createContext } from 'react';
+import React, { useState, createContext, useContext } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { lightTheme, darkTheme } from './theme';
@@ -30,7 +30,7 @@ import BackgroundChecks from './pages/BackgroundChecks';
 import Compliance from './pages/Compliance';
 import Reporting from './pages/Reporting';
 import Onboarding from './pages/Onboarding';
-import ContractGeneration from './pages/ContractGeneration';
+import ContractManagement from './pages/ContractManagement';
 import Documents from './pages/Documents';
 import InterviewScheduling from './pages/InterviewScheduling';
 import DocumentManagement from './pages/DocumentManagement';
@@ -50,11 +50,32 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 
-const ColorModeContext = createContext({ toggleColorMode: () => {} });
+export const ColorModeContext = createContext({ mode: 'light', toggleColorMode: () => {} });
+
+export function useColorMode() {
+  return useContext(ColorModeContext);
+}
+
+const THEME_KEY = 'people_pulse_theme';
 
 function AppContent() {
-  const [mode, setMode] = useState('light');
-  const colorMode = { toggleColorMode: () => setMode(prev => prev === 'light' ? 'dark' : 'light') };
+  const [mode, setMode] = useState(() => {
+    try {
+      return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light';
+    } catch (e) {
+      return 'light';
+    }
+  });
+  const colorMode = {
+    mode,
+    toggleColorMode: () => {
+      const next = mode === 'light' ? 'dark' : 'light';
+      setMode(next);
+      try {
+        localStorage.setItem(THEME_KEY, next);
+      } catch (e) { /* ignore */ }
+    },
+  };
   const theme = mode === 'light' ? lightTheme : darkTheme;
 
   let user = null;
@@ -98,7 +119,7 @@ function AppContent() {
               <Route path="compliance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Compliance /></ProtectedRoute>} />
               <Route path="reporting" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Reporting /></ProtectedRoute>} />
               <Route path="onboarding" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Onboarding /></ProtectedRoute>} />
-              <Route path="contracts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><ContractGeneration /></ProtectedRoute>} />
+              <Route path="contracts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><ContractManagement /></ProtectedRoute>} />
               <Route path="documents" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant']}><DocumentManagement /></ProtectedRoute>} />
               <Route path="forms" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><DocumentForms /></ProtectedRoute>} />
               <Route path="interviews" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><InterviewScheduling /></ProtectedRoute>} />
