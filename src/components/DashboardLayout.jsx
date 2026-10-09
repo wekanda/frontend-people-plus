@@ -319,7 +319,7 @@ function SidebarContent({ onNavigate }) {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25, minHeight: '100%', pt: 0.5 }}>
       {/* Logo Section */}
       <Box component={NavLink} to="/" sx={{ p: 1.25, borderRadius: 1, bgcolor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', display: 'flex', alignItems: 'center', gap: 1.25, cursor: 'pointer' }}>
-        <Box component="img" src="/favicon-and-logo.jpeg" alt="PEOPLE PULSE logo"
+        <Box component="img" src="/favicon.svg" alt="PEOPLE PULSE logo"
           sx={{ width: 40, height: 40, borderRadius: '10px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.35)' }} />
         <Box sx={{ minWidth: 0 }}>
           <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.25, fontSize: '1rem', color: '#FFFFFF', lineHeight: 1.1 }}>
