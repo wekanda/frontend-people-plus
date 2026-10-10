@@ -48,6 +48,12 @@ import {
   LogOut as LogoutIcon,
   Moon as DarkModeIcon,
   Sun as LightModeIcon,
+  ShoppingCart as ProcurementIcon,
+  ClipboardList as ProcessIcon,
+  Boxes as AssetIcon,
+  Tag as AssetRegisterIcon,
+  Landmark as FinanceDeptIcon,
+  Calculator as BudgetIcon,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useColorMode } from '../App';
@@ -78,6 +84,7 @@ const NAV_SECTIONS = [
       { label: 'Analytics', path: '/reporting', roles: EXEC },
       { label: 'Pipeline', path: '/pipeline', roles: EXEC },
       { label: 'Reports', path: '/reports', roles: TOOLS },
+      { label: 'Organization Calendar', path: '/calendar', roles: ALL },
     ],
   },
   {
@@ -107,10 +114,24 @@ const NAV_SECTIONS = [
     icon: PaymentsIcon,
     items: [
       { label: 'Financial Management', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer'] },
+      { label: 'Finance Department', path: '/finance-department', roles: ['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer', 'ceo', 'ceo_assistant'] },
       { label: 'Payroll', path: '/payroll', roles: ['hr_admin', 'finance', 'it_officer'] },
       { label: 'Payslips', path: '/payslips', roles: ALL },
-      { label: 'Payslip Tool (Excel)', path: '/hr-tools?tab=excel', roles: ALL },
       { label: 'Medical Insurance', path: '/medical-insurance', roles: ['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer'] },
+    ],
+  },
+  {
+    heading: 'Procurement',
+    icon: ProcurementIcon,
+    items: [
+      { label: 'Procurement Process', path: '/procurement', roles: ['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant'] },
+    ],
+  },
+  {
+    heading: 'Asset Management',
+    icon: AssetIcon,
+    items: [
+      { label: 'Asset Register', path: '/assets', roles: ['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant'] },
     ],
   },
   {
@@ -130,19 +151,13 @@ const NAV_SECTIONS = [
     ],
   },
   {
-    heading: 'Calendar & Scheduling',
-    icon: CalendarMonthIcon,
-    items: [
-      { label: 'Organization Calendar', path: '/calendar', roles: ALL },
-      { label: 'Schedule Interviews / Meetings / Trainings', path: '/calendar?new=1', roles: ALL },
-    ],
-  },
-  {
     heading: 'Performance',
     icon: AssessmentIcon,
     items: [
       { label: 'Performance Appraisals', path: '/appraisals', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
       { label: 'Performance Analysis', path: '/reporting?tab=performance', roles: EXEC },
+      { label: 'Timesheets', path: '/timesheet', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
+      { label: 'Leave', path: '/leave', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
     ],
   },
   {
@@ -154,26 +169,17 @@ const NAV_SECTIONS = [
     ],
   },
   {
-    heading: 'HR Tools & Documents',
+    heading: 'HR Tools',
     icon: BuildIcon,
-    staffHeading: 'Staff Tools & Documents',
+    staffHeading: 'Staff Forms & Templates',
     items: [
-      { label: 'HR Tools & Excel', path: '/hr-tools', roles: EXEC, staffLabel: 'Staff Tools & Downloads' },
-      { label: 'Document Forms & Templates', path: '/forms', roles: TOOLS, staffLabel: 'My Documents & Templates' },
+      { label: 'Document Forms & Templates', path: '/forms', roles: TOOLS, staffLabel: 'My Forms & Templates' },
       { label: 'Contract Management', path: '/contracts', roles: EXEC },
       { label: 'Document Management', path: '/documents', roles: ['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant'] },
       { label: 'Document Workflow', path: '/document-workflow', roles: EXEC },
-      { label: 'Excel / Employee Import', path: '/excel-import', roles: ['hr_admin', 'it_officer'] },
-    ],
-  },
-  {
-    heading: 'Organization & Settings',
-    icon: SettingsIcon,
-    items: [
-      { label: 'Organization Branding', path: '/hr-tools?tab=company', roles: ALL },
+      { label: 'Organization Branding (Logo & Letterhead)', path: '/hr-tools?tab=company', roles: ALL },
+      { label: 'My Profile & Signature (Photo & Stamp)', path: '/my-profile', roles: TOOLS },
       { label: 'Compliance & Policies', path: '/compliance', roles: EXEC },
-      { label: 'My Profile & Signature', path: '/my-profile', roles: TOOLS },
-      { label: 'System Manual', path: '/manual', roles: ALL },
       { label: 'Integrations', path: '/integrations', roles: ALL },
     ],
   },
@@ -195,28 +201,28 @@ const ITEM_ICONS = {
   'Background Checks': FactCheckIcon,
   'Onboarding': LuggageIcon,
   'Financial Management': SavingsIcon,
+  'Finance Department': FinanceDeptIcon,
   'Payroll': ReceiptLongIcon,
   'Payslips': ReceiptIcon,
   'Medical Insurance': MedicalServicesIcon,
+  'Procurement Process': ProcessIcon,
+  'Asset Register': AssetRegisterIcon,
   'Plan & Billing': WorkspacePremiumIcon,
   'Leave Management': HolidayVillageIcon,
+  'Leave': HolidayVillageIcon,
   'Leave Application & Tracker': FileCopyIcon,
   'Timesheets': ScheduleIcon,
   'Organization Calendar': CalendarTodayIcon,
-  'Schedule Interviews / Meetings / Trainings': EventSeatIcon,
   'Performance Appraisals': StarIcon,
   'Performance Analysis': AnalyticsIcon,
   'Analytics & Trends': BarChartIcon,
-  'HR Tools & Excel': BuildIcon,
   'Document Forms & Templates': FileCopyIcon,
   'Contract Management': DescriptionIcon,
   'Document Management': FolderOpenIcon,
   'Document Workflow': VerifiedIcon,
-  'Excel / Employee Import': UploadIcon,
-  'Organization Branding': VpnKeyIcon,
+  'Organization Branding (Logo & Letterhead)': VpnKeyIcon,
+  'My Profile & Signature (Photo & Stamp)': PersonIcon,
   'Compliance & Policies': ShieldIcon,
-  'My Profile & Signature': PersonIcon,
-  'System Manual': MenuBookIcon,
   'Integrations': IosShareIcon,
 };
 
@@ -319,14 +325,14 @@ function SidebarContent({ onNavigate }) {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25, minHeight: '100%', pt: 0.5 }}>
       {/* Logo Section */}
       <Box component={NavLink} to="/" sx={{ p: 1.25, borderRadius: 1, bgcolor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', display: 'flex', alignItems: 'center', gap: 1.25, cursor: 'pointer' }}>
-        <Box component="img" src="/favicon.svg" alt="PEOPLE PULSE logo"
+        <Box component="img" src="/favicon-and-logo.jpeg" alt="PEOPLE PULSE logo"
           sx={{ width: 40, height: 40, borderRadius: '10px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.35)' }} />
         <Box sx={{ minWidth: 0 }}>
           <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.25, fontSize: '1rem', color: '#FFFFFF', lineHeight: 1.1 }}>
             PEOPLE PULSE
           </Typography>
           <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.72rem' }}>
-            Workforce & People Management
+            People & Culture
           </Typography>
         </Box>
       </Box>
@@ -353,6 +359,36 @@ function SidebarContent({ onNavigate }) {
             onToggle={(heading, nowExpanded) => setOpen(nowExpanded ? heading : '')}
             role={user?.role} onNavigate={onNavigate} />
         ))}
+      </Box>
+
+      {/* System Manual (standalone, near logout) */}
+      <Box sx={{ mt: 'auto', mb: 0.75 }}>
+        <List disablePadding>
+          <ListItemButton
+            component={NavLink}
+            to="/manual"
+            onClick={onNavigate}
+            sx={{
+              color: '#FFFFFF',
+              borderRadius: 1,
+              py: 0.8,
+              px: 1.5,
+              fontSize: '0.88rem',
+              transition: 'all 0.15s ease',
+              '&.active': { bgcolor: 'rgba(255,255,255,0.16)', fontWeight: 700 },
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.09)' },
+            }}
+          >
+            <Stack direction="row" spacing={1.25} alignItems="center" sx={{ width: '100%' }}>
+              {renderIcon(MenuBookIcon, 17)}
+              <ListItemText
+                primary="System Manual"
+                sx={{ flex: 1 }}
+                primaryTypographyProps={{ fontSize: '0.88rem', fontWeight: 500, color: '#FFFFFF' }}
+              />
+            </Stack>
+          </ListItemButton>
+        </List>
       </Box>
 
       {/* Logout */}

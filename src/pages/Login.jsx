@@ -65,7 +65,7 @@ export default function Login() {
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default', p: 2 }}>
       <Paper sx={{ width: '100%', maxWidth: 480, p: 4, borderRadius: 3, boxShadow: 3 }}>
         <Box sx={{ textAlign: 'center', mb: 2 }}>
-          <Box component="img" src="/favicon.svg" alt="PEOPLE PULSE logo"
+          <Box component="img" src="/favicon-and-logo.jpeg" alt="PEOPLE PULSE logo"
             sx={{ width: 96, height: 96, borderRadius: '18px', objectFit: 'cover', boxShadow: 2 }} />
         </Box>
         <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, textAlign: 'center' }}>

@@ -31,6 +31,9 @@ import Compliance from './pages/Compliance';
 import Reporting from './pages/Reporting';
 import Onboarding from './pages/Onboarding';
 import ContractManagement from './pages/ContractManagement';
+import Procurement from './pages/Procurement';
+import AssetManagement from './pages/AssetManagement';
+import FinanceDepartment from './pages/FinanceDepartment';
 import Documents from './pages/Documents';
 import InterviewScheduling from './pages/InterviewScheduling';
 import DocumentManagement from './pages/DocumentManagement';
@@ -125,6 +128,9 @@ function AppContent() {
               <Route path="interviews" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><InterviewScheduling /></ProtectedRoute>} />
               <Route path="internships" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'it_officer', 'ceo', 'ceo_assistant']}><Internship /></ProtectedRoute>} />
               <Route path="finance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer']}><Finance /></ProtectedRoute>} />
+              <Route path="finance-department" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay', 'it_officer', 'ceo', 'ceo_assistant']}><FinanceDepartment /></ProtectedRoute>} />
+              <Route path="procurement" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><Procurement /></ProtectedRoute>} />
+              <Route path="assets" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'it_officer', 'ceo', 'ceo_assistant']}><AssetManagement /></ProtectedRoute>} />
               <Route path="payslips" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay', 'it_officer', 'ceo', 'ceo_assistant']}><Payslip /></ProtectedRoute>} />
               <Route path="leave" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant']}><LeaveManagement /></ProtectedRoute>} />
               <Route path="timesheet" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'it_officer', 'ceo', 'ceo_assistant']}><Timesheet /></ProtectedRoute>} />

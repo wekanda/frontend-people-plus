@@ -119,6 +119,7 @@ export default function Dashboard() {
   const isFinance = role === 'finance' || role === 'pay';
   const isStaff = role === 'staff';
   const [sub, setSub] = useState(null);
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -146,10 +147,23 @@ export default function Dashboard() {
       }
     };
 
+    const fetchEvents = async () => {
+      try {
+        const res = await api.get('/api/calendar/events', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const list = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.events) ? res.data.events : [];
+        setEvents(list);
+      } catch (err) {
+        console.error('Calendar events error:', err);
+      }
+    };
+
     if (token) {
       Promise.all([
         fetchDashboard(),
         fetchNotifications(),
+        fetchEvents(),
         api.get('/api/subscription').then((r) => setSub(r.data || null)).catch(() => setSub(null)),
       ]).finally(() => setLoading(false));
     } else {
@@ -235,10 +249,10 @@ const renderBirthdayEntry = (entry, isToday = false) => (
           ];
 
   const quickActions = isStaff
-    ? [['My Documents', '/documents'], ['Apply Leave', '/leave'], ['My Timesheet', '/timesheet'], ['Smart Alerts', '/alerts']]
+    ? [['My Documents', '/documents'], ['Apply Leave', '/leave'], ['My Timesheet', '/timesheet'], ['Smart Alerts', '/alerts'], ['Calendar', '/calendar']]
     : isFinance
-      ? [['Payslips', '/payslips'], ['Finance', '/finance'], ['HR Tools', '/hr-tools'], ['Smart Alerts', '/alerts']]
-      : [['Smart Alerts', '/alerts'], ['Staff', '/staff'], ['HR Tools', '/hr-tools'], ['Leave', '/leave'], ['Timesheets', '/timesheet'], ['Reports', '/reports']];
+      ? [['Payslips', '/payslips'], ['Finance', '/finance'], ['Calendar', '/calendar'], ['Smart Alerts', '/alerts']]
+      : [['Smart Alerts', '/alerts'], ['Staff', '/staff'], ['Calendar', '/calendar'], ['Leave', '/leave'], ['Timesheets', '/timesheet'], ['Reports', '/reports']];
 
   const primaryActionLabel = isStaff ? 'My Documents' : role === 'ceo' || role === 'ceo_assistant' ? 'Executive Reports' : isFinance ? 'Financial Management' : 'HR Tools';
   const primaryActionPath = isStaff ? '/documents' : role === 'ceo' || role === 'ceo_assistant' ? '/reports' : isFinance ? '/finance' : '/hr-tools';
@@ -546,6 +560,42 @@ return (
               {birthdaysToday.length === 0 && upcomingBirthdays.length === 0 && (
                 <Typography variant="body2" color="text.secondary">No birthdays this week.</Typography>
               )}
+            </Paper>
+<Paper sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                <EventNoteIcon size={22} style={{ color: 'inherit' }} />
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Upcoming Events</Typography>
+              </Box>
+              {events.length === 0 && (
+                <Typography variant="body2" color="text.secondary">No upcoming events.</Typography>
+              )}
+              <Box sx={{ display: 'grid', gap: 1, maxHeight: 220, overflowY: 'auto' }}>
+                {[...events]
+                  .filter((e) => !e.start_at || new Date(e.start_at) >= new Date(new Date().setHours(0, 0, 0, 0)))
+                  .sort((a, b) => new Date(a.start_at || a.start || 0) - new Date(b.start_at || b.start || 0))
+                  .slice(0, 4)
+                  .map((e, i) => {
+                    const when = new Date(e.start_at || e.start || e.date);
+                    return (
+                      <Box key={`${e.id || e.title}-${i}`} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                        <Box sx={{ width: 42, height: 42, borderRadius: '10px', bgcolor: 'primary.light', color: '#fff', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                          <Typography sx={{ fontWeight: 800, fontSize: '0.7rem', textAlign: 'center', lineHeight: 1.15 }}>
+                            {isNaN(when.getTime()) ? '—' : when.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.title || 'Event'}</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {e.event_type || ''}{e.event_type && when && !isNaN(when.getTime()) ? ' · ' : ''}{isNaN(when.getTime()) ? '' : when.toLocaleString('en-US', { weekday: 'short', hour: '2-digit', minute: '2-digit' })}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    );
+                  })}
+              </Box>
+              <Button fullWidth variant="outlined" sx={{ mt: 1.5, textTransform: 'none' }} onClick={() => navigate('/calendar')}>
+                Open Calendar
+              </Button>
             </Paper>
 
             <Paper sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
