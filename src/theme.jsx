@@ -5,14 +5,14 @@
 
 import { createTheme } from '@mui/material/styles';
 
-// Official brand colors (People Pulse / People & Culture logo palette)
+// People Pulse logo palette: teal, orange and deep navy.
 const professionalColors = {
-  primaryBlue: '#6D28D9',       // Brand violet (logo purple family)
-  lightBlue: '#8B5CF6',         // Light violet
-  accentBlue: '#7E14FF',        // Logo vivid purple
-  darkBlue: '#5B21B6',          // Darker violet
-  teal: '#0EA5E9',              // Logo light blue accents
-  coral: '#E64A19',             // Accent/warning
+  primaryBlue: '#087D78',
+  lightBlue: '#28A19B',
+  accentBlue: '#E97535',
+  darkBlue: '#075B5B',
+  teal: '#E97535',
+  coral: '#D9533F',
   lightGray: '#F5F7FA',         // Light backgrounds
   mediumGray: '#ECEFF1',        // Medium backgrounds
   darkGray: '#263238',          // Dark text
@@ -20,10 +20,10 @@ const professionalColors = {
   white: '#FFFFFF'
 };
 
-// Sidebar palette: deep brand violet so the white navigation text stays highly readable.
+// Deep navy keeps white navigation text readable beside the brighter logo colors.
 const sidebarColors = {
-  light: { main: '#2E1065', contrastText: '#FFFFFF', subtext: 'rgba(255,255,255,0.88)' },
-  dark: { main: '#170B3B', contrastText: '#FFFFFF', subtext: 'rgba(255,255,255,0.9)' },
+  light: { main: '#12333A', contrastText: '#FFFFFF', subtext: 'rgba(255,255,255,0.88)' },
+  dark: { main: '#0A2027', contrastText: '#FFFFFF', subtext: 'rgba(255,255,255,0.9)' },
 };
 
 // Light theme
@@ -78,7 +78,7 @@ export const lightTheme = createTheme({
     divider: '#BDBDBD',
     action: {
       hover: professionalColors.mediumGray,
-      selected: '#E3F2FD',
+      selected: '#E6F3F1',
     }
   },
   typography: {
@@ -149,9 +149,9 @@ export const lightTheme = createTheme({
           transition: 'all 0.3s ease',
         },
         contained: {
-          boxShadow: '0 2px 8px rgba(109, 40, 217, 0.18)',
+          boxShadow: '0 2px 8px rgba(8, 125, 120, 0.18)',
           '&:hover': {
-            boxShadow: '0 4px 16px rgba(109, 40, 217, 0.3)',
+            boxShadow: '0 4px 16px rgba(8, 125, 120, 0.3)',
             transform: 'translateY(-2px)',
           },
         },
@@ -339,7 +339,7 @@ export const darkTheme = createTheme({
     divider: '#424242',
     action: {
       hover: '#263238',
-      selected: '#1A237E',
+      selected: '#183B3D',
     }
   },
   typography: {
