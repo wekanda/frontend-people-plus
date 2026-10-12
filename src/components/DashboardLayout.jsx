@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Box, Typography, Avatar, Button, Divider, Stack, List, ListItemButton, ListItemText, IconButton, Drawer, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { Menu, ChevronDown } from 'lucide-react';
@@ -57,6 +57,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useColorMode } from '../App';
+import api from '../api';
 import NotificationBell from './NotificationBell';
 import ToastAlerts from './ToastAlerts';
 
@@ -405,6 +406,22 @@ export default function DashboardLayout() {
   const { user, logout } = useAuth();
   const { mode, toggleColorMode } = useColorMode();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [passportPhoto, setPassportPhoto] = useState('');
+  const passportPhotoSrc = passportPhoto.startsWith('/')
+    ? `${api.defaults.baseURL}${passportPhoto}`
+    : passportPhoto;
+
+  useEffect(() => {
+    let active = true;
+    api.get('/api/employees/me')
+      .then(({ data }) => {
+        if (active) setPassportPhoto(data.passport_photo_url || data.photo_url || '');
+      })
+      .catch(() => {
+        if (active) setPassportPhoto('');
+      });
+    return () => { active = false; };
+  }, []);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary', flexDirection: { xs: 'column', md: 'row' } }}>
@@ -475,9 +492,16 @@ export default function DashboardLayout() {
               {mode === 'dark' ? <LightModeIcon size={20} /> : <DarkModeIcon size={20} />}
             </IconButton>
             <NotificationBell />
-            <Button variant="outlined" color="primary" size="small" onClick={logout} startIcon={<LogoutIcon size={17} />} sx={{ display: { xs: 'none', md: 'inline-flex' }, textTransform: 'none', fontWeight: 600 }}>
-              Logout
-            </Button>
+            <Avatar
+              src={passportPhotoSrc || undefined}
+              alt={`${user?.full_name || 'User'} passport photo`}
+              role="img"
+              aria-label={`${user?.full_name || 'User'} passport photo`}
+              variant="rounded"
+              sx={{ width: 42, height: 56, borderRadius: 1, bgcolor: 'secondary.main', fontSize: '0.85rem', fontWeight: 700, border: '1px solid', borderColor: 'divider' }}
+            >
+              {(user?.full_name || user?.email || 'U').split(' ').map((part) => part[0]).slice(0, 2).join('').toUpperCase()}
+            </Avatar>
           </Stack>
         </Box>
 
